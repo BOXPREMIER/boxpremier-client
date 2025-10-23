@@ -5,6 +5,7 @@ function Home() {
         <>
             <h1 className='text-2xl text-red-500'>HOME</h1>
         </>
+        
     )
 }
 
