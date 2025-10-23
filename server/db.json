@@ -1,0 +1,72 @@
+{
+  "users": [
+    {
+      "id": "usr_1001",
+      "first_name": "Laura",
+      "last_name": "García",
+      "email": "laura.garcia@example.com",
+      "phone": "+34 600 000 001",
+      "address": {
+        "street": "Calle Mayor 15",
+        "postal_code": "28013",
+        "city": "Madrid",
+        "country": "ES"
+      },
+      "created_at": "2025-01-10T12:30:00Z",
+      "payment_status": "ok",
+      "subscription_plan": "mensual",
+      "next_renewal_at": "2025-11-01T00:00:00Z",
+      "payment_method": "multisafepay",
+      "orders_history": [
+        "ord_5001"
+      ],
+      "preferences": {
+        "notes": "Prefiere tintos"
+      },
+      "updated_at": "2025-10-01T09:00:00Z"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_2001",
+      "user_id": "usr_1001",
+      "plan_type": "mensual",
+      "box_size": 6,
+      "created_at": "2025-01-10T12:30:00Z",
+      "next_renewal_at": "2025-11-01T00:00:00Z",
+      "status": "activa",
+      "payment_method": "multisafepay",
+      "shipping_status": "pendiente",
+      "tracking_number": null,
+      "amount_total": 59.9
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_5001",
+      "subscription_id": "sub_2001",
+      "user_id": "usr_1001",
+      "period": "2025-10",
+      "shipping_status": "en_preparacion",
+      "tracking_number": null,
+      "amount_total": 59.9,
+      "created_at": "2025-10-01T08:00:00Z",
+      "delivered_at": null
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay_9001",
+      "user_id": "usr_1001",
+      "subscription_id": "sub_2001",
+      "order_id": "ord_5001",
+      "provider": "multisafepay",
+      "status": "captured",
+      "amount": 59.9,
+      "currency": "EUR",
+      "created_at": "2025-10-01T08:01:00Z",
+      "webhook_url": "https://example.com/api/payments/webhook",
+      "attempt": 1
+    }
+  ]
+}
