@@ -1,72 +1,89 @@
 {
   "users": [
     {
-      "id": "usr_1001",
-      "first_name": "Laura",
-      "last_name": "García",
+      "_id": "ObjectId(\"6750000000010001abcd0001\")",
+      "userType": "customer",
       "email": "laura.garcia@example.com",
+      "password": null,
+      "firstName": "Laura",
+      "lastName": "García",
       "phone": "+34 600 000 001",
-      "address": {
-        "street": "Calle Mayor 15",
-        "postal_code": "28013",
-        "city": "Madrid",
-        "country": "ES"
-      },
-      "created_at": "2025-01-10T12:30:00Z",
-      "payment_status": "ok",
-      "subscription_plan": "mensual",
-      "next_renewal_at": "2025-11-01T00:00:00Z",
-      "payment_method": "multisafepay",
-      "orders_history": [
-        "ord_5001"
-      ],
-      "preferences": {
-        "notes": "Prefiere tintos"
-      },
-      "updated_at": "2025-10-01T09:00:00Z"
+      "street": "Calle Mayor",
+      "number": "15",
+      "floor": null,
+      "postalCode": "28013",
+      "city": "Madrid",
+      "province": null,
+      "country": "ES",
+      "status": true,
+      "createdAt": "2025-01-10T12:30:00Z",
+      "updatedAt": "2025-10-01T09:00:00Z"
+    }
+  ],
+  "subscriptionsPlan": [
+    {
+      "_id": "ObjectId(\"6750000000022001abcd0001\")",
+      "name": "mensual",
+      "boxType": "wine",
+      "boxSize": 6,
+      "price": 59.9,
+      "active": true,
+      "createdAt": "2025-01-10T12:30:00Z"
     }
   ],
   "subscriptions": [
     {
-      "id": "sub_2001",
-      "user_id": "usr_1001",
-      "plan_type": "mensual",
-      "box_size": 6,
-      "created_at": "2025-01-10T12:30:00Z",
-      "next_renewal_at": "2025-11-01T00:00:00Z",
+      "_id": "ObjectId(\"6750000000033001abcd0001\")",
+      "users": "ObjectId(\"6750000000010001abcd0001\")",
+      "subscriptionsPlan": "ObjectId(\"6750000000022001abcd0001\")",
+      "boxType": "wine",
+      "boxSize": 6,
+      "startDate": "2025-01-10T12:30:00Z",
+      "nextPayDate": "2025-11-01T00:00:00Z",
+      "endDate": null,
       "status": "activa",
-      "payment_method": "multisafepay",
-      "shipping_status": "pendiente",
-      "tracking_number": null,
-      "amount_total": 59.9
+      "isGift": false,
+      "giftFromId": null,
+      "giftMessage": null,
+      "payMethod": "multisafepay",
+      "createdAt": "2025-01-10T12:30:00Z",
+      "updatedAt": "2025-10-01T09:00:00Z"
     }
   ],
   "orders": [
     {
-      "id": "ord_5001",
-      "subscription_id": "sub_2001",
-      "user_id": "usr_1001",
-      "period": "2025-10",
-      "shipping_status": "en_preparacion",
-      "tracking_number": null,
-      "amount_total": 59.9,
-      "created_at": "2025-10-01T08:00:00Z",
-      "delivered_at": null
+      "_id": "ObjectId(\"6750000000045001abcd0001\")",
+      "users": "ObjectId(\"6750000000010001abcd0001\")",
+      "subscriptions": "ObjectId(\"6750000000033001abcd0001\")",
+      "fullName": "Laura García",
+      "phone": "+34 600 000 001",
+      "street": "Calle Mayor",
+      "number": "15",
+      "floor": null,
+      "postalCode": "28013",
+      "city": "Madrid",
+      "province": null,
+      "country": "ES",
+      "status": "en_preparacion",
+      "trackingNumber": null,
+      "transportCompany": null,
+      "orderDate": "2025-10-01T08:00:00Z",
+      "sentDate": null,
+      "deliveryDate": null,
+      "createdAt": "2025-10-01T08:00:00Z"
     }
   ],
   "payments": [
     {
-      "id": "pay_9001",
-      "user_id": "usr_1001",
-      "subscription_id": "sub_2001",
-      "order_id": "ord_5001",
-      "provider": "multisafepay",
-      "status": "captured",
+      "_id": "ObjectId(\"6750000000059001abcd0001\")",
+      "subscriptions": "ObjectId(\"6750000000033001abcd0001\")",
+      "orders": "ObjectId(\"6750000000045001abcd0001\")",
       "amount": 59.9,
-      "currency": "EUR",
-      "created_at": "2025-10-01T08:01:00Z",
-      "webhook_url": "https://example.com/api/payments/webhook",
-      "attempt": 1
+      "status": "captured",
+      "gateway": "multisafepay",
+      "transactionId": "pay_9001",
+      "paymentDate": "2025-10-01T08:01:00Z",
+      "createdAt": "2025-10-01T08:01:00Z"
     }
   ]
 }
