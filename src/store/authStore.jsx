@@ -1,18 +1,22 @@
-// store/authStore.js
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 const useAuthStore = create(
   persist(
     (set, get) => ({
       token: null,
       user: null,
-      isAuthenticated: () => Boolean(get().token),
       setToken: (token) => set({ token }),
       setUser:  (user)  => set({ user }),
-      logout:   () => set({ token: null, user: null })
+      logout:   () => set({ token: null, user: null }),
     }),
-    { name: 'auth', partialize: (s) => ({ token: s.token, user: s.user }) }
+    {
+      name: 'auth', // clave en storage
+      partialize: (s) => ({ token: s.token, user: s.user }), // solo guarda esto
+      storage: createJSONStorage(() => localStorage),         // puedes usar sessionStorage
+      
+    }
   )
 )
 
-export default useAuthStore
+export default useAuthStore;
