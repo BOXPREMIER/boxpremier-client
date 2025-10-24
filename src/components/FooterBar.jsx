@@ -36,7 +36,7 @@ function NewsletterPopup() {
           placeholder="Correo Electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2 text-black outline-none rounded border border-gray-300"
+          className="w-full px-3 py-2 bg-white text-black rounded border border-gray-300 outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
           required
         />
         <button
@@ -103,7 +103,12 @@ export default function VinoPremierNewsletter() {
           <h3 className="font-bold mt-3 mb-1 text-sm">GARANTÍA DE VINOPREMIER</h3>
           <img src={footerImg1} alt="metodo del pago" className="h-16 w-auto object-contain mt-1" />
           <p className="text-sm text-gray-600 mt-2">
-            <a href="https://vinopremier.com/plataforma-odr-para-la-resolucion-de-litigios-en-linea" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            <a
+              href="https://vinopremier.com/plataforma-odr-para-la-resolucion-de-litigios-en-linea"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
               Plataforma ODR para la resolución de litigios en línea
             </a>
           </p>
@@ -123,7 +128,13 @@ export default function VinoPremierNewsletter() {
             {socialLinks.map((item, i) => {
               const Icon = item.icon;
               return (
-                <a key={i} href={item.href} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-black rounded flex items-center justify-center hover:bg-gray-800 transition-colors">
+                <a
+                  key={i}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 bg-black rounded flex items-center justify-center hover:bg-gray-800 transition-colors"
+                >
                   <Icon className="w-4 h-4 text-white" />
                 </a>
               );
@@ -139,12 +150,19 @@ export default function VinoPremierNewsletter() {
               </li>
             ))}
           </ul>
-          <img src={footerImg2} alt="vinos garantizados" className="h-20 w-auto object-contain mt-2 mx-auto lg:mx-0" />
+          <img
+            src={footerImg2}
+            alt="vinos garantizados"
+            className="h-20 w-auto object-contain mt-2 mx-auto lg:mx-0"
+          />
         </div>
       </footer>
 
       {/* Scroll to top button */}
-      <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="fixed bottom-4 right-4 w-10 h-10 bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg">
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="fixed bottom-4 right-4 w-10 h-10 bg-black text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-lg"
+      >
         <ChevronUp className="w-5 h-5" />
       </button>
     </div>
