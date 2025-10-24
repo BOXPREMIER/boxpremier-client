@@ -1,4 +1,4 @@
-import API from "./axiosInstance";
+import API from "./Api";
 
 // Obtener todos los usuarios
 export const getUsers = async () => {
