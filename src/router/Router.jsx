@@ -2,6 +2,8 @@ import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
 import Home from "../pages/Home";
+import ProfilePage from "../pages/ProfilePage"
+import SubscriptionPage from "../pages/SubscriptionPage"
 
 const router = createBrowserRouter([
   {
@@ -15,12 +17,12 @@ const router = createBrowserRouter([
       {
         path: "/profilePage",
         element: <ProfilePage />,
-        loader: routeValidator,
+        // loader: routeValidator,
       },
       {
         path: "/subscriptionPage",
         element: <SubscriptionPage />,
-        loader: routeValidator,
+        // loader: routeValidator,
       },
     ],
   },
