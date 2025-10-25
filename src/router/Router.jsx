@@ -5,10 +5,16 @@ import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
 import SubscriptionPage from "../pages/SubscriptionPage";
 import AuthForm from "../components/AuthForm";
+import MainPage from "../pages/MainPage";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <MainPage />,
+  },
+  {
+    path: "/app",
     element: <Layout />,
     children: [
       {
@@ -16,23 +22,24 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/profilePage",
+        path: "profilePage",
         element: <ProfilePage />,
-        //loader: routeValidator,
       },
       {
-        path: "/subscriptionPage",
+        path: "subscriptionPage",
         element: <SubscriptionPage />,
-        //loader: routeValidator,
       },
-      { path: "login", 
-        element: <AuthForm mode="login" /> 
+      {
+        path: "login",
+        element: <AuthForm mode="login" />,
       },
-      { path: "register", 
-        element: <AuthForm mode="register" /> 
+      {
+        path: "register",
+        element: <AuthForm mode="register" />,
       },
     ],
   },
 ]);
+
 
 export default router;
