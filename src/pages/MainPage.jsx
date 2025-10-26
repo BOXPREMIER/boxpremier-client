@@ -10,10 +10,6 @@ const MainPage = () => {
 
   const duplicate = (arr) => [...arr, ...arr];
 
-  const bottleHeight = 640; // referencia
-  const gap = 32;
-  const totalHeight = duplicate(leftBottles).length * (bottleHeight + gap);
-
   return (
     <div
       className="relative min-h-screen w-full bg-white overflow-hidden font-sans cursor-pointer"
@@ -22,11 +18,12 @@ const MainPage = () => {
       {/* Carrusel de botellas */}
       <div className="absolute inset-0 z-20 pointer-events-none flex justify-center items-start">
         <div className="flex w-full max-w-7xl justify-around px-2 overflow-hidden">
+          
           {/* Columna izquierda */}
           <motion.div
             className="flex flex-col gap-4 sm:gap-6 md:gap-8"
-            animate={{ y: [0, -totalHeight / 2] }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+            animate={{ y: ['0%', '-50%'] }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           >
             {duplicate(leftBottles).map((bottle, i) => (
               <img
@@ -41,8 +38,8 @@ const MainPage = () => {
           {/* Columna central */}
           <motion.div
             className="flex flex-col gap-4 sm:gap-6 md:gap-8"
-            animate={{ y: [0, -totalHeight / 2] }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+            animate={{ y: ['0%', '-50%'] }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           >
             {duplicate(centerBottles).map((bottle, i) => (
               <img
@@ -57,8 +54,8 @@ const MainPage = () => {
           {/* Columna derecha */}
           <motion.div
             className="flex flex-col gap-4 sm:gap-6 md:gap-8"
-            animate={{ y: [0, -totalHeight / 2] }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+            animate={{ y: ['0%', '-50%'] }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           >
             {duplicate(rightBottles).map((bottle, i) => (
               <img
@@ -74,18 +71,40 @@ const MainPage = () => {
 
       {/* Contenido principal */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 text-center">
-        <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-gray-800 capitalize tracking-wide">
+        {/* Título - texto responsive */}
+        <h1
+          className="text-gray-800 font-light capitalize tracking-wide mb-2"
+          style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
+        >
           ¿No sabes qué vino elegir?
         </h1>
-        <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 capitalize mt-4">
+
+        {/* Subtítulo - texto responsive */}
+        <p
+          className="text-gray-700 font-light capitalize mb-4"
+          style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
+        >
           Elige
         </p>
+
+        {/* Logo responsive - se reduce con la ventana pero siempre más grande que texto */}
         <img
           src="/bpr.PNG"
           alt="Box Premier Logo"
-          className="w-48 sm:w-64 md:w-96 lg:w-[800px] mx-auto my-8 drop-shadow-xl"
+          className="mx-auto drop-shadow-xl"
+          style={{ 
+            width: 'clamp(18rem, 45vw, 50rem)',
+            height: 'auto',
+            marginTop: 'clamp(0.5rem, 2vw, 1.5rem)',
+            marginBottom: 'clamp(0.5rem, 2vw, 1.5rem)'
+          }}
         />
-        <p className="text-xl md:text-2xl lg:text-3xl font-light text-gray-700 capitalize">
+
+        {/* Texto inferior - texto responsive */}
+        <p
+          className="text-gray-700 font-light capitalize mt-4"
+          style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
+        >
           ¡Y déjanos sorprenderte!
         </p>
       </div>
