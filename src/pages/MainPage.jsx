@@ -6,7 +6,7 @@ const MainPage = () => {
 
   const leftBottles = ['b1.PNG', 'b2.PNG', 'b3.PNG'];
   const centerBottles = ['b4.PNG', 'b5.PNG', 'b6.PNG'];
-  const rightBottles = ['b3.PNG', 'b2.PNG', 'b1.PNG'];
+  const rightBottles = ['b7.PNG', 'b8.PNG', 'b9.PNG'];
 
   const duplicate = (arr) => [...arr, ...arr];
 
@@ -73,7 +73,7 @@ const MainPage = () => {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 text-center">
         {/* Título - texto responsive */}
         <h1
-          className="text-gray-800 font-light capitalize tracking-wide mb-2"
+          className="text-gray-800 font-light tracking-wide mb-2"
           style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
         >
           ¿No sabes qué vino elegir?
@@ -102,7 +102,7 @@ const MainPage = () => {
 
         {/* Texto inferior - texto responsive */}
         <p
-          className="text-gray-700 font-light capitalize mt-4"
+          className="text-gray-700 font-light  mt-4"
           style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
         >
           ¡Y déjanos sorprenderte!
