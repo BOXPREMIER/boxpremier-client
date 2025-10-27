@@ -5,6 +5,8 @@ import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
 import SubscriptionPage from "../pages/SubscriptionPage";
 import AuthForm from "../components/AuthForm";
+import { authGuard } from "../validators/routeValidator";
+import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
 
 
@@ -24,10 +26,17 @@ const router = createBrowserRouter([
       {
         path: "profilePage",
         element: <ProfilePage />,
+        loader: authGuard,
       },
       {
         path: "subscriptionPage",
         element: <SubscriptionPage />,
+        loader: authGuard,
+      },
+      {
+        path: "/subscription/checkout",
+        element: <SubscriptionCheckout />,
+        loader: authGuard,
       },
       {
         path: "login",
@@ -37,6 +46,8 @@ const router = createBrowserRouter([
         path: "register",
         element: <AuthForm mode="register" />,
       },
+      { path: "login", element: <AuthForm mode="login" /> },
+      { path: "register", element: <AuthForm mode="register" /> },
     ],
   },
 ]);
