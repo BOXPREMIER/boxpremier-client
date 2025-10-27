@@ -5,6 +5,8 @@ import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
 import SubscriptionPage from "../pages/SubscriptionPage";
 import AuthForm from "../components/AuthForm";
+import { authGuard } from "../validators/routeValidator";
+import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 
 const router = createBrowserRouter([
   {
@@ -18,19 +20,20 @@ const router = createBrowserRouter([
       {
         path: "/profilePage",
         element: <ProfilePage />,
-        //loader: routeValidator,
+        loader: authGuard,
       },
       {
         path: "/subscriptionPage",
         element: <SubscriptionPage />,
-        //loader: routeValidator,
+        loader: authGuard,
       },
-      { path: "login", 
-        element: <AuthForm mode="login" /> 
+      {
+        path: "/subscription/checkout",
+        element: <SubscriptionCheckout />,
+        loader: authGuard,
       },
-      { path: "register", 
-        element: <AuthForm mode="register" /> 
-      },
+      { path: "login", element: <AuthForm mode="login" /> },
+      { path: "register", element: <AuthForm mode="register" /> },
     ],
   },
 ]);
