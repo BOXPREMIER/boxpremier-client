@@ -7,10 +7,16 @@ import SubscriptionPage from "../pages/SubscriptionPage";
 import AuthForm from "../components/AuthForm";
 import { authGuard } from "../validators/routeValidator";
 import SubscriptionCheckout from "../pages/SubscriptionCheckout";
+import MainPage from "../pages/MainPage";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <MainPage />,
+  },
+  {
+    path: "/app",
     element: <Layout />,
     children: [
       {
@@ -18,12 +24,12 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/profilePage",
+        path: "profilePage",
         element: <ProfilePage />,
         loader: authGuard,
       },
       {
-        path: "/subscriptionPage",
+        path: "subscriptionPage",
         element: <SubscriptionPage />,
         loader: authGuard,
       },
@@ -32,10 +38,19 @@ const router = createBrowserRouter([
         element: <SubscriptionCheckout />,
         loader: authGuard,
       },
+      {
+        path: "login",
+        element: <AuthForm mode="login" />,
+      },
+      {
+        path: "register",
+        element: <AuthForm mode="register" />,
+      },
       { path: "login", element: <AuthForm mode="login" /> },
       { path: "register", element: <AuthForm mode="register" /> },
     ],
   },
 ]);
+
 
 export default router;
