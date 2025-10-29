@@ -13,7 +13,7 @@ const MainPage = () => {
   return (
     <div
       className="relative min-h-screen w-full bg-white overflow-hidden font-sans cursor-pointer"
-      onClick={() => navigate('/pages/home.jsx')}
+      onClick={() => navigate('/Home')}
     >
       {/* Carrusel de botellas */}
       <div className="absolute inset-0 z-20 pointer-events-none flex justify-center items-start">
