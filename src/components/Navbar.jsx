@@ -125,7 +125,7 @@ const NavBar = ({ logo = Logo }) => {
     <nav className="w-full bg-black text-white px-6 py-3">
       <div className="flex items-center justify-between">
         {/* Ir a la Home dentro de la app */}
-        <Link to="/app" aria-label="Ir al inicio">
+        <Link to="/app" aria-label="Ir al inicio" data-testid="link-home">
           <img
             src={logo}
             alt="Vino Premier"
@@ -133,9 +133,12 @@ const NavBar = ({ logo = Logo }) => {
           />
         </Link>
 
-        {/* Logo central (solo md+) -> ruta relativa dentro de /app */}
         <div className="hidden md:flex justify-center items-center">
-          <NavLink to="subscription" aria-label="Página de suscripción">
+          <NavLink
+            to="subscription"
+            aria-label="Página de suscripción"
+            data-testid="link-subscription"
+          >
             <img
               src={logo2}
               alt="Círculo dorado - Suscripción"
@@ -149,11 +152,11 @@ const NavBar = ({ logo = Logo }) => {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="block md:hidden p-2 text-2xl"
           aria-label="Abrir o cerrar menú"
+          data-testid="mobile-menu-button"
         >
           {isMenuOpen ? "Χ" : "☰"}
         </button>
 
-        {/* Enlaces de escritorio */}
         <div className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
           {/* Ejemplos de rutas internas relativas si las agregas:
               <NavLink to="profile">PERFIL</NavLink>
@@ -161,16 +164,16 @@ const NavBar = ({ logo = Logo }) => {
           */}
 
           {/* Auth está FUERA de /app, por eso absoluto */}
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `hover:text-[#C9A35C] transition-colors ${
-                isActive ? "text-[#C9A35C]" : ""
-              }`
-            }
-          >
-            LOGIN
-          </NavLink>
+          {isAuthenticated && user ? (
+            <>
+              <span data-testid="username">{user.name}</span>
+              <button onClick={logout} data-testid="logout-button">LOGOUT</button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" data-testid="link-login">LOGIN</NavLink>
+            </>
+          )}
 
           <button
             type="button"
@@ -182,30 +185,37 @@ const NavBar = ({ logo = Logo }) => {
         </div>
       </div>
 
-      {/* Menú móvil */}
       {isMenuOpen && (
-        <div className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide">
-          {/* Rutas RELATIVAS dentro de /app */}
+        <div
+          className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide"
+          data-testid="mobile-menu"
+        >
           <NavLink
-            to="subscription"
+            to="/subscriptionPage"
             className="hover:text-[#C9A35C] transition-colors"
             onClick={() => setIsMenuOpen(false)}
+            data-testid="mobile-link-subscription"
           >
             SUSCRIPCIÓN
           </NavLink>
 
           {/* Auth absoluto */}
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `hover:text-[#C9A35C] transition-colors ${
-                isActive ? "text-[#C9A35C]" : ""
-              }`
-            }
-            onClick={() => setIsMenuOpen(false)}
-          >
-            LOGIN
-          </NavLink>
+          {isAuthenticated && user ? (
+            <>
+              <span data-testid="mobile-username">{user.name}</span>
+              <button onClick={logout} data-testid="mobile-logout-button">LOGOUT</button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                data-testid="mobile-link-login"
+              >
+                LOGIN
+              </NavLink>
+            </>
+          )}
 
           <button
             type="button"
