@@ -25,12 +25,19 @@ const Button = ({ title, action, tooltip, type = "button", "data-testid": testid
       data-testid={testid}
       className={`
         w-full md:w-auto
-        px-8 py-3
-        bg-[#b49361] 
-        text-white font-bold uppercase tracking-wider
-        transition-all duration-300
-        ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#a18150]"}
+        px-10 py-4
+        bg-[#b49361]
+        text-white uppercase tracking-wider
+        transition-all duration-300 ease-out
+        ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#a18150] hover:scale-[1.02]"}
+        rounded-full shadow-md
+        focus:outline-none focus:ring-2 focus:ring-[#b49361]/50
       `}
+      style={{
+        fontFamily: "Gotham, sans-serif",
+        fontWeight: 700, // Gotham Bold
+        letterSpacing: "0.05em",
+      }}
     >
       {loading ? "Cargando..." : title}
     </button>
