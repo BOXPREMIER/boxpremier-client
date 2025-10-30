@@ -48,6 +48,10 @@ export async function cancelSubscription(subId) {
   const { data } = await API.post(`/subscriptions/${subId}/cancel`)
   return data
 }
+export async function getSubscriptions() {
+  const { data } = await API.get('/subscriptions') 
+  return data
+}
 
 
 // Fallback local por si la API de planes aún no está lista
