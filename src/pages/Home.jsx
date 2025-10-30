@@ -1,7 +1,8 @@
-
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Star } from 'lucide-react';
+import Button from "../components/button";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const ref = useRef(null);
@@ -22,6 +23,8 @@ export default function Home() {
   const heroY = useTransform(heroScroll, [0, 1], ["0%", "-60%"]);
   const heroScale = useTransform(heroScroll, [0, 1], [1.05, 1.2]);
   const backgroundOpacity = useTransform(heroScroll, [0.1, 0.8], [0, 1]);
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden" style={{ fontFamily: 'Gotham, sans-serif' }}>
@@ -130,6 +133,15 @@ export default function Home() {
             <p className="text-sm sm:text-base text-gray-700 font-bold">Productos de calidad</p>
           </div>
         </motion.div>
+
+        {/* 🔹 Botón "Conoce más" */}
+        <div className="flex justify-center mt-8 mb-12">
+          <Button
+            title="Conoce más"
+            tooltip="Ir a la página de suscripción"
+            action={() => navigate("/src/pages/SubscriptionPage.jsx")}
+          />
+        </div>
 
         {/* 🔹 Parallax Section */}
         <div ref={ref} className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] overflow-hidden mt-8">
