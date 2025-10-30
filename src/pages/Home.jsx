@@ -1,3 +1,4 @@
+
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Star } from 'lucide-react';
@@ -83,6 +84,7 @@ export default function Home() {
          <span style={{ fontWeight: 200 }}>B</span>O<span style={{ fontWeight: 300 }}>X</span> PREMIER
          </h1>
         </motion.div>
+
 
         {/* 🔹 Intro Text */}
         <motion.div 
