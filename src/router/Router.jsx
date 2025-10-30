@@ -65,6 +65,8 @@ import AuthForm from "../components/AuthForm";
 import { authGuard } from "../validators/routeValidator";
 import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import UsersTab from "../pages/admin/UsersTab";
 
 const router = createBrowserRouter([
   // Si quieres una landing primero:
@@ -79,6 +81,19 @@ const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
       { path: "subscription", element: <SubscriptionPage />, loader: authGuard }, // /app/subscription
       { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
+      {
+    path: "admin",
+    element: <AdminDashboard />,
+    children: [
+      {
+        path: "users",
+        element: <UsersTab />,
+      },
+      // outras rotas (plans, subscriptions, etc)
+    ],
+  },
+  //loader: authGuard ,    // opcional: solo usuarios logueados
+
     ],
   },
 
