@@ -105,7 +105,7 @@ const MainPage = () => {
           className="text-gray-700 font-light  mt-4"
           style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
         >
-          ¡Y déjanos sorprenderte!
+          ¡Haz clic y déjanos sorprenderte!
         </p>
       </div>
     </div>
