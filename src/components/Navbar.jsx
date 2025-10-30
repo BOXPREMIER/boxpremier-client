@@ -123,7 +123,7 @@ const NavBar = ({ logo = Logo }) => {
 
   return (
     <nav className="w-full bg-black text-white px-6 py-3">
-       <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         {/* Ir a la Home dentro de la app */}
         <Link to="/app" aria-label="Ir al inicio" data-testid="link-home">
           <img
@@ -172,7 +172,6 @@ const NavBar = ({ logo = Logo }) => {
           ) : (
             <>
               <NavLink to="/login" data-testid="link-login">LOGIN</NavLink>
-              <NavLink to="/signup" data-testid="link-signup">SIGNUP</NavLink>
             </>
           )}
 
@@ -191,7 +190,7 @@ const NavBar = ({ logo = Logo }) => {
           className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide"
           data-testid="mobile-menu"
         >
-          <Link
+          <NavLink
             to="/subscriptionPage"
             className="hover:text-[#C9A35C] transition-colors"
             onClick={() => setIsMenuOpen(false)}
@@ -214,13 +213,6 @@ const NavBar = ({ logo = Logo }) => {
                 data-testid="mobile-link-login"
               >
                 LOGIN
-              </NavLink>
-              <NavLink
-                to="/signup"
-                onClick={() => setIsMenuOpen(false)}
-                data-testid="mobile-link-signup"
-              >
-                SIGNUP
               </NavLink>
             </>
           )}
