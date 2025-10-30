@@ -1,1 +1,170 @@
 @import 'tailwindcss';
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url("../public/fonts/GOTHAM-THIN_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 100;
+    font-display: swap;
+    src: url("/fonts/GOTHAM-THINITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url("/fonts/GOTHAMEXLIGHT_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 200;
+    font-display: swap;
+    src: url("/fonts/GOTHAMEXLIGHT-ITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url("/fonts/GOTHAMLIGHT_1.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 300;
+    font-display: swap;
+    src: url("/fonts/GOTHAMLIGHT-ITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBOOK_2.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBOOK-ITALIC_1.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/GOTHAM BOOK REGULAR.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("/fonts/GOTHAMMEDIUM_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url("/fonts/GOTHAMMEDIUM-ITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBOLD_1.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBOLD-ITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/GOTHAM-BOLD_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/GOTHAM-BOLDITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBLACK_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src: url("/fonts/GOTHAMBLACK-ITALIC_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url("/fonts/GOTHAM-BLACK_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: normal;
+    font-weight: 950;
+    font-display: swap;
+    src: url("/fonts/GOTHAMULTRA_0.OTF") format("opentype");
+}
+
+@font-face {
+    font-family: Gotham;
+    font-style: italic;
+    font-weight: 950;
+    font-display: swap;
+    src: url("/fonts/GOTHAMULTRA-ITALIC_0.OTF") format("opentype");
+}
+
+@theme {
+    --font-gotham: "Gotham", sans-serif;
+
+    --color-primary: #27251F;
+    /*PANTONE P Process Black C*/
+    --color-secondary: #AB9470;
+    /*PANTONE P 13-7C*/
+}
