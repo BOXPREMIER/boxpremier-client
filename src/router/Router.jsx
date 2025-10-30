@@ -68,6 +68,7 @@ import MainPage from "../pages/MainPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersTab from "../pages/admin/UsersTab";
 import PlansTab from "../pages/admin/PlansTab";
+import SubscriptionsTab from "../pages/admin/SubscriptionTab"
 
 const router = createBrowserRouter([
   // Si quieres una landing primero:
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
       {
       path: "plans",
       element: <PlansTab />,
+    },
+     {
+      path: "subscriptions",
+      element: <SubscriptionsTab />,
     },
       // outras rotas (plans, subscriptions, etc)
     ],
