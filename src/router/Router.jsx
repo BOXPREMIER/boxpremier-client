@@ -67,6 +67,7 @@ import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersTab from "../pages/admin/UsersTab";
+import PlansTab from "../pages/admin/PlansTab";
 
 const router = createBrowserRouter([
   // Si quieres una landing primero:
