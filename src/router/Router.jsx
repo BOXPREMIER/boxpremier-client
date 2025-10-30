@@ -89,6 +89,10 @@ const router = createBrowserRouter([
         path: "users",
         element: <UsersTab />,
       },
+      {
+      path: "plans",
+      element: <PlansTab />,
+    },
       // outras rotas (plans, subscriptions, etc)
     ],
   },
