@@ -12,11 +12,11 @@ const MainPage = () => {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-white overflow-hidden font-sans cursor-pointer"
-      onClick={() => navigate('/pages/home.jsx')}
+      className="relative min-h-screen w-full bg-white overflow-hidden font-gotham cursor-pointer"
+      onClick={() => navigate('/Home')}
     >
       {/* Carrusel de botellas */}
-      <div className="absolute inset-0 z-20 pointer-events-none flex justify-center items-start">
+      <div className="absolute inset-0 z-0 pointer-events-none flex justify-center items-start opacity-60">
         <div className="flex w-full max-w-7xl justify-around px-2 overflow-hidden">
           
           {/* Columna izquierda */}
@@ -70,7 +70,7 @@ const MainPage = () => {
       </div>
 
       {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 text-center">
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 py-12 text-center">
         {/* Título - texto responsive */}
         <h1
           className="text-gray-800 font-light tracking-wide mb-2"
@@ -87,7 +87,7 @@ const MainPage = () => {
           Elige
         </p>
 
-        {/* Logo responsive - se reduce con la ventana pero siempre más grande que texto */}
+        {/* Logo responsive */}
         <img
           src="/bpr.PNG"
           alt="Box Premier Logo"
@@ -100,12 +100,12 @@ const MainPage = () => {
           }}
         />
 
-        {/* Texto inferior - texto responsive */}
+        {/* Texto inferior */}
         <p
-          className="text-gray-700 font-light  mt-4"
+          className="text-gray-700 font-light mt-4"
           style={{ fontSize: 'clamp(0.875rem, 2.5vw, 2rem)' }}
         >
-          ¡Y déjanos sorprenderte!
+          ¡Haz clic y déjanos sorprenderte!
         </p>
       </div>
     </div>
