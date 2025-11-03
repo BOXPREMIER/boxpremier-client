@@ -95,7 +95,7 @@ const router = createBrowserRouter([
       path: "plans",
       element: <PlansTab />,
     },
-     {
+    {
       path: "subscriptions",
       element: <SubscriptionsTab />,
     },
@@ -111,7 +111,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <AuthForm mode="login" /> },
   { path: "/register", element: <AuthForm mode="register" /> },
 
-  // Fallback: cualquier cosa rara te manda a /app
+  //Fallback: cualquier cosa rara te manda a /app
   { path: "*", element: <Navigate to="/app" replace /> },
 ]);
 

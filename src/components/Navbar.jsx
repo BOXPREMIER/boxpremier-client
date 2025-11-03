@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-import Logo from "../assets/full-logo-white.png";
-import logo2 from "../assets/logo2.png";
+import Logo from "../assets/full-logo-white.png"; // большое лого (слева)
+import logo2 from "../assets/logo2.png"; // круглое лого (по центру)
 
-// 🔹 Componente reutilizable para los enlaces de navegación (desktop y móvil)
+// 🔹 Enlaces reutilizables para el menú
 const NavLinks = ({ isMobile = false, closeMenu }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
@@ -23,9 +23,9 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
           : "flex items-center gap-6"
       } text-sm font-semibold tracking-wide`}
     >
-      {/* Enlace a la página de suscripción */}
+      {/* 🔸 Enlace a la página de suscripción */}
       <NavLink
-        to="/subscription"
+        to="/app/subscription"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
         data-testid={isMobile ? "mobile-link-subscription" : "link-subscription"}
@@ -33,7 +33,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
         SUSCRIPCIÓN
       </NavLink>
 
-      {/* Autenticación: si el usuario está logueado o no */}
+      {/* 🔸 Estado de autenticación */}
       {isAuthenticated && user ? (
         <>
           {isMobile ? (
@@ -74,54 +74,53 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
   );
 };
 
-// 🔸 Componente principal del menú de navegación
-const NavBar = ({ logo = Logo }) => {
+// 🔸 Navbar principal
+const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-black text-white px-6 py-3">
-      <div className="flex items-center justify-between">
-        {/* Logotipo principal: redirige al inicio (/app) */}
-        <Link to="/app" aria-label="Ir al inicio" data-testid="link-home">
+    <nav className="w-full bg-black text-white px-6 py-3 relative">
+      <div className="flex items-center justify-between relative">
+        {/* 🔹 Logotipo grande (izquierda) → Home */}
+        <Link to="/" aria-label="Ir al inicio" data-testid="link-home">
           <img
-            src={logo}
-            alt="Vino Premier"
+            src={Logo}
+            alt="Vino Premier Logo"
             className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
           />
         </Link>
 
-        {/* Logotipo central (solo visible en pantallas medianas o grandes) */}
-        <div className="hidden md:flex justify-center items-center">
-          <NavLink
-            to="/subscription"
-            aria-label="Página de suscripción"
-            data-testid="logo-subscription"
-          >
-            <img
-              src={logo2}
-              alt="Círculo dorado - Suscripción"
-              className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-            />
-          </NavLink>
-        </div>
+        {/* 🔹 Logotipo circular (centro) → Main Page */}
+        <Link
+          to="/main"
+          aria-label="Ir a la página principal"
+          data-testid="link-main"
+          className="absolute left-1/2 transform -translate-x-1/2"
+        >
+          <img
+            src={logo2}
+            alt="Círculo dorado - Main"
+            className="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+          />
+        </Link>
 
-        {/* Botón menú hamburguesa (visible solo en móviles) */}
+        {/* 🔹 Botón menú hamburguesa (solo móvil) */}
         <button
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
           aria-label="Abrir o cerrar menú"
           data-testid="mobile-menu-button"
         >
-          {isMenuOpen ? "Χ" : "☰"}
+          {isMenuOpen ? "✕" : "☰"}
         </button>
 
-        {/* Enlaces visibles en versión escritorio */}
+        {/* 🔹 Enlaces de escritorio */}
         <div className="hidden md:flex">
           <NavLinks />
         </div>
       </div>
 
-      {/* Menú desplegable (solo visible en móviles) */}
+      {/* 🔹 Menú móvil desplegable */}
       {isMenuOpen && (
         <div className="md:hidden" data-testid="mobile-menu">
           <NavLinks isMobile closeMenu={() => setIsMenuOpen(false)} />
