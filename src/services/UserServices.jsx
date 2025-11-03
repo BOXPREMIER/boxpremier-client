@@ -30,3 +30,10 @@ export const deleteUser = async (id) => {
   const { data } = await API.delete(`/users/${id}`);
   return data.data;
 };
+
+//INGRID ESTUVO POR AQUI
+export async function getUserById(userId) {
+  const { data } = await API.get(`/users/${userId}`)
+  return data
+}
+

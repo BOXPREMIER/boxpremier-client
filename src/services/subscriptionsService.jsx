@@ -8,6 +8,11 @@ export async function fetchActivePlans() {
   const { data } = await JsonServerAPI.get('/subscriptions/plans', { params: { active: true } })
   return data
 }
+//GET/subscriptions activos e inactivos
+export async function getAllPlans() {
+  const { data } = await API.get('/subscriptionsPlan');
+  return data;
+}
 
 // ------- Subscriptions (axios) -------
 export async function createSubscription({ planId, boxType, wineType, payMethod = 'multisafepay' }) {
@@ -43,6 +48,11 @@ export async function cancelSubscription(subId) {
   const { data } = await JsonServerAPI.post(`/subscriptions/${subId}/cancel`)
   return data
 }
+export async function getSubscriptions() {
+  const { data } = await API.get('/subscriptions')
+  return data
+}
+
 
 // Fallback local por si la API de planes aún no está lista
 export function localPlansFallback() {
