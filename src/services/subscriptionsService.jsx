@@ -5,8 +5,13 @@ import useAuthStore from '../store/authStore'
 // ------- Plans (axios) -------
 export async function fetchActivePlans() {
   // GET /subscriptions/plans?active=true
-  const { data } = await API.get('/subscriptions/plans', { params: { active: true } })
+  const { data } = await API.get('/subscriptionsPlan', { params: { active: true } })
   return data
+}
+  //GET/subscriptions activos e inactivos
+export async function getAllPlans() {
+  const { data } = await API.get('/subscriptionsPlan');
+  return data;
 }
 
 // ------- Subscriptions (axios) -------
@@ -43,6 +48,11 @@ export async function cancelSubscription(subId) {
   const { data } = await API.post(`/subscriptions/${subId}/cancel`)
   return data
 }
+export async function getSubscriptions() {
+  const { data } = await API.get('/subscriptions') 
+  return data
+}
+
 
 // Fallback local por si la API de planes aún no está lista
 export function localPlansFallback() {
