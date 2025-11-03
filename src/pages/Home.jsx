@@ -132,6 +132,16 @@ export default function Home() {
             />
             <p className="text-sm sm:text-base text-gray-700 font-bold">Productos de calidad</p>
           </div>
+
+          {/* 🔹 Nuevo bloque: Opciones de regalo */}
+          <div className="flex flex-col items-center text-center w-full md:w-1/3">
+            <img 
+              src="/gift.png" 
+              alt="Opciones de regalo" 
+              className="w-24 sm:w-28 md:w-32 h-auto object-contain mb-4"
+            />
+            <p className="text-sm sm:text-base text-gray-700 font-bold">Opciones de regalo</p>
+          </div>
         </motion.div>
 
         {/* 🔹 Botón "Conoce más" */}
@@ -139,7 +149,7 @@ export default function Home() {
           <Button
             title="Conoce más"
             tooltip="Ir a la página de suscripción"
-            action={() => navigate("/app/subscription")} 
+            action={() => navigate("/app/subscriptiogit n")} 
           />
         </div>
 
