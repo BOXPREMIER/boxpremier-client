@@ -69,7 +69,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersTab from "../pages/admin/UsersTab";
 import PlansTab from "../pages/admin/PlansTab";
 import SubscriptionsTab from "../pages/admin/SubscriptionTab"
-import OrdersTab from "../pages/admin/Orders/OrdersTab";
+import OrdersTab from "../pages/admin/OrdersTab";
 import PaymentsTab from "../pages/admin/PaymentsTab";
 import GiftPage from "../pages/GiftPage";
 
