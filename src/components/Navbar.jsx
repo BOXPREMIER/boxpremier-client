@@ -23,6 +23,31 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
           : "flex items-center gap-6"
       } text-sm font-semibold tracking-wide`}
     >
+      {/* 🔸 Nuevos enlaces */}
+      <NavLink
+        to="/planes"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        PLANES
+      </NavLink>
+
+      <NavLink
+        to="/regala"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        REGALA
+      </NavLink>
+
+      <NavLink
+        to="/cajas-anteriores"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        CAJAS ANTERIORES
+      </NavLink>
+
       {/* 🔸 Enlace a la página de suscripción */}
       <NavLink
         to="/app/subscription"
