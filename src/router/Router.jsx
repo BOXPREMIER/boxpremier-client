@@ -71,6 +71,8 @@ import PlansTab from "../pages/admin/PlansTab";
 import SubscriptionsTab from "../pages/admin/SubscriptionTab"
 import OrdersTab from "../pages/admin/Orders/OrdersTab";
 import PaymentsTab from "../pages/admin/PaymentsTab";
+import GiftPage from "../pages/GiftPage";
+
 
 const router = createBrowserRouter([
   // Si quieres una landing primero:
@@ -85,6 +87,7 @@ const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
       { path: "subscription", element: <SubscriptionPage />, loader: authGuard }, // /app/subscription
       { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
+      { path: "gift", element: <GiftPage /> },
       {
         path: "admin", element: <AdminDashboard />, loader: adminGuard,
         children: [
