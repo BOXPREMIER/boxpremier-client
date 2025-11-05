@@ -167,5 +167,104 @@
       "createdAt": "2025-10-01T08:01:00Z",
       "id": "e786"
     }
-  ]
+  ], 
+  "monthlyWines": [
+  {
+    "month": "january",
+    "wines": [
+      { "name": "Cabernet Sauvignon Reserva", "image": "/images/january1.jpg" },
+      { "name": "Classic Chardonnay", "image": "/images/january2.jpg" },
+      { "name": "House Merlot", "image": "/images/january3.jpg" }
+    ]
+  },
+  {
+    "month": "february",
+    "wines": [
+      { "name": "Andean Malbec", "image": "/images/february1.jpg" },
+      { "name": "Grenache Rosé", "image": "/images/february2.jpg" },
+      { "name": "Young Tempranillo", "image": "/images/february3.jpg" }
+    ]
+  },
+  {
+    "month": "march",
+    "wines": [
+      { "name": "Sauvignon Blanc", "image": "/images/march1.jpg" },
+      { "name": "Pinot Noir", "image": "/images/march2.jpg" },
+      { "name": "Cabernet Franc", "image": "/images/march3.jpg" }
+    ]
+  },
+  {
+    "month": "april",
+    "wines": [
+      { "name": "Old Vine Garnacha", "image": "/images/april1.jpg" },
+      { "name": "Atlantic Albariño", "image": "/images/april2.jpg" },
+      { "name": "Mediterranean Syrah", "image": "/images/april3.jpg" }
+    ]
+  },
+  {
+    "month": "may",
+    "wines": [
+      { "name": "Tempranillo Crianza", "image": "/images/may1.jpg" },
+      { "name": "Organic Verdejo", "image": "/images/may2.jpg" },
+      { "name": "Cabernet Sauvignon", "image": "/images/may3.jpg" }
+    ]
+  },
+  {
+    "month": "june",
+    "wines": [
+      { "name": "Provençal Rosé", "image": "/images/june1.jpg" },
+      { "name": "Merlot Reserva", "image": "/images/june2.jpg" },
+      { "name": "Barrel-Aged Chardonnay", "image": "/images/june3.jpg" }
+    ]
+  },
+  {
+    "month": "july",
+    "wines": [
+      { "name": "Summer Syrah", "image": "/images/july1.jpg" },
+      { "name": "Pinot Grigio", "image": "/images/july2.jpg" },
+      { "name": "Rioja Red Blend", "image": "/images/july3.jpg" }
+    ]
+  },
+  {
+    "month": "august",
+    "wines": [
+      { "name": "Albariño Fresh Harvest", "image": "/images/august1.jpg" },
+      { "name": "Cabernet Rosé", "image": "/images/august2.jpg" },
+      { "name": "Chenin Blanc", "image": "/images/august3.jpg" }
+    ]
+  },
+  {
+    "month": "september",
+    "wines": [
+      { "name": "Rioja Crianza", "image": "/images/september1.jpg" },
+      { "name": "Sparkling Cava", "image": "/images/september2.jpg" },
+      { "name": "Old Vine Garnacha", "image": "/images/september3.jpg" }
+    ]
+  },
+  {
+    "month": "october",
+    "wines": [
+      { "name": "Reserva Cabernet", "image": "/images/october1.jpg" },
+      { "name": "Verdejo Selección", "image": "/images/october2.jpg" },
+      { "name": "Syrah Limited Edition", "image": "/images/october3.jpg" }
+    ]
+  },
+  {
+    "month": "november",
+    "wines": [
+      { "name": "Mystery Wine 1", "image": "/images/question1.jpg" },
+      { "name": "Mystery Wine 2", "image": "/images/question2.jpg" },
+      { "name": "Mystery Wine 3", "image": "/images/question3.jpg" }
+    ]
+  },
+  {
+    "month": "december",
+    "wines": [
+      { "name": "Mystery Wine 1", "image": "/images/question1.jpg" },
+      { "name": "Mystery Wine 2", "image": "/images/question2.jpg" },
+      { "name": "Mystery Wine 3", "image": "/images/question3.jpg" }
+    ]
+  }
+]
+
 }

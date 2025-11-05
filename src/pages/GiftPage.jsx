@@ -1,7 +1,7 @@
 // src/pages/GiftPage.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/Button"; // Ajusta la ruta si es diferente
+import Button from "../components/Button"; 
 
 const GiftPage = () => {
   const [offsetY, setOffsetY] = useState(0);
