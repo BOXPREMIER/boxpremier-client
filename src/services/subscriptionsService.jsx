@@ -7,6 +7,11 @@ export async function fetchActivePlans() {
   const { data } = await API.get("/subscriptions/plans"); // activos ya filtrados para customer
   return data;
 }
+//GET/subscriptions activos e inactivos
+export async function getAllPlans() {
+  const { data } = await API.get('/subscriptionsPlan');
+  return data;
+}
 
 // ------- Subscriptions -------
 export async function createSubscription({ planId, wineType }) {
