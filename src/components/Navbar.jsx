@@ -10,7 +10,6 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
   const logout = useAuthStore((state) => state.logout);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Получаем имя пользователя независимо от названия поля
   const nombreUsuario =
     user?.nombre ||
     user?.name ||
@@ -34,7 +33,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     >
       {/* 🔸 Enlaces principales */}
       <NavLink
-        to="/planes"
+        to="plans"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
       >
@@ -42,7 +41,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
       </NavLink>
 
       <NavLink
-        to="/regala"
+        to="gift"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
       >
