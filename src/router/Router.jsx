@@ -85,7 +85,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> }, // /app
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
-      { path: "subscription", element: <SubscriptionPage />, loader: authGuard }, // /app/subscription
+      { path: "subscription", element: <SubscriptionPage /> }, // /app/subscription
       { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
       { path: "gift", element: <GiftPage /> },
       {
@@ -105,7 +105,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <AuthForm mode="login" /> },
   { path: "/register", element: <AuthForm mode="register" /> },
 
-  // Fallback: cualquier cosa rara te manda a /app
+  //Fallback: cualquier cosa rara te manda a /app
   { path: "*", element: <Navigate to="/app" replace /> },
 ]);
 
