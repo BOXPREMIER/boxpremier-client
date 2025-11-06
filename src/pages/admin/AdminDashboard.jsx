@@ -43,9 +43,6 @@ const AdminDashboard = () => {
           <NavLink to="plans" className={tabClass}>
             Planes de Suscripción
           </NavLink>
-          <NavLink to="subscriptions" className={tabClass}>
-            Suscripciones
-          </NavLink>
           <NavLink to="orders" className={tabClass}>
             Pedidos
           </NavLink>

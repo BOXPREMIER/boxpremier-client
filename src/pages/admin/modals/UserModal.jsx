@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Button from "../../../components/Button";
 
 const UserModal = ({ isOpen, onClose, onSave, selectedUser }) => {
   const [formData, setFormData] = useState({
@@ -9,33 +10,23 @@ const UserModal = ({ isOpen, onClose, onSave, selectedUser }) => {
     status: true,
   });
 
-  // Cargar datos del usuario si estás editando
   useEffect(() => {
-    if (selectedUser) {
-      setFormData({
-        fullName: selectedUser.fullName || "",
-        email: selectedUser.email || "",
-        phone: selectedUser.phone || "",
-        role: selectedUser.role || "",
-        status: selectedUser.status ?? true,
-      });
-    } else {
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        role: "",
-        status: true,
-      });
-    }
+    setFormData(
+      selectedUser
+        ? {
+            fullName: selectedUser.fullName || "",
+            email: selectedUser.email || "",
+            phone: selectedUser.phone || "",
+            role: selectedUser.role || "",
+            status: selectedUser.status ?? true,
+          }
+        : { fullName: "", email: "", phone: "", role: "", status: true }
+    );
   }, [selectedUser]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = (e) => {
@@ -47,54 +38,35 @@ const UserModal = ({ isOpen, onClose, onSave, selectedUser }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
+        <h2 className="text-xl font-semibold mb-4 text-center">
           {selectedUser ? "Editar Usuario" : "Nuevo Usuario"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium">Nombre completo</label>
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
+          {["fullName", "email", "phone"].map((field) => (
+            <div key={field}>
+              <label className="block text-sm font-medium mb-1 capitalize">
+                {field === "fullName" ? "Nombre completo" : field}
+              </label>
+              <input
+                type={field === "email" ? "email" : "text"}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                required={field !== "phone"}
+              />
+            </div>
+          ))}
 
           <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Telefono</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Rol</label>
+            <label className="block text-sm font-medium mb-1">Rol</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-primary focus:outline-none"
             >
               <option value="">Seleccionar rol</option>
               <option value="user">Usuario</option>
@@ -115,19 +87,8 @@ const UserModal = ({ isOpen, onClose, onSave, selectedUser }) => {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Guardar
-            </button>
+            <Button title="Cancelar" action={onClose} variant="secondary" />
+            <Button title="Guardar" type="submit" />
           </div>
         </form>
       </div>
