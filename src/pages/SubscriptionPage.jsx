@@ -1,20 +1,25 @@
-// pages/Subscribe.jsx
+// src/pages/Subscribe.jsx
 import { useEffect, useMemo, useState } from "react";
 import {
   fetchActivePlans,
-  localPlansFallback,
   createSubscription,
 } from "../services/subscriptionsService";
 import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 
-const HERO_BG = "/public/vinosuscripcion.png";
+const HERO_BG = "/vinosuscripcion.png"; // si está en /public
 
 const LOGIN_NEXT = "/subscriptionPage";
 const LOGIN_URL  = `/login?next=${encodeURIComponent(LOGIN_NEXT)}`;
 
 const WINE_TYPES = ["mixto", "tinto", "rosa", "espumoso"];
 const FIRST_MONTH_PROMO = 25;
+
+// Fallback local (por si la API de planes aún no responde)
+const LOCAL_FALLBACK_PLANS = [
+  { _id: "plan_basic_6",   name: "mensual", boxType: "basic",   boxSize: 6, price: 59.9, active: true },
+  { _id: "plan_premium_6", name: "mensual", boxType: "premium", boxSize: 6, price: 79.9, active: true },
+];
 
 export default function SubscriptionPage() {
   const navigate = useNavigate();
@@ -31,13 +36,18 @@ export default function SubscriptionPage() {
     let mounted = true;
     (async () => {
       try {
+        setError(null);
         setLoading(true);
-        const res = await fetchActivePlans(); // axios
+        const res = await fetchActivePlans(); // axios (back real)
         if (!mounted) return;
-        setPlans(res);
-      } catch {
+        setPlans(res || []);
+        // Si el back devolviera vacío, usa fallback para que se vea algo
+        if ((res || []).length === 0) setPlans(LOCAL_FALLBACK_PLANS);
+      } catch (e) {
         if (!mounted) return;
-        setPlans(localPlansFallback());
+        console.error(e);
+        setError("No se pudieron cargar los planes. Mostrando opciones por defecto.");
+        setPlans(LOCAL_FALLBACK_PLANS);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -69,20 +79,16 @@ export default function SubscriptionPage() {
   };
 
   const currentPrice = selectedPlan?.price ?? 0;
-  const firstMonthPrice = Math.min(
-    FIRST_MONTH_PROMO,
-    currentPrice || FIRST_MONTH_PROMO
-  );
+  const firstMonthPrice = Math.min(FIRST_MONTH_PROMO, currentPrice || FIRST_MONTH_PROMO);
 
-  // este helper es para exigir login antes de una acción
-function ensureAuthThen(action) {
-  if (!isAuthenticated) {
-    navigate(LOGIN_URL);
-    return;
+  // exigir login antes de una acción
+  function ensureAuthThen(action) {
+    if (!isAuthenticated) {
+      navigate(LOGIN_URL);
+      return;
+    }
+    action?.();
   }
-  action?.();
-}
-
 
   async function handleSubscribe() {
     setError(null);
@@ -95,19 +101,18 @@ function ensureAuthThen(action) {
       const planId = selectedPlan?._id;
       if (!planId) throw new Error("No hay plan seleccionado");
 
+      // Back real espera { subscriptionPlanId, wineType } -> mapeado en service
       const sub = await createSubscription({
         planId,
-        boxType: selectedLevel,
         wineType,
-        payMethod: "PayPall",
-      }); // axios
+      });
 
       navigate("/account/subscription", { state: { createdId: sub?._id } });
     } catch (e) {
       setError(
         e?.response?.data?.message ||
-          e.message ||
-          "No se pudo crear la suscripción"
+        e.message ||
+        "No se pudo crear la suscripción"
       );
     } finally {
       setSubmitting(false);
@@ -151,9 +156,7 @@ function ensureAuthThen(action) {
                 <button
                   className="rounded-2xl bg-[#AD946C] px-7 py-3 font-semibold text-[#000000] shadow hover:opacity-90"
                   onClick={() =>
-                    document
-                      .getElementById("plans")
-                      ?.scrollIntoView({ behavior: "smooth" })
+                    document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" })
                   }
                 >
                   Suscríbete
@@ -179,8 +182,13 @@ function ensureAuthThen(action) {
             </h2>
             <p className="mt-2 text-[#000000]">
               Elige el que mejor acompañe tu estilo de disfrutar el vino.
-              <br></br>Paga como prefieras y cancela cuando quieras.
+              <br />Paga como prefieras y cancela cuando quieras.
             </p>
+            {error && (
+              <p className="mx-auto mt-3 max-w-xl rounded-xl bg-yellow-50 p-3 text-sm text-yellow-800">
+                {error}
+              </p>
+            )}
           </header>
 
           {/* Toggle nivel */}
@@ -190,13 +198,9 @@ function ensureAuthThen(action) {
                 key={level}
                 onClick={() => setSelectedLevel(level)}
                 className={`rounded-xl px-4 py-3 font-semibold capitalize transition ${
-                  selectedLevel === level
-                    ? "bg-[#FFFFFF] shadow"
-                    : "text-[#ADADAD] hover:bg-[#F8F8F8]"
+                  selectedLevel === level ? "bg-[#FFFFFF] shadow" : "text-[#ADADAD] hover:bg-[#F8F8F8]"
                 }`}
-                style={{
-                  color: selectedLevel === level ? "#000000" : undefined,
-                }}
+                style={{ color: selectedLevel === level ? "#000000" : undefined }}
               >
                 {level}
               </button>
@@ -215,7 +219,6 @@ function ensureAuthThen(action) {
                     active ? "ring-2 ring-[#AD946C]" : ""
                   }`}
                 >
-                
                   <div className="mb-6 flex flex-col items-center text-center">
                     <p className="text-xl uppercase tracking-widest text-[#000000]">
                       Box Premier
@@ -226,24 +229,19 @@ function ensureAuthThen(action) {
                     <div className="mt-3">
                       <p className="text-sm text-[#ADADAD]">1er mes</p>
                       <p className="text-3xl font-black text-[#000000]">
-                        {firstMonthPrice.toFixed(0)}€
+                        {FIRST_MONTH_PROMO.toFixed(0)}€
                       </p>
                     </div>
                   </div>
 
-                  <div
-                    className="mb-4 rounded-xl bg-[#F8F6F4] p-4"
-                    style={{ backgroundColor: "#F8F6F4" }}
-                  >
+                  <div className="mb-4 rounded-xl p-4" style={{ backgroundColor: "#F8F6F4" }}>
                     <p className="text-sm text-[#000000]">
                       Luego{" "}
                       <span className="font-semibold">
                         {plan?.price ? `${plan.price.toFixed(2)}€` : "—"}
                       </span>{" "}
                       al mes. Caja de{" "}
-                      <span className="font-semibold">
-                        {plan?.boxSize ?? "—"}
-                      </span>{" "}
+                      <span className="font-semibold">{plan?.boxSize ?? "—"}</span>{" "}
                       botellas (750 ml).
                     </p>
                   </div>
@@ -287,22 +285,8 @@ function ensureAuthThen(action) {
                         ))}
                       </div>
 
-                      {/* <button
-                        onClick={handleSubscribe}
-                        disabled={submitting}
-                        className="mt-2 w-full rounded-2xl bg-[#000000] px-6 py-3 font-semibold text-[#FFFFFF] hover:opacity-90 disabled:opacity-60"
-                      >
-                        {submitting
-                          ? "Creando suscripción…"
-                          : "Suscribirme ahora"}
-                      </button> */}
-
-                      <p
-                        className="mt-2 text-center text-xs"
-                        style={{ color: "#ADADAD" }}
-                      >
-                        Pagos seguros con PayPall. Puedes cancelar cuando
-                        quieras.
+                      <p className="mt-2 text-center text-xs" style={{ color: "#ADADAD" }}>
+                        Pagos seguros. Puedes cancelar cuando quieras.
                       </p>
                     </div>
                   )}
@@ -311,28 +295,19 @@ function ensureAuthThen(action) {
             })}
           </div>
 
-          {/* CTA global en la sección 2 */}
+          {/* CTA global */}
           <div className="mt-10 flex justify-center">
             <button
               onClick={() => ensureAuthThen(handleSubscribe)}
-              disabled={submitting || !selectedPlan}
+              disabled={submitting || !selectedPlan || loading}
               className="rounded-2xl bg-[#AD946C] px-6 py-3 mt-8 font-semibold text-[#000000] hover:opacity-90 disabled:opacity-60"
-              title={
-                !selectedPlan
-                  ? "Selecciona un plan"
-                  : "Continuar con la suscripción"
-              }
+              title={!selectedPlan ? "Selecciona un plan" : "Continuar con la suscripción"}
             >
               {submitting ? "Creando suscripción…" : "Suscríbete ahora"}
             </button>
-            {error && (
-              <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-                {error}
-              </p>
-            )}
           </div>
 
-          {/* ===== Todo lo que necesitas saber (FAQ) ===== */}
+          {/* FAQ */}
           <div className="mt-14">
             <h3 className="mb-4 text-2xl font-bold text-center text-[#000000]">
               Todo lo que necesitas saber
@@ -344,13 +319,10 @@ function ensureAuthThen(action) {
                   <span className="text-base font-semibold text-[#000000]">
                     ¿Qué incluye cada caja?
                   </span>
-                  <span className="text-[#AD946C] transition group-open:rotate-180">
-                    ⌄
-                  </span>
+                  <span className="text-[#AD946C] transition group-open:rotate-180">⌄</span>
                 </summary>
                 <p className="mt-3 text-sm text-[#000000]">
-                  6 botellas seleccionadas por sumilleres, fichas de cata y
-                  sugerencias de maridaje.
+                  6 botellas seleccionadas por sumilleres, fichas de cata y sugerencias de maridaje.
                 </p>
               </details>
 
@@ -359,14 +331,11 @@ function ensureAuthThen(action) {
                   <span className="text-base font-semibold text-[#000000]">
                     ¿Cómo funciona el cobro?
                   </span>
-                  <span className="text-[#AD946C] transition group-open:rotate-180">
-                    ⌄
-                  </span>
+                  <span className="text-[#AD946C] transition group-open:rotate-180">⌄</span>
                 </summary>
                 <p className="mt-3 text-sm text-[#000000]">
-                  El primer mes pagas {firstMonthPrice.toFixed(0)}€ y luego{" "}
-                  {currentPrice ? `${currentPrice.toFixed(2)}€` : "—"} al mes
-                  mediante PayPall. Puedes cancelar cuando quieras.
+                  El primer mes pagas {FIRST_MONTH_PROMO.toFixed(0)}€ y luego{" "}
+                  {currentPrice ? `${currentPrice.toFixed(2)}€` : "—"} al mes. Puedes cancelar cuando quieras.
                 </p>
               </details>
 
@@ -375,13 +344,10 @@ function ensureAuthThen(action) {
                   <span className="text-base font-semibold text-[#000000]">
                     ¿Cuándo recibo mi caja?
                   </span>
-                  <span className="text-[#AD946C] transition group-open:rotate-180">
-                    ⌄
-                  </span>
+                  <span className="text-[#AD946C] transition group-open:rotate-180">⌄</span>
                 </summary>
                 <p className="mt-3 text-sm text-[#000000]">
-                  Preparamos tu pedido al confirmar la suscripción y te
-                  notificamos con el número de seguimiento.
+                  Preparamos tu pedido al confirmar la suscripción y te notificamos con el número de seguimiento.
                 </p>
               </details>
             </div>

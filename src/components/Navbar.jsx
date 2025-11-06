@@ -1,230 +1,165 @@
-// import Logo from "../assets/Logo.png"; 
-// import logo2 from "../assets/logo2.png";
-// import { useState, useEffect } from "react"; 
-// import { NavLink, useLocation, useNavigate, Link } from "react-router-dom"; 
-// import useAuthStore from "../store/authStore";
-
-// const NavBar = ({ logo = Logo }) => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const location = useLocation(); //borrar si no lo vamos a usar
-//   const navigate = useNavigate();//borrar si no lo  vamos a usar
-
-//   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-//   const user = useAuthStore((state) => state.user);
-//   const logout = useAuthStore((state) => state.logout);
-
- 
-//   return (
-//     <nav className="w-full bg-black text-white px-6 py-3">
-//      <div className="flex items-center justify-between">
-//         <Link to="/" aria-label="Ir al inicio">
-//           <img
-//             src={logo}
-//             alt="Vino Premier"
-//             className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-//           />
-//         </Link>
-
-//         {/* Logo central (solo visible en pantallas medianas y grandes) */}
-//         <div className="hidden md:flex justify-center items-center">
-//           <Link to="/subscriptionPage" aria-label="Página de suscripción">
-//             <img
-//               src={logo2}
-//               alt="Círculo dorado - Suscripción"
-//               className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-//             />
-//           </Link>
-//         </div>
-
-//         {/* Menú hamburguesa (solo visible en móviles) */}
-//         <button
-//           onClick={() => setIsMenuOpen(!isMenuOpen)}
-//           className="block md:hidden p-2 text-2xl"
-//           aria-label="Abrir o cerrar menú"
-//         >
-//           {isMenuOpen ? "Χ" : "☰"}
-//         </button>
-
-//         {/* Enlaces de escritorio */}
-//         <div className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
-//           <NavLink
-//             to="/login"
-//             className={({ isActive }) =>
-//               `hover:text-[#C9A35C] transition-colors ${
-//                 isActive ? "text-[#C9A35C]" : ""
-//               }`
-//             }
-//           >
-//             LOGIN
-//           </NavLink>
-
-//           <button
-//             type="button"
-//             aria-label="Cambiar idioma"
-//             className="flex items-center gap-1 hover:text-[#C9A35C] transition-colors"
-//           >
-//             <span>IDIOMA</span>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Menú móvil desplegable */}
-//       {isMenuOpen && (
-//         <div className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide">
-//           {/* Logo dorado en versión móvil */}
-//           <Link
-//             to="/subscriptionPage"
-//             className="hover:text-[#C9A35C] transition-colors"
-//             onClick={() => setIsMenuOpen(false)}
-//           >
-//             SUSCRIPCIÓN
-//           </Link>
-
-//           <NavLink
-//             to="/login"
-//             className={({ isActive }) =>
-//               `hover:text-[#C9A35C] transition-colors ${
-//                 isActive ? "text-[#C9A35C]" : ""
-//               }`
-//             }
-//             onClick={() => setIsMenuOpen(false)}
-//           >
-//             LOGIN
-//           </NavLink>
-
-//           <button
-//             type="button"
-//             aria-label="Cambiar idioma"
-//             className="hover:text-[#C9A35C] transition-colors"
-//             onClick={() => setIsMenuOpen(false)}
-//           >
-//             IDIOMA
-//           </button>
-//         </div>
-//       )}
-//     </nav>
-//   );
-// };
-
-// export default NavBar;
-
-import Logo from "../assets/Logo.png";
-import logo2 from "../assets/logo2.png";
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
+import Logo from "../assets/full-logo-white.png"; // большое лого (слева)
+import logo2 from "../assets/logo2.png"; // круглое лого (по центру)
 
-const NavBar = ({ logo = Logo }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+const NavLinks = ({ isMobile = false, closeMenu }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const nombreUsuario =
+    user?.nombre ||
+    user?.name ||
+    user?.username ||
+    user?.firstName ||
+    user?.email?.split("@")[0] || // fallback — часть email до "@"
+    "usuario";
+
+  const linkClass = ({ isActive }) =>
+    `hover:text-[#C9A35C] transition-colors ${
+      isActive ? "text-[#C9A35C]" : ""
+    }`;
 
   return (
-    <nav className="w-full bg-black text-white px-6 py-3">
-      <div className="flex items-center justify-between">
-        {/* Ir a la Home dentro de la app */}
-        <Link to="/app" aria-label="Ir al inicio" data-testid="link-home">
+    <div
+      className={`${
+        isMobile
+          ? "flex flex-col items-start gap-3 mt-4"
+          : "flex items-center gap-6"
+      } text-sm font-semibold tracking-wide`}
+    >
+      {/* 🔸 Enlaces principales */}
+      <NavLink
+        to="plans"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        PLANES
+      </NavLink>
+
+      <NavLink
+        to="gift"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        REGALA
+      </NavLink>
+
+      <NavLink
+        to="/cajas-anteriores"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        CAJAS ANTERIORES
+      </NavLink>
+
+      <NavLink
+        to="/app/subscription"
+        className={linkClass}
+        onClick={isMobile ? closeMenu : undefined}
+      >
+        SUSCRIPCIÓN
+      </NavLink>
+
+      {/* 🔹 Usuario logueado */}
+      {isAuthenticated && user ? (
+        <div className="relative">
+          <button
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
+          >
+            Hola, {nombreUsuario}
+          </button>
+
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg z-50">
+              <NavLink
+                to="/app/profile"
+                className="block px-4 py-2 hover:bg-gray-100"
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (closeMenu) closeMenu();
+                }}
+              >
+                Ver perfil
+              </NavLink>
+              <button
+                onClick={() => {
+                  logout();
+                  setIsDropdownOpen(false);
+                  if (closeMenu) closeMenu();
+                }}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                Terminar la sesión
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <NavLink
+          to="/login"
+          className={linkClass}
+          onClick={isMobile ? closeMenu : undefined}
+        >
+          LOGIN
+        </NavLink>
+      )}
+    </div>
+  );
+};
+
+// 🔸 Navbar principal
+const NavBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <nav className="w-full bg-black text-white px-6 py-3 relative">
+      <div className="flex items-center justify-between relative">
+        {/* 🔹 Logotipo grande (izquierda) → Home */}
+        <Link to="/" aria-label="Ir al inicio">
           <img
-            src={logo}
-            alt="Vino Premier"
+            src={Logo}
+            alt="Vino Premier Logo"
             className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
           />
         </Link>
 
-        <div className="hidden md:flex justify-center items-center">
-          <NavLink
-            to="subscription"
-            aria-label="Página de suscripción"
-            data-testid="link-subscription"
-          >
-            <img
-              src={logo2}
-              alt="Círculo dorado - Suscripción"
-              className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-            />
-          </NavLink>
-        </div>
+        {/* 🔹 Logotipo circular (centro) → Main Page */}
+        <Link
+          to="/main"
+          aria-label="Ir a la página principal"
+          className="absolute left-1/2 transform -translate-x-1/2"
+        >
+          <img
+            src={logo2}
+            alt="Círculo dorado - Main"
+            className="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+          />
+        </Link>
 
-        {/* Menú hamburguesa (móvil) */}
+        {/* 🔹 Botón menú hamburguesa (solo móvil) */}
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
           aria-label="Abrir o cerrar menú"
-          data-testid="mobile-menu-button"
         >
-          {isMenuOpen ? "Χ" : "☰"}
+          {isMenuOpen ? "✕" : "☰"}
         </button>
 
-        <div className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
-          {/* Ejemplos de rutas internas relativas si las agregas:
-              <NavLink to="profile">PERFIL</NavLink>
-              <NavLink to="subscription">SUSCRIPCIÓN</NavLink>
-          */}
-
-          {/* Auth está FUERA de /app, por eso absoluto */}
-          {isAuthenticated && user ? (
-            <>
-              <span data-testid="username">{user.name}</span>
-              <button onClick={logout} data-testid="logout-button">LOGOUT</button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login" data-testid="link-login">LOGIN</NavLink>
-            </>
-          )}
-
-          <button
-            type="button"
-            aria-label="Cambiar idioma"
-            className="flex items-center gap-1 hover:text-[#C9A35C] transition-colors"
-          >
-            <span>IDIOMA</span>
-          </button>
+        {/* 🔹 Enlaces de escritorio */}
+        <div className="hidden md:flex">
+          <NavLinks />
         </div>
       </div>
 
+      {/* 🔹 Menú móvil desplegable */}
       {isMenuOpen && (
-        <div
-          className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide"
-          data-testid="mobile-menu"
-        >
-          <NavLink
-            to="/subscriptionPage"
-            className="hover:text-[#C9A35C] transition-colors"
-            onClick={() => setIsMenuOpen(false)}
-            data-testid="mobile-link-subscription"
-          >
-            SUSCRIPCIÓN
-          </NavLink>
-
-          {/* Auth absoluto */}
-          {isAuthenticated && user ? (
-            <>
-              <span data-testid="mobile-username">{user.name}</span>
-              <button onClick={logout} data-testid="mobile-logout-button">LOGOUT</button>
-            </>
-          ) : (
-            <>
-              <NavLink
-                to="/login"
-                onClick={() => setIsMenuOpen(false)}
-                data-testid="mobile-link-login"
-              >
-                LOGIN
-              </NavLink>
-            </>
-          )}
-
-          <button
-            type="button"
-            aria-label="Cambiar idioma"
-            className="hover:text-[#C9A35C] transition-colors"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            IDIOMA
-          </button>
+        <div className="md:hidden">
+          <NavLinks isMobile closeMenu={() => setIsMenuOpen(false)} />
         </div>
       )}
     </nav>

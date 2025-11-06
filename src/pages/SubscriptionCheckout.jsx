@@ -1,15 +1,20 @@
-// pages/SubscriptionCheckout.jsx
+// src/pages/SubscriptionCheckout.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import {
   fetchActivePlans,
-  localPlansFallback,
   createSubscription,
 } from "../services/subscriptionsService";
 
 const COLORS = { gold: "#AD946C", gray: "#ADADAD", black: "#000000" };
 const WINE_TYPES = ["mixto", "tinto", "rosa", "espumoso"];
+
+// Fallback local por si la API de planes no responde
+const LOCAL_FALLBACK_PLANS = [
+  { _id: "plan_basic_6",   name: "mensual", boxType: "basic",   boxSize: 6, price: 59.9, active: true },
+  { _id: "plan_premium_6", name: "mensual", boxType: "premium", boxSize: 6, price: 79.9, active: true },
+];
 
 export default function SubscriptionCheckout() {
   const navigate = useNavigate();
@@ -48,7 +53,7 @@ export default function SubscriptionCheckout() {
   const [wineType, setWineType] = useState(initialWine);
   const [isGift, setIsGift] = useState(false);
 
-  const [payMethod, setPayMethod] = useState("multisafepay"); // “paypal/multisafepay” en tu JSON
+  const [payMethod, setPayMethod] = useState("multisafepay"); // ajusta a tu back si lo usas
   const [submitting, setSubmitting] = useState(false);
 
   // 🔎 Cargar planes
@@ -56,13 +61,21 @@ export default function SubscriptionCheckout() {
     let ok = true;
     (async () => {
       try {
+        setError(null);
         setLoadingPlans(true);
         const res = await fetchActivePlans();
         if (!ok) return;
-        setPlans(res);
-      } catch {
+        if (Array.isArray(res) && res.length) {
+          setPlans(res);
+        } else {
+          setPlans(LOCAL_FALLBACK_PLANS);
+          setError("No se recibieron planes desde la API. Mostrando opciones por defecto.");
+        }
+      } catch (e) {
         if (!ok) return;
-        setPlans(localPlansFallback());
+        console.error(e);
+        setPlans(LOCAL_FALLBACK_PLANS);
+        setError("No se pudieron cargar los planes. Mostrando opciones por defecto.");
       } finally {
         ok && setLoadingPlans(false);
       }
@@ -93,25 +106,15 @@ export default function SubscriptionCheckout() {
     try {
       setSubmitting(true);
 
-      // payload compatible con tu JSON/schema
-      const payload = {
+      // El back real espera { planId, wineType } (en el service se mapea a subscriptionPlanId)
+      await createSubscription({
         planId,
-        boxType,
         wineType,
-        payMethod,              
-        isGift,
-        // Datos de envío (si backend admite en la creación)
-        shipping: {
-          firstName,
-          lastName,
-          email,
-          phone,
-          address: { street, number, floor, postalCode, city, province, country },
-        },
-      };
+        // Si luego soportas envío de datos extra, puedes agregar:
+        // isGift, payMethod, shipping: { ... }
+      });
 
-      const sub = await createSubscription(payload);
-      navigate("/account/subscription", { state: { createdId: sub?._id } });
+      navigate("/account/subscription", { state: { createdId: planId } });
     } catch (err) {
       setError(err?.response?.data?.message || err.message || "No se pudo crear la suscripción");
     } finally {
@@ -249,7 +252,7 @@ export default function SubscriptionCheckout() {
             </div>
           </div>
 
-          {/* Método de pago */}
+          {/* Método de pago (visual; ignora el valor si tu back aun no lo usa) */}
           <div className="mt-6">
             <p className="mb-3 text-sm font-semibold">Método de pago</p>
             <div className="flex flex-wrap gap-6 text-sm">
@@ -261,7 +264,7 @@ export default function SubscriptionCheckout() {
                   checked={payMethod === "multisafepay"}
                   onChange={(e) => setPayMethod(e.target.value)}
                 />
-                 PayPal
+                PayPal
               </label>
               <label className="flex items-center gap-2">
                 <input
