@@ -11,7 +11,7 @@ export const getUser = async (id) => {
   const { data } = await API.get(`/users/${id}`);
   return data.data;
 };
-
+ 
 // Crear usuario
 export const createUser = async (userData) => {
   const { data } = await API.post("/users", userData);
@@ -30,9 +30,5 @@ export const deleteUser = async (id) => {
   return data.data;
 };
 
-//INGRID ESTUVO POR AQUI
-export async function getUserById(userId) {
-  const { data } = await API.get(`/users/${userId}`)
-  return data.data
-}
+
 
