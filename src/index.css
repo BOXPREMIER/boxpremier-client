@@ -168,3 +168,41 @@
     --color-secondary: #AB9470;
     /*PANTONE P 13-7C*/
 }
+
+/* Colores y estilo componente Custom Alert SweetAlert */ 
+
+.custom-alert-popup {
+  border: 2px solid #AD946C !important;
+  border-radius: 16px !important;
+  font-family: Gotham, sans-serif !important;
+}
+
+.custom-alert-title {
+  font-weight: 700 !important;
+  font-family: Gotham, sans-serif !important;
+  color: var(--color-primary);
+}
+
+.custom-alert-text {
+  font-weight: 400 !important;
+  font-family: Gotham, sans-serif !important;
+  color: var(--color-primary);
+}
+
+.custom-alert-confirm,
+.custom-alert-cancel {
+  border: 2px solid #AD946C !important;
+  color: #AD946C !important;
+  background-color: transparent !important;
+  font-family: Gotham, sans-serif !important;
+  border-radius: 10px !important;
+  padding: 8px 20px !important;
+  margin: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-alert-confirm:hover,
+.custom-alert-cancel:hover {
+  background-color: #AD946C !important;
+  color: white !important;
+}
