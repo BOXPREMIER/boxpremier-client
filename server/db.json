@@ -167,5 +167,247 @@
       "createdAt": "2025-10-01T08:01:00Z",
       "id": "e786"
     }
+  ], 
+  "monthlyWines": [
+    {
+      "month": "january",
+      "wines": [
+        {
+          "name": "Quintela Colheita",
+          "image": "/public/monthly-wines/quintela-douro.jpg",
+          "link": "https://vinopremier.com/vino-blanco-quintela-colheita.html"
+        },
+        {
+          "name": "El Sastre y El Simio Crianza",
+          "image": "/public/monthly-wines/el-sastre-y-el-simio.jpg",
+          "link": "https://vinopremier.com/vino-tinto-el-sastre-y-el-simio-crianza.html"
+        },
+        {
+          "name": "Abadía de San Quirce 6 Meses",
+          "image": "/public/monthly-wines/abadia-de-san-quirce.jpg",
+          "link": "https://vinopremier.com/vino-tinto-abadia-de-san-quirce-6-meses-barrica.html"
+        }
+      ]
+    },
+    {
+      "month": "february",
+      "wines": [
+        {
+          "name": "Tuccibel Roble",
+          "image": "/public/monthly-wines/Vitdu.jpg",
+          "link": "https://vinopremier.com/vino-tinto-tuccibel-roble.html"
+        },
+        {
+          "name": "Valbusenda Abios Nude",
+          "image": "/public/monthly-wines/Valbusenda.jpg",
+          "link": "https://vinopremier.com/vino-rosado-abios-nude.html"
+        },
+        {
+          "name": "Hacienda Albae Viognier",
+          "image": "/public/monthly-wines/hacienda-albae.jpg",
+          "link": "https://vinopremier.com/vino-blanco-hacienda-albae-viognier.html"
+        }
+      ]
+    },
+    {
+      "month": "march",
+      "wines": [
+        {
+          "name": "OMMO Verdejo Bulería",
+          "image": "/public/monthly-wines/ommo.jpg",
+          "link": "https://vinopremier.com/vino-blanco-ommo-verdejo-buleria.html"
+        },
+        {
+          "name": "Optio Macchie Santa Maria",
+          "image": "/public/monthly-wines/optio.jpg",
+          "link": "https://vinopremier.com/vino-tinto-optio-macchie-santa-maria.html"
+        },
+        {
+          "name": "Siesto Vino De Contrabando",
+          "image": "/public/monthly-wines/siesto.jpg",
+          "link": "https://vinopremier.com/vino-tinto-siesto-vino-de-contrabando.html"
+        }
+      ]
+    },
+    {
+      "month": "april",
+      "wines": [
+        {
+          "name": "Raimat Albariño Saira Ecológico",
+          "image": "/public/monthly-wines/raimat.jpg",
+          "link": "https://vinopremier.com/vino-blanco-raimat-albari-o-saira-ecologico.html"
+        },
+        {
+          "name": "Domblasco",
+          "image": "/public/monthly-wines/Domblasco.jpg",
+          "link": "https://vinopremier.com/vino-tinto-domblasco.html"
+        },
+        {
+          "name": "Corral de Campanas",
+          "image": "/public/monthly-wines/corral-de-campanas.jpg",
+          "link": "https://vinopremier.com/vino-tinto-corral-de-campanas.html"
+        }
+      ]
+    },
+    {
+      "month": "may",
+      "wines": [
+        {
+          "name": "Kolenda Lagar d'Amprius",
+          "image": "/public/monthly-wines/kolenda.jpg",
+          "link": "https://vinopremier.com/vino-blanco-kolenda-lagar-d-amprius.html"
+        },
+        {
+          "name": "Santa Ema Select Terroir Reserva Merlot",
+          "image": "/public/monthly-wines/santa-ema.jpg",
+          "link": "https://vinopremier.com/vino-tinto-santa-ema-select-terroir-reserva-merlot.html"
+        },
+        {
+          "name": "Bucrana Crianza",
+          "image": "/public/monthly-wines/bucrana.jpg",
+          "link": "https://vinopremier.com/vino-tinto-bucrana-crianza.html"
+        }
+      ]
+    },
+    {
+      "month": "june",
+      "wines": [
+        {
+          "name": "La Font del Mosquit",
+          "image": "/public/monthly-wines/mosquit.jpg",
+          "link": "https://vinopremier.com/vino-blanco-la-font-del-mosquit.html"
+        },
+        {
+          "name": "Ilurce Rioja Joven",
+          "image": "/public/monthly-wines/Ilurce.jpg",
+          "link": "https://vinopremier.com/vino-tinto-ilurce-joven-tempranillo.html"
+        },
+        {
+          "name": "Salmoral",
+          "image": "/public/monthly-wines/salmoral.jpg",
+          "link": "https://vinopremier.com/vino-tinto-salmoral.html"
+        }
+      ]
+    },
+    {
+      "month": "july",
+      "wines": [
+        {
+          "name": "CIPMA I Marisol Rubio",
+          "image": "/public/monthly-wines/marisol.jpg",
+          "link": "https://vinopremier.com/vino-blanco-cima-marisol-rubio.html"
+        },
+        {
+          "name": "Álvarez Alfaro Llaves de Yerga",
+          "image": "/public/monthly-wines/llaves-de-yerga.jpg",
+          "link": "https://vinopremier.com/vino-tinto-alvarez-alfaro-llaves-de-yerga.html"
+        },
+        {
+          "name": "Compartir Joven",
+          "image": "/public/monthly-wines/compartir.jpg",
+          "link": "https://vinopremier.com/vino-tinto-compartir-joven.html"
+        }
+      ]
+    },
+    {
+      "month": "august",
+      "wines": [
+        {
+          "name": "Dulce Picardías",
+          "image": "/public/monthly-wines/picardias.jpg",
+          "link": "https://vinopremier.com/vino-blanco-dulce-picardias.html"
+        },
+        {
+          "name": "Las Margas Garnacha Blanca Vegano",
+          "image": "/public/monthly-wines/margas.jpg",
+          "link": "https://vinopremier.com/vino-blanco-las-margas-garnacha-blanca-vegano.html"
+        },
+        {
+          "name": "Valmenia Roble 9 Meses",
+          "image": "/public/monthly-wines/valmenia.jpg",
+          "link": "https://vinopremier.com/vino-tinto-valmenia-roble.html"
+        }
+      ]
+    },
+    {
+      "month": "september",
+      "wines": [
+        {
+          "name": "Vile La Finca Albarín",
+          "image": "/public/monthly-wines/vile-la-finca.jpg",
+          "link": "https://vinopremier.com/vino-blanco-vile-la-finca-albarin.html"
+        },
+        {
+          "name": "Don Bernardino Mencía",
+          "image": "/public/monthly-wines/don-bernardino.jpg",
+          "link": "https://vinopremier.com/vino-tinto-don-bernardino-mencia.html"
+        },
+        {
+          "name": "Pago de Marinacea Joven",
+          "image": "/public/monthly-wines/pago-de-marinacea.jpg",
+          "link": "https://vinopremier.com/vino-tinto-pago-de-marinacea-joven.html"
+        }
+      ]
+    },
+    {
+      "month": "october",
+      "wines": [
+        {
+          "name": "Abulaga",
+          "image": "/public/monthly-wines/abugala.jpg",
+          "link": "https://vinopremier.com/vino-blanco-abulaga.html"
+        },
+        {
+          "name": "Vetusta Viñas de Fuentenebro",
+          "image": "/public/monthly-wines/vetusta.jpg",
+          "link": "https://vinopremier.com/vino-tinto-vetusta-vi-as-de-fuentenebro.html"
+        },
+        {
+          "name": "Alagú Garnacha Tintorera",
+          "image": "/public/monthly-wines/alagu.jpg",
+          "link": "https://vinopremier.com/vino-tinto-alagu-garnacha-tintorera.html"
+        }
+      ]
+    },
+    {
+      "month": "november",
+      "wines": [
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        },
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        },
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        }
+      ]
+    },
+    {
+      "month": "december",
+      "wines": [
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        },
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        },
+        {
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
+          "link": ""
+        }
+      ]
+    }
   ]
 }
