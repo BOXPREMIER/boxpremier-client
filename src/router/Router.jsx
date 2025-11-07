@@ -86,7 +86,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> }, // /app
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
       { path: "subscription", element: <SubscriptionPage /> }, // /app/subscription
-      { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
+      { path: "subscription/checkout", element: <SubscriptionCheckout /> }, // /app/subscription/checkout
       { path: "gift", element: <GiftPage /> },
       {
         path: "admin", element: <AdminDashboard />, loader: adminGuard,
@@ -97,7 +97,7 @@ const router = createBrowserRouter([
           { path: "orders", element: <OrdersTab />, },
           { path: "payments", element: <PaymentsTab />, },
         ],
-      },
+      }, // /app/admin
     ],
   },
 
