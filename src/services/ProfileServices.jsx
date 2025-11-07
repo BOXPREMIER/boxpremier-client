@@ -4,21 +4,27 @@ import useAuthStore from "../store/authStore";
 
 // GET datos del usuario autenticado
 export async function getMe() {
-  const id = useAuthStore.getState()?.user?._id || useAuthStore.getState()?.user?.id;
+  const user = useAuthStore.getState()?.user;
+  const id = user?._id || user?.id;
+
   const { data } = await API.get(`/users/${id}`);
-  return data;
+  return data.data;
 }
 
 // PATCH perfil del usuario autenticado (incluida password si la envías)
-export async function updateMe(patch) {
-  const id = useAuthStore.getState()?.user?._id || useAuthStore.getState()?.user?.id;
-  const { data } = await API.patch(`/users/${id}`, patch);
-  return data;
+export async function updateMe(profileData) {
+  const user = useAuthStore.getState()?.user;
+  const id = user?._id || user?.id;
+
+  const { data } = await API.put(`/users/${id}`, profileData);
+  return data.data;
 }
 
 // Cambiar contraseña = PATCH /users/:id con { password }
 export async function changeMyPassword({ newPassword }) {
-  const id = useAuthStore.getState()?.user?._id || useAuthStore.getState()?.user?.id;
-  const { data } = await API.patch(`/users/${id}`, { password: newPassword });
-  return data;
+  const user = useAuthStore.getState()?.user;
+  const id = user?._id || user?.id;
+
+  const { data } = await API.put(`/users/${id}`, { password: newPassword });
+  return data.data;
 }

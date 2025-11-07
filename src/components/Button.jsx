@@ -26,12 +26,12 @@ const Button = ({ title, action, tooltip, type = "button", "data-testid": testid
       className={`
         w-full md:w-auto
         px-10 py-4
-        bg-[#b49361]
+        bg-secondary
         text-white uppercase tracking-wider
         transition-all duration-300 ease-out
-        ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#a18150] hover:scale-[1.02]"}
+        ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-secondary hover:scale-[1.02] cursor-pointer"}
         rounded-full shadow-md
-        focus:outline-none focus:ring-2 focus:ring-[#b49361]/50
+        focus:outline-none focus:ring-2 focus:ring-secondary/50
       `}
       style={{
         fontFamily: "Gotham, sans-serif",
