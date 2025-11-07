@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import useAuthStore from "../store/authStore";
-import { getMyActiveSubscription, cancelSubscription } from "../services/SubscriptionServices";
+import { getSubscriptions, cancelSubscription } from "../services/SubscriptionServices";
 import { getMe, updateMe, changeMyPassword } from "../services/ProfileServices";
+import { getAllOrders, cancelOrder } from "../services/OrderServices";
 
 const tabButton = (active) =>
   `px-4 py-1 rounded-full text-sm border transition font-gotham ${active ? "bg-[#F5F5F5] border-[#ADADAD]" : "border-[#ADADAD] hover:bg-[#F5F5F5]"}`;
@@ -16,6 +17,7 @@ const card =
 export default function ProfilePage() {
   const { user: userStore, setUser } = useAuthStore();
   const [tab, setTab] = useState("perfil");
+  const [orders, setOrders] = useState([]);
 
   const [profile, setProfile] = useState({
     firstName: "",
@@ -32,8 +34,7 @@ export default function ProfilePage() {
   });
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  const [sub, setSub] = useState(null);
+  const [sub, setSub] = useState([]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [canceling, setCanceling] = useState(false);
 
@@ -48,12 +49,10 @@ export default function ProfilePage() {
   useEffect(() => {
     (async () => {
       if (!userStore?._id) {
-        console.log("❌ No hay usuario en el store");
         return;
       }
 
       if (profile.email) {
-        console.log("✅ Perfil ya cargado, no es necesario buscar");
         return;
       }
       try {
@@ -86,11 +85,41 @@ export default function ProfilePage() {
     (async () => {
       setLoadingSub(true);
       try {
-        const s = await getMyActiveSubscription();
-        setSub(s || null);
+        const [allSubs, allOrders] = await Promise.all([
+          getSubscriptions(),
+          getAllOrders()
+        ]);
+
+        const activeSubs = allSubs.filter(s =>
+          s.status === "active" || s.status === "pending"
+        );
+
+        const subsWithOrders = activeSubs.map(sub => {
+          const matchingOrders = allOrders.filter(order => {
+            const match1 = order.subscriptionId?._id === sub._id;
+            const match2 = order.subscriptionId === sub._id;
+            const match3 = String(order.subscriptionId?._id) === String(sub._id);
+            const match4 = String(order.subscriptionId) === String(sub._id);
+
+            // console.log("Comparando:", {
+            //   subId: sub._id,
+            //   orderSubId: order.subscriptionId,
+            //   orderSubIdObj: order.subscriptionId?._id,
+            //   match1, match2, match3, match4,
+            //   orderStatus: order.status
+            // });
+
+            return (match3 || match4) && ['pending', 'preparing', 'shipped', 'delivered'].includes(order.status);
+          });
+
+          return { ...sub, hasOrders: matchingOrders.length > 0 };
+        });
+
+        setSub(subsWithOrders);
+        setOrders(allOrders);
       } catch (e) {
         console.error(e);
-        setSub(null);
+        setSub([]);
       } finally {
         setLoadingSub(false);
       }
@@ -118,20 +147,40 @@ export default function ProfilePage() {
     }
   };
 
-  const onCancelPlan = async () => {
-    if (!sub?._id) return;
+  const onCancelPlan = async (subId) => {
+    if (!subId) return;
     if (!confirm("¿Seguro que quieres cancelar tu plan?")) return;
+
     try {
       setCanceling(true);
-      const res = await cancelSubscription(sub._id);
-      setSub(res);
+
+      await cancelSubscription(subId);
+
+      const activeOrder = orders.find(
+        (o) =>
+          (String(o.subscriptionId?._id) === String(subId) ||
+            String(o.subscriptionId) === String(subId)) &&
+          !["shipped", "delivered", "cancelled"].includes(o.status)
+      );
+
+      // if (activeOrder) {
+      //   await cancelOrder(activeOrder._id);
+      //   console.log("Pedido cancelado:", activeOrder._id);
+      // }
+
+      setSub((prev) =>
+        prev.map((s) =>
+          s._id === subId ? { ...s, status: "canceled" } : s
+        )
+      );
     } catch (e) {
       console.error(e);
-      alert("No se pudo cancelar la suscripción");
+      alert("No se pudo cancelar la suscripción ni el pedido");
     } finally {
       setCanceling(false);
     }
   };
+
 
   const onChangePassword = async (e) => {
     e.preventDefault();
@@ -348,67 +397,73 @@ export default function ProfilePage() {
           <p className="text-sm" style={{ color: "#ADADAD" }}>
             Administra tus suscripciones como quieras.
           </p>
-
           {loadingSub ? (
             <p>Cargando...</p>
-          ) : !sub ? (
-            <p>No tienes una suscripción activa.</p>
+          ) : sub.length === 0 ? (
+            <p>No tienes suscripciones activas.</p>
           ) : (
-            <div
-              className="rounded-xl p-6 mt-4"
-              style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-semibold mb-1">
-                    {sub.boxType === "basic" ? "Box Premier Basic" : "Suscripción"}
-                  </h3>
-                  <p className="text-sm" style={{ color: "#6B6B6B" }}>
-                    {(sub.boxSize || 3)} botella de vino al mes.
-                  </p>
-                </div>
-              </div>
-
+            sub.map((s) => (
               <div
-                className="border-t mt-4 pt-4 text-sm grid md:grid-cols-2 gap-2"
-                style={{ borderColor: "#D9C7AE" }}
+                key={s._id}
+                className="rounded-xl p-6 mt-4"
+                style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
               >
-                <div className="flex justify-between">
-                  <span>Fecha de suscripción:</span>
-                  <span>
-                    {new Date(sub.startDate).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-1">
+                      {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
+                    </h3>
+                    <p className="text-sm" style={{ color: "#6B6B6B" }}>
+                      {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Próximo cobro:</span>
-                  <span>
-                    {new Date(sub.nextPayDate).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={onCancelPlan}
-                  disabled={canceling || sub.status !== "active"}
-                  className="px-5 py-2 rounded-full text-white"
-                  style={{
-                    backgroundColor: "#7B1D1D",
-                    opacity: canceling || sub.status !== "active" ? 0.6 : 1,
-                  }}
+                <div
+                  className="border-t mt-4 pt-4 text-sm space-y-2"
+                  style={{ borderColor: "#D9C7AE" }}
                 >
-                  {canceling ? "Cancelando..." : "Cancelar plan"}
-                </button>
+                  <div className="flex justify-between">
+                    <span>Fecha de suscripción:</span>
+                    <span>
+                      {new Date(s.startDate).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Próximo cobro:</span>
+                    <span>
+                      {new Date(s.nextPayDate).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  {s.hasOrders ? (
+                    <p className="text-sm text-gray-600 italic">
+                      Esta suscripción tiene pedido enviado o entregue. Contacta con el administrador para cancelarla.
+                    </p>
+                  ) : (
+                    <button
+                      onClick={() => { console.log("Clicou no botão, subId:", s._id); onCancelPlan(s._id) }}
+                      disabled={canceling || s.status == "canceled"}
+                      className="px-5 py-2 rounded-full text-white cursor-pointer"
+                      style={{
+                        backgroundColor: "#7B1D1D",
+                        opacity: canceling || s.status == "canceled" ? 0.6 : 1,
+                      }}
+                    >
+                      {canceling ? "Cancelando..." : "Cancelar plan"}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            ))
           )}
         </section>
       )}
