@@ -62,13 +62,17 @@ import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
 import SubscriptionPage from "../pages/SubscriptionPage";
 import AuthForm from "../components/AuthForm";
-import { authGuard } from "../validators/routeValidator";
+import { authGuard, adminGuard } from "../validators/routeValidator";
 import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersTab from "../pages/admin/UsersTab";
 import PlansTab from "../pages/admin/PlansTab";
 import SubscriptionsTab from "../pages/admin/SubscriptionTab"
+import OrdersTab from "../pages/admin/OrdersTab";
+import PaymentsTab from "../pages/admin/PaymentsTab";
+import GiftPage from "../pages/GiftPage";
+
 
 const router = createBrowserRouter([
   // Si quieres una landing primero:
@@ -81,29 +85,19 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> }, // /app
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
-      { path: "subscription", element: <SubscriptionPage />, loader: authGuard }, // /app/subscription
+      { path: "subscription", element: <SubscriptionPage /> }, // /app/subscription
       { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
+      { path: "gift", element: <GiftPage /> },
       {
-    path: "admin",
-    element: <AdminDashboard />,
-    children: [
-      {
-        path: "users",
-        element: <UsersTab />,
+        path: "admin", element: <AdminDashboard />, loader: adminGuard,
+        children: [
+          { path: "users", element: <UsersTab />, },
+          { path: "plans", element: <PlansTab />, },
+          { path: "subscriptions", element: <SubscriptionsTab />, },
+          { path: "orders", element: <OrdersTab />, },
+          { path: "payments", element: <PaymentsTab />, },
+        ],
       },
-      {
-      path: "plans",
-      element: <PlansTab />,
-    },
-     {
-      path: "subscriptions",
-      element: <SubscriptionsTab />,
-    },
-      // outras rotas (plans, subscriptions, etc)
-    ],
-  },
-  //loader: authGuard ,    // opcional: solo usuarios logueados
-
     ],
   },
 
@@ -111,7 +105,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <AuthForm mode="login" /> },
   { path: "/register", element: <AuthForm mode="register" /> },
 
-  // Fallback: cualquier cosa rara te manda a /app
+  //Fallback: cualquier cosa rara te manda a /app
   { path: "*", element: <Navigate to="/app" replace /> },
 ]);
 

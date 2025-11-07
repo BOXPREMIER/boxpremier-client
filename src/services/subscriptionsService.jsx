@@ -1,63 +1,46 @@
 // services/subscriptions.js
-import API from './Api'
-import useAuthStore from '../store/authStore'
+import API from "./Api";
+import useAuthStore from "../store/authStore";
 
-// ------- Plans (axios) -------
+// ------- Plans -------
 export async function fetchActivePlans() {
-  // GET /subscriptions/plans?active=true
-  const { data } = await API.get('/subscriptionsPlan', { params: { active: true } })
-  return data
+  const { data } = await API.get("/subscriptions/plans"); // activos ya filtrados para customer
+  return data;
 }
-  //GET/subscriptions activos e inactivos
+//GET/subscriptions activos e inactivos
 export async function getAllPlans() {
   const { data } = await API.get('/subscriptionsPlan');
   return data;
 }
 
-// ------- Subscriptions (axios) -------
-export async function createSubscription({ planId, boxType, wineType, payMethod = 'multisafepay' }) {
-  const { user } = useAuthStore.getState()
-  if (!user?._id && !user?.id) throw new Error('Necesitas iniciar sesión')
+// ------- Subscriptions -------
+export async function createSubscription({ planId, wineType }) {
+  // el back espera subscriptionPlanId y wineType
+  const payload = { subscriptionPlanId: planId, wineType };
+  const { data } = await API.post("/subscriptions", payload);
+  return data;
+}
 
-  const users = user._id || user.id
-
-  const payload = {
-    users,                    // ObjectId del usuario
-    subscriptionsPlan: planId,
-    boxType,                  // "basic" | "premium"
-    wineType,                 // "mixto" | "tinto" | "rosa" | "espumoso"
-    payMethod                 // "multisafepay"
-    // boxSize lo define el plan en backend (opcional enviarlo)
-  }
-
-  const { data } = await API.post('/subscriptions', payload)
-  return data
+export async function getMySubscriptions() {
+  const { data } = await API.get("/subscriptions");
+  return data; // array
 }
 
 export async function getMyActiveSubscription() {
-  const { data } = await API.get('/subscriptions/me/active')
-  return data
+  const subs = await getMySubscriptions();
+  if (!Array.isArray(subs) || subs.length === 0) return null;
+  return subs.find(s => s.status === "active") ||
+         subs.find(s => s.status === "pending") ||
+         subs[0];
 }
 
 export async function updateSubscription(subId, patch) {
-  const { data } = await API.patch(`/subscriptions/${subId}`, patch)
-  return data
+  const { data } = await API.patch(`/subscriptions/${subId}`, patch);
+  return data;
 }
 
 export async function cancelSubscription(subId) {
-  const { data } = await API.post(`/subscriptions/${subId}/cancel`)
-  return data
-}
-export async function getSubscriptions() {
-  const { data } = await API.get('/subscriptions') 
-  return data
-}
-
-
-// Fallback local por si la API de planes aún no está lista
-export function localPlansFallback() {
-  return [
-    { _id: 'plan_basic_6',   name: 'mensual', boxType: 'basic',   boxSize: 6, price: 59.9, active: true },
-    { _id: 'plan_premium_6', name: 'mensual', boxType: 'premium', boxSize: 6, price: 79.9, active: true }
-  ]
+  // si tu router la montó como POST, cambia a API.post
+  const { data } = await API.patch(`/subscriptions/${subId}/cancel`);
+  return data;
 }
