@@ -7,7 +7,12 @@ import { createUser, updatePaymentMethod } from "../services/UserServices";
 import { login } from "../services/authServices";
 
 const COLORS = { gold: "#AD946C", gray: "#ADADAD", black: "#000000" };
-const WINE_TYPES = ["mixto", "tinto", "rosa", "espumoso"];
+const WINE_TYPES = [
+  { label: "mixto", value: "mixed" },
+  { label: "tinto", value: "red" },
+  { label: "rosa", value: "rose" },
+  { label: "espumoso", value: "sparkling" },
+];
 
 export default function SubscriptionCheckout() {
   const navigate = useNavigate();
@@ -386,12 +391,12 @@ export default function SubscriptionCheckout() {
                 {WINE_TYPES.map((t) => (
                   <button
                     type="button"
-                    key={t}
-                    onClick={() => setWineType(t)}
-                    className={`rounded-xl border px-3 py-2 capitalize ${wineType === t ? "border-[#AD946C] bg-[#FFF8F1]" : "border-[#ADADAD] hover:bg-[#F8F8F8]"
+                    key={t.value}
+                    onClick={() => setWineType(t.value)}
+                    className={`rounded-xl border px-3 py-2 capitalize ${wineType === t.value ? "border-[#AD946C] bg-[#FFF8F1]" : "border-[#ADADAD] hover:bg-[#F8F8F8]"
                       }`}
                   >
-                    {t}
+                    {t.label}
                   </button>
                 ))}
               </div>
@@ -483,7 +488,11 @@ export default function SubscriptionCheckout() {
             )}
           </div>
 
-          {error && <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {error && (
+            <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+              {typeof error === "object" ? error.message || JSON.stringify(error) : error}
+            </p>
+          )}
 
           <div className="mt-8 flex justify-center">
             <button
