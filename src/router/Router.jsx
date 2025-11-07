@@ -72,6 +72,7 @@ import SubscriptionsTab from "../pages/admin/SubscriptionTab"
 import OrdersTab from "../pages/admin/OrdersTab";
 import PaymentsTab from "../pages/admin/PaymentsTab";
 import GiftPage from "../pages/GiftPage";
+import MonthlyWines from "../pages/MonthlyWines";
 
 
 const router = createBrowserRouter([
@@ -88,6 +89,7 @@ const router = createBrowserRouter([
       { path: "subscription", element: <SubscriptionPage /> }, // /app/subscription
       { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
       { path: "gift", element: <GiftPage /> },
+      { path: "monthly-wines", element: <MonthlyWines /> },
       {
         path: "admin", element: <AdminDashboard />, loader: adminGuard,
         children: [
