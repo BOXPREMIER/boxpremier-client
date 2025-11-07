@@ -15,7 +15,9 @@ export async function createSubscription({ planId, boxType, wineType, payMethod 
 
 export async function getMyActiveSubscription() {
     const { data } = await API.get('/subs');
-    const activeSubs = data.data?.filter(sub => sub.status === 'active') || [];
+    const activeSubs = data.data?.filter(sub =>
+        !['canceled', 'expired'].includes(sub.status)
+    ) || [];
     return activeSubs[0] || null;
 }
 
