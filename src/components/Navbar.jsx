@@ -33,7 +33,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     >
       {/* 🔸 Enlaces principales */}
       <NavLink
-        to="plans"
+        to="subscription"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
       >
@@ -54,14 +54,6 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
         onClick={isMobile ? closeMenu : undefined}
       >
         CAJAS ANTERIORES
-      </NavLink>
-
-      <NavLink
-        to="/app/subscription"
-        className={linkClass}
-        onClick={isMobile ? closeMenu : undefined}
-      >
-        SUSCRIPCIÓN
       </NavLink>
 
       {/* 🔹 Usuario logueado */}
