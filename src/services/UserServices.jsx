@@ -36,3 +36,7 @@ export async function getUserById(userId) {
   return data.data
 }
 
+export const updatePaymentMethod = async (paymentData) => {
+  const { data } = await API.patch('/users/me/payment-method', paymentData);
+  return data.data;
+};
