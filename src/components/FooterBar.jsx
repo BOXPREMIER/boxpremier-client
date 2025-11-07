@@ -81,8 +81,7 @@ export default function VinoPremierNewsletter() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <div className="flex-1">{/* Основной контент */}</div>
+    <div className="flex flex-col bg-white">
 
       {/* Футер */}
       <footer className="w-full bg-gray-200 py-6 flex flex-col lg:flex-row items-start justify-center gap-6 px-4">
