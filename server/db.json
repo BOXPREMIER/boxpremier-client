@@ -239,12 +239,12 @@
         },
         {
           "name": "Domblasco",
-          "image": "/images/april2.jpg",
+          "image": "/public/monthly-wines/Domblasco.jpg",
           "link": "https://vinopremier.com/vino-tinto-domblasco.html"
         },
         {
           "name": "Corral de Campanas",
-          "image": "/images/april3.jpg",
+          "image": "/public/monthly-wines/corral-de-campanas.jpg",
           "link": "https://vinopremier.com/vino-tinto-corral-de-campanas.html"
         }
       ]
@@ -254,17 +254,17 @@
       "wines": [
         {
           "name": "Kolenda Lagar d'Amprius",
-          "image": "/images/may1.jpg",
+          "image": "/public/monthly-wines/kolenda.jpg",
           "link": "https://vinopremier.com/vino-blanco-kolenda-lagar-d-amprius.html"
         },
         {
           "name": "Santa Ema Select Terroir Reserva Merlot",
-          "image": "/images/may2.jpg",
+          "image": "/public/monthly-wines/santa-ema.jpg",
           "link": "https://vinopremier.com/vino-tinto-santa-ema-select-terroir-reserva-merlot.html"
         },
         {
           "name": "Bucrana Crianza",
-          "image": "/images/may3.jpg",
+          "image": "/public/monthly-wines/bucrana.jpg",
           "link": "https://vinopremier.com/vino-tinto-bucrana-crianza.html"
         }
       ]
@@ -274,17 +274,17 @@
       "wines": [
         {
           "name": "La Font del Mosquit",
-          "image": "/images/june1.jpg",
+          "image": "/public/monthly-wines/mosquit.jpg",
           "link": "https://vinopremier.com/vino-blanco-la-font-del-mosquit.html"
         },
         {
           "name": "Ilurce Rioja Joven",
-          "image": "/images/june2.jpg",
+          "image": "/public/monthly-wines/Ilurce.jpg",
           "link": "https://vinopremier.com/vino-tinto-ilurce-joven-tempranillo.html"
         },
         {
           "name": "Salmoral",
-          "image": "/images/june3.jpg",
+          "image": "/public/monthly-wines/salmoral.jpg",
           "link": "https://vinopremier.com/vino-tinto-salmoral.html"
         }
       ]
@@ -294,17 +294,17 @@
       "wines": [
         {
           "name": "CIPMA I Marisol Rubio",
-          "image": "/images/july1.jpg",
+          "image": "/public/monthly-wines/marisol.jpg",
           "link": "https://vinopremier.com/vino-blanco-cima-marisol-rubio.html"
         },
         {
           "name": "Álvarez Alfaro Llaves de Yerga",
-          "image": "/images/july2.jpg",
+          "image": "/public/monthly-wines/llaves-de-yerga.jpg",
           "link": "https://vinopremier.com/vino-tinto-alvarez-alfaro-llaves-de-yerga.html"
         },
         {
           "name": "Compartir Joven",
-          "image": "/images/july3.jpg",
+          "image": "/public/monthly-wines/compartir.jpg",
           "link": "https://vinopremier.com/vino-tinto-compartir-joven.html"
         }
       ]
@@ -314,17 +314,17 @@
       "wines": [
         {
           "name": "Dulce Picardías",
-          "image": "/images/august1.jpg",
+          "image": "/public/monthly-wines/picardias.jpg",
           "link": "https://vinopremier.com/vino-blanco-dulce-picardias.html"
         },
         {
           "name": "Las Margas Garnacha Blanca Vegano",
-          "image": "/images/august2.jpg",
+          "image": "/public/monthly-wines/margas.jpg",
           "link": "https://vinopremier.com/vino-blanco-las-margas-garnacha-blanca-vegano.html"
         },
         {
           "name": "Valmenia Roble 9 Meses",
-          "image": "/images/august3.jpg",
+          "image": "/public/monthly-wines/valmenia.jpg",
           "link": "https://vinopremier.com/vino-tinto-valmenia-roble.html"
         }
       ]
@@ -354,17 +354,17 @@
       "wines": [
         {
           "name": "Abulaga",
-          "image": "/images/october1.jpg",
+          "image": "/public/monthly-wines/abugala.jpg",
           "link": "https://vinopremier.com/vino-blanco-abulaga.html"
         },
         {
           "name": "Vetusta Viñas de Fuentenebro",
-          "image": "/images/october2.jpg",
+          "image": "/public/monthly-wines/vetusta.jpg",
           "link": "https://vinopremier.com/vino-tinto-vetusta-vi-as-de-fuentenebro.html"
         },
         {
           "name": "Alagú Garnacha Tintorera",
-          "image": "/images/october3.jpg",
+          "image": "/public/monthly-wines/alagu.jpg",
           "link": "https://vinopremier.com/vino-tinto-alagu-garnacha-tintorera.html"
         }
       ]
@@ -373,18 +373,18 @@
       "month": "november",
       "wines": [
         {
-          "name": "Mystery Wine 1",
-          "image": "/images/question1.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         },
         {
-          "name": "Mystery Wine 2",
-          "image": "/images/question2.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         },
         {
-          "name": "Mystery Wine 3",
-          "image": "/images/question3.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         }
       ]
@@ -393,18 +393,18 @@
       "month": "december",
       "wines": [
         {
-          "name": "Mystery Wine 1",
-          "image": "/images/question1.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         },
         {
-          "name": "Mystery Wine 2",
-          "image": "/images/question2.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         },
         {
-          "name": "Mystery Wine 3",
-          "image": "/images/question3.jpg",
+          "name": "?",
+          "image": "/public/monthly-wines/mystery.jpg",
           "link": ""
         }
       ]

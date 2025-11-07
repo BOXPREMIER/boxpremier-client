@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMonthlyWines } from "../services/MonthlyWines";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // 👈 añadido useNavigate
+import Button from "../components/Button"; // 👈 importación del botón
 
 export default function MonthlyWines() {
   const [months, setMonths] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate(); // 👈 hook para navegación
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,67 +104,73 @@ export default function MonthlyWines() {
       </div>
 
       {/* ---------- Carrusel ---------- */}
-      <AnimatePresence mode="sync">
+<AnimatePresence mode="sync">
+  <motion.div
+    key={currentMonth.month}
+    variants={transitionVariants}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    transition={{ duration: 0.4 }}
+    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"
+  >
+    {currentMonth.wines.map((wine, i) => {
+      const hasExternalLink = wine.link && wine.link.startsWith("http");
+      const internalLink = `/app/wine/${currentMonth.month}/${i}`;
+
+      const Card = (
         <motion.div
-          key={currentMonth.month}
-          variants={transitionVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={{ duration: 0.4 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"
+          whileHover={{ scale: 1.03 }}
+          className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group transition-transform duration-300 aspect-[3/4]"
         >
-          {isFutureMonth
-            ? [1, 2, 3].map((n) => (
-                <div
-                  key={`placeholder-${n}`}
-                  className="bg-gray-100 rounded-2xl shadow-md p-8 flex flex-col items-center justify-center aspect-square"
-                >
-                  <div className="text-6xl text-gray-400 font-bold">?</div>
-                </div>
-              ))
-            : currentMonth.wines.map((wine, i) => {
-                const hasExternalLink =
-                  wine.link && wine.link.startsWith("http");
-                const internalLink = `/app/wine/${currentMonth.month}/${i}`;
-
-                const Card = (
-                  <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group transition-transform duration-300 aspect-[3/4]"
-                  >
-                    <img
-                      src={wine.image}
-                      alt={wine.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-center">
-                      <h3 className="text-white text-lg sm:text-xl font-semibold tracking-wide">
-                        {wine.name}
-                      </h3>
-                    </div>
-                  </motion.div>
-                );
-
-                return hasExternalLink ? (
-                  <a
-                    key={i}
-                    href={wine.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    {Card}
-                  </a>
-                ) : (
-                  <Link key={i} to={internalLink} className="block">
-                    {Card}
-                  </Link>
-                );
-              })}
+          <img
+            src={wine.image}
+            alt={wine.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-center">
+            <h3 className="text-white text-lg sm:text-xl font-semibold tracking-wide">
+              {wine.name}
+            </h3>
+          </div>
         </motion.div>
-      </AnimatePresence>
+      );
+
+      return hasExternalLink ? (
+        <a
+          key={i}
+          href={wine.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
+          {Card}
+        </a>
+      ) : (
+        <Link key={i} to={internalLink} className="block">
+          {Card}
+        </Link>
+      );
+    })}
+  </motion.div>
+</AnimatePresence>
+
+
+      {/* ---------- Frase + Botón ---------- */}
+      <div className="flex flex-col items-center text-center mt-16 space-y-6">
+        <p
+          className="text-black text-xl sm:text-2xl font-bold"
+          style={{ fontFamily: "Gotham, sans-serif" }}
+        >
+          No te quedes con la curiosidad… ¡Descubre las próximas ediciones!
+        </p>
+
+        <Button
+          title="Suscríbete"
+          action={() => navigate("/suscriptionpage")} 
+        />
+      </div>
     </section>
   );
 }
