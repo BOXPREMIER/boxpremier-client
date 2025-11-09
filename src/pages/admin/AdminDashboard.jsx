@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, Navigate, useLocation } from "react-router-dom";
 import StatsCards from "./StatsCards";
 
-/**
- * AdminDashboard - layout principal del panel de administración.
- * Mantiene el mismo comportamiento pero con tu estilo visual personalizado.
- */
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({

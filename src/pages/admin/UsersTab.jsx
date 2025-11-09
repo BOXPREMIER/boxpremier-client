@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { getUsers, createUser, updateUser, deleteUser } from "../../services/UserServices";
-import { getSubscriptions } from "../../services/SubscriptionServices";
+import { getSubscriptions } from "../../services/SubscriptionServices"; 
 import UserModal from "./UserModal";
+import AdminModal from "./AdminModal"; 
+import Button from "../../components/Button";
 
 const UsersTab = () => {
   const [users, setUsers] = useState([]);
-  const [subscriptions, setSubscriptions] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isAdminModal, setIsAdminModal] = useState(false); 
   const [selectedUser, setSelectedUser] = useState(null);
   const [readOnly, setReadOnly] = useState(false);
+  const [filterType, setFilterType] = useState("customer"); 
 
   // --- Cargar usuarios ---
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await getUsers();
-      setUsers(res);
+      const [usersRes, subsRes] = await Promise.all([
+        getUsers(),
+        getSubscriptions()
+      ]);
+
+      // Enriquecer usuarios con suscripción y plan
+      const enrichedUsers = usersRes.map(user => {
+        const userSub = subsRes.find(sub => sub.user._id === user._id);
+        return {
+          ...user,
+          subscription: userSub || null,
+          plan: userSub?.subscriptionPlan || null,
+        };
+      });
+
+      setUsers(enrichedUsers);
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
     } finally {
@@ -25,25 +42,21 @@ const UsersTab = () => {
     }
   };
 
-  // --- Cargar suscripciones ---
-  const fetchSubscriptions = async () => {
-    try {
-      const res = await getSubscriptions();
-      setSubscriptions(res);
-    } catch (error) {
-      console.error("Error al cargar suscripciones:", error);
-    }
-  };
-
   useEffect(() => {
     fetchUsers();
-    fetchSubscriptions();
   }, []);
 
   // --- Modal crear usuario ---
   const handleAddUser = () => {
-    setSelectedUser(null);
     setReadOnly(false);
+    setIsAdminModal(false); 
+    setModalOpen(true);
+  };
+
+  // --- Modal crear admin ---
+  const handleAddAdmin = () => {
+    setReadOnly(false);
+    setIsAdminModal(true); 
     setModalOpen(true);
   };
 
@@ -51,17 +64,12 @@ const UsersTab = () => {
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setReadOnly(false);
+    // Detectar si es admin para abrir el modal correcto
+    setIsAdminModal(user.userType === "admin");
     setModalOpen(true);
   };
 
-  // --- Modal ver usuario ---
-  const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setReadOnly(true);
-    setModalOpen(true);
-  };
-
-  // --- Guardar usuario ---
+  // --- Guardar usuario o admin ---
   const handleSubmitUser = async (data) => {
     try {
       if (selectedUser) {
@@ -88,27 +96,63 @@ const UsersTab = () => {
     }
   };
 
+  // --- Filtrar por tipo de usuario ---
+  const usersByType = users.filter(u => {
+    if (filterType === "customer") return u.userType === "customer";
+    if (filterType === "admin") return u.userType === "admin";
+    return true;
+  });
+
   // --- Filtro de búsqueda ---
-  const filteredUsers = users.filter(
+  const filteredUsers = usersByType.filter(
     (u) =>
       u.fullName?.toLowerCase().includes(search.toLowerCase()) ||
-      u.email?.toLowerCase().includes(search.toLowerCase())
+      u.email?.toLowerCase().includes(search.toLowerCase()) ||
+      u.firstName?.toLowerCase().includes(search.toLowerCase()) ||
+      u.lastName?.toLowerCase().includes(search.toLowerCase())
   );
-
-  // --- Obtener datos de suscripción por usuario ---
-  const getUserSubscription = (userId) => {
-    return subscriptions.find((sub) => sub.userId === userId);
-  };
+       
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md border border-secondary">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-primary">Administración de Usuarios</h2>
+
+        <div className="flex gap-3">
+          <Button
+            title="+ Nuevo Cliente"
+            action={handleAddUser}
+            tooltip="Crear nuevo cliente"
+          />
+          <Button
+            title="+ Nuevo Admin"
+            action={handleAddAdmin}
+            tooltip="Crear nuevo administrador"
+          />
+        </div>
+      </div>
+
+      {/* 👇 Botones de filtro por tipo */}
+      <div className="flex gap-3 mb-4">
         <button
-          onClick={handleAddUser}
-          className="bg-primary text-white px-4 py-2 rounded-lg hover:opacity-80 transition"
+          onClick={() => setFilterType("customer")}
+          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+            filterType === "customer"
+              ? "bg-secondary  text-white shadow-md"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
         >
-          + Nuevo usuario
+          Clientes
+        </button>
+        <button
+          onClick={() => setFilterType("admin")}
+          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+            filterType === "admin"
+              ? "bg-secondary text-white shadow-md"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          Administradores
         </button>
       </div>
 
@@ -125,59 +169,58 @@ const UsersTab = () => {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-primary text-white">
+            <tr className="bg-secondary text-white">
               <th className="p-3 text-left">Nombre</th>
               <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">plan</th>
-              <th className="p-3 text-left">Estado</th>
-              <th className="p-3 text-left">Inicio</th>
-              <th className="p-3 text-left">Próximo cobro</th>
+              {filterType === "customer" && (
+                <>
+                  <th className="p-3 text-left">Plan</th>
+                  <th className="p-3 text-left">Estado</th>
+                  <th className="p-3 text-left">Dirección</th>
+                  <th className="p-3 text-left">Fecha de suscripción</th>
+                  <th className="p-3 text-left">Próximo cobro</th>
+                </>
+              )}
               <th className="p-3 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="7" className="p-4 text-center">
+                <td colSpan={filterType === "customer" ? "8" : "3"} className="p-4 text-center">
                   Cargando...
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No se encontraron usuarios
+                <td colSpan={filterType === "customer" ? "8" : "3"} className="p-4 text-center text-gray-500">
+                  No se encontraron {filterType === "customer" ? "clientes" : "administradores"}
                 </td>
               </tr>
             ) : (
               filteredUsers.map((user) => {
-                const sub = getUserSubscription(user._id);
                 return (
                   <tr key={user._id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">
-                      {user.fullName || `${user.firstName || ""} ${user.lastName || ""}`}
-                    </td>
+                    <td className="p-3">{user.fullName || `${user.firstName || ""} ${user.lastName || ""}`.trim()}</td>
                     <td className="p-3">{user.email}</td>
-                    <td className="p-3">{sub?.boxtype|| "Sin plan"}</td>
-                    <td className="p-3">{sub?.status || "No activo"}</td>
-                    <td className="p-3">
-                      {sub?.startDate ? new Date(sub.startDate).toLocaleDateString() : "-"}
-                    </td>
-                    <td className="p-3">
-                      {sub?.nextBillingDate ? new Date(sub.nextBillingDate).toLocaleDateString() : "-"}
-                    </td>
+                    {filterType === "customer" && (
+                      <>
+                        <td className="p-3 capitalize">{user.plan?.boxType ?? "-"}</td>
+                        <td className="p-3">
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                            user.status ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                          }`}>
+                            {user.status ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td className="p-3">{`${user.city ?? "-"}, ${user.postalCode ?? "-"}, ${user.street ?? "-"} ${user.number ?? "-"}`}</td>
+                        <td className="p-3">{user.subscription?.startDate ? new Date(user.subscription.startDate).toLocaleDateString("es-ES") : "-"}</td>
+                        <td className="p-3">{user.subscription?.nextPayDate ? new Date(user.subscription.nextPayDate).toLocaleDateString("es-ES") : "-"}</td>
+                      </>
+                    )}
                     <td className="p-3 flex gap-2 justify-center">
-                      <button
-                        onClick={() => handleEditUser(user)}
-                        className="text-blue-600 hover:opacity-80 transition"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user._id)}
-                        className="text-red-600 hover:opacity-80 transition"
-                      >
-                        Eliminar
-                      </button>
+                      <Button title="Editar" action={() => handleEditUser(user)} tooltip="Editar usuario" />
+                      <Button title="Eliminar" action={() => handleDeleteUser(user._id)} tooltip="Eliminar usuario" />
                     </td>
                   </tr>
                 );
@@ -187,13 +230,25 @@ const UsersTab = () => {
         </table>
       </div>
 
-      <UserModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmitUser}
-        initialData={selectedUser}
-        readOnly={readOnly}
-      />
+      {isAdminModal ? (
+        <AdminModal
+        key={selectedUser?._id || 'new-admin'}
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleSubmitUser}
+          initialData={selectedUser}
+          readOnly={readOnly}
+        />
+      ) : (
+        <UserModal
+        key={selectedUser?._id || 'new-user'}
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleSubmitUser}
+          initialData={selectedUser}
+          readOnly={readOnly}
+        />
+      )}
     </div>
   );
 };

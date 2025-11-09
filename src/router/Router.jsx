@@ -67,8 +67,7 @@ import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersTab from "../pages/admin/UsersTab";
-import PlansTab from "../pages/admin/PlansTab";
-import SubscriptionsTab from "../pages/admin/SubscriptionTab"
+// import PlansTab from "../pages/admin/PlansTab";
 import OrdersTab from "../pages/admin/OrdersTab";
 import PaymentsTab from "../pages/admin/PaymentsTab";
 import GiftPage from "../pages/GiftPage";
@@ -92,8 +91,7 @@ const router = createBrowserRouter([
         path: "admin", element: <AdminDashboard />, loader: adminGuard,
         children: [
           { path: "users", element: <UsersTab />, },
-          { path: "plans", element: <PlansTab />, },
-          { path: "subscriptions", element: <SubscriptionsTab />, },
+          // { path: "plans", element: <PlansTab />, },
           { path: "orders", element: <OrdersTab />, },
           { path: "payments", element: <PaymentsTab />, },
         ],

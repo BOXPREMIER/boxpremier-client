@@ -1,253 +1,193 @@
-import React, { useEffect, useState, useRef } from "react";
-import { getSubscriptions } from "../../services/SubscriptionServices";
+import React, { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import Button from "../../components/Button"; // Asegúrate de que la ruta sea correcta
 
-const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
-  const modalRef = useRef(null);
-
+const PlanModal = ({ plan, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    userType: "user",
-    planName: "",
-    status: "",
-    startDate: "",
-    nextBillingDate: "",
+    boxType: "",
+    boxSize: "",
+    price: "",
+    active: true,
   });
 
-  const [plans, setPlans] = useState([]);
+  const [errors, setErrors] = useState({});
 
-  // Cargar datos iniciales y planes
   useEffect(() => {
-    if (initialData) {
+    if (plan) {
       setFormData({
-        firstName: initialData.firstName || "",
-        lastName: initialData.lastName || "",
-        email: initialData.email || "",
-        phone: initialData.phone || "",
-        userType: initialData.userType || "user",
-        planName: initialData.planName || "",
-        status: initialData.status || "",
-        startDate: initialData.startDate || "",
-        nextBillingDate: initialData.nextBillingDate || "",
-      });
-    } else {
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        userType: "user",
-        planName: "",
-        status: "",
-        startDate: "",
-        nextBillingDate: "",
+        boxType: plan.boxType || "",
+        boxSize: plan.boxSize || "",
+        price: plan.price || "",
+        active: plan.active !== undefined ? plan.active : true,
       });
     }
+  }, [plan]);
 
-    const fetchPlans = async () => {
-      try {
-        const res = await getSubscriptions();
-        setPlans(res);
-      } catch (error) {
-        console.error("Error al cargar planes:", error);
-      }
-    };
-
-    fetchPlans();
-  }, [initialData]);
-
-  // Cerrar modal si haces clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
-    const handleEsc = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEsc);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, [open, onClose]);
-
-  // Manejador de cambios
   const handleChange = (e) => {
-    if (readOnly) return;
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
-  // Guardar
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const validate = () => {
+    const newErrors = {};
+    
+    if (!formData.boxType.trim()) {
+      newErrors.boxType = "El tipo de box es obligatorio";
+    }
+    
+    const boxSize = Number(formData.boxSize);
+    if (!formData.boxSize || isNaN(boxSize) || boxSize <= 0) {
+      newErrors.boxSize = "El tamaño debe ser un número mayor a 0";
+    }
+    
+    const price = Number(formData.price);
+    if (!formData.price || isNaN(price) || price <= 0) {
+      newErrors.price = "El precio debe ser un número mayor a 0";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  if (!open) return null;
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    try {
+      // Convertir a números antes de enviar
+      const dataToSave = {
+        boxType: formData.boxType,
+        boxSize: parseInt(formData.boxSize, 10),
+        price: parseFloat(formData.price),
+        active: Boolean(formData.active),
+      };
+      
+      
+      
+      await onSave(dataToSave);
+      onClose();
+    } catch (err) {
+      let errorMsg = "Error al guardar el plan";
+      
+      if (err.response?.data) {
+    
+        
+        errorMsg = serverError.message || 
+                   serverError.error || 
+                   serverError.errors?.[0]?.msg ||
+                   serverError.errors?.[0]?.message ||
+                   JSON.stringify(serverError);
+      }
+      
+      alert(`Error: ${errorMsg}`);
+    }
+  };
+
+  const handleCancel = async () => {
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-6 animate-fadeIn"
-      >
-        <h2 className="text-2xl font-bold text-primary mb-4">
-          {initialData ? "Editar Usuario" : "Nuevo Usuario"}
-        </h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h3 className="text-2xl font-bold text-gray-800">
+            {plan ? "Editar Plan" : "Crear Nuevo Plan"}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={24} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          {/* Campos personales */}
+        <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1">Nombre</label>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Apellido</label>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Teléfono</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          {/* Tipo de usuario */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Tipo de Usuario</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Tipo de Box <span className="text-red-500">*</span>
+            </label>
             <select
-              name="userType"
-              value={formData.userType}
+              name="boxType"
+              value={formData.boxType}
               onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 ${
+                errors.boxType ? "border-red-500" : "border-gray-300"
+              }`}
             >
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
+              <option value="">Selecciona un tipo</option>
+              <option value="basic">Básico</option>
+              <option value="premium">Premium</option>
             </select>
+            {errors.boxType && <p className="text-red-500 text-sm mt-1">{errors.boxType}</p>}
           </div>
 
-          {/* Plan */}
           <div>
-            <label className="block text-sm font-medium mb-1">Plan</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Tamaño de Box (número de productos) <span className="text-red-500">*</span>
+            </label>
             <input
-              type="text"
-              name="planName"
-              value={formData.planName}
+              type="number"
+              name="boxSize"
+              value={formData.boxSize}
               onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
+              min="1"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 ${
+                errors.boxSize ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Ej: 3"
+            />
+            {errors.boxSize && <p className="text-red-500 text-sm mt-1">{errors.boxSize}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Precio ($) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              min="0"
+              step="0.01"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 ${
+                errors.price ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Ej: 29.99"
+            />
+            {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="active"
+              checked={formData.active}
+              onChange={handleChange}
+              className="w-5 h-5 text-blue-600 rounded focus:ring-2"
+            />
+            <label className="text-sm font-semibold text-gray-700">Plan Activo</label>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+            <Button
+              title="Cancelar"
+              action={handleCancel}
+              tooltip="Cerrar sin guardar cambios"
+            />
+            <Button
+              title={plan ? "Actualizar" : "Crear"}
+              action={handleSubmit}
+              tooltip={plan ? "Guardar cambios del plan" : "Crear nuevo plan de suscripción"}
             />
           </div>
-
-          {/* Estado */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Estado</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            >
-              <option value="">Seleccionar...</option>
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-              <option value="canceled">Cancelado</option>
-            </select>
-          </div>
-
-          {/* Fechas */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Fecha de Inicio</label>
-            <input
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Próximo Cobro</label>
-            <input
-              type="date"
-              name="nextBillingDate"
-              value={formData.nextBillingDate}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border border-secondary rounded-lg p-2"
-            />
-          </div>
-
-          {/* Botones */}
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
-            >
-              Cerrar
-            </button>
-            {!readOnly && (
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-80 transition"
-              >
-                Guardar
-              </button>
-            )}
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
 
-export default UserModal;
+export default PlanModal;
