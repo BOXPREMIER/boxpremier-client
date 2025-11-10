@@ -69,20 +69,22 @@ const UsersTab = () => {
     setModalOpen(true);
   };
 
-  // --- Guardar usuario o admin ---
-  const handleSubmitUser = async (data) => {
-    try {
-      if (selectedUser) {
-        await updateUser(selectedUser._id, data);
-      } else {
-        await createUser(data);
-      }
-      await fetchUsers();
-      setModalOpen(false);
-    } catch (error) {
-      console.error("Error al guardar usuario:", error);
-    }
-  };
+  const handleSubmitUser = async (userData) => {
+  try {
+    // 🧹 Limpiar campos vacíos para pasar la validación del backend
+    const cleanedData = Object.fromEntries(
+      Object.entries(userData).filter(([_, value]) => value !== "" && value !== null)
+    );
+
+    // ✅ Llamada al servicio con los datos limpios
+    await updateUser(userData._id, cleanedData);
+
+    console.log("✅ Usuario actualizado correctamente");
+  } catch (error) {
+    console.error("Error al guardar usuario:", error);
+  }
+};
+
 
   // --- Eliminar usuario ---
   const handleDeleteUser = async (id) => {
