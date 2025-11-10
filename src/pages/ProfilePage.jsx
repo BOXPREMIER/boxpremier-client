@@ -3,6 +3,7 @@ import useAuthStore from "../store/authStore";
 import { getSubscriptions, cancelSubscription } from "../services/SubscriptionServices";
 import { getMe, updateMe, changeMyPassword } from "../services/ProfileServices";
 import { getAllOrders, cancelOrder } from "../services/OrderServices";
+import SubscriptionDetailsModal from "../components/SubscriptionDetailsModal";
 
 const tabButton = (active) =>
   `px-4 py-1 rounded-full text-sm border transition font-gotham ${active ? "bg-[#F5F5F5] border-[#ADADAD]" : "border-[#ADADAD] hover:bg-[#F5F5F5]"}`;
@@ -37,6 +38,8 @@ export default function ProfilePage() {
   const [sub, setSub] = useState([]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [selectedSub, setSelectedSub] = useState(null);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   const [pwd, setPwd] = useState({
     currentPassword: "",
@@ -217,7 +220,10 @@ export default function ProfilePage() {
       country: userStore.country || "ES",
     });
   };
-
+  const handleOpenSubDetails = (subscription) => {
+    setSelectedSub(subscription);
+    setIsSubModalOpen(true);
+  };
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary">
       <header className="mb-6">
@@ -412,7 +418,8 @@ export default function ProfilePage() {
             sub.map((s) => (
               <div
                 key={s._id}
-                className="rounded-xl p-6 mt-4"
+                onClick={() => handleOpenSubDetails(s)}
+                className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
                 style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -532,6 +539,13 @@ export default function ProfilePage() {
             </div>
           </form>
         </section>
+      )}
+
+      {isSubModalOpen && selectedSub && (
+        <SubscriptionDetailsModal
+          subscription={selectedSub}
+          onClose={() => setIsSubModalOpen(false)}
+        />
       )}
     </div>
   );
