@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Button from "../../../components/Button";
+import Swal from 'sweetalert2';
 
 const PlansModal = ({ plan, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -42,7 +43,14 @@ const PlansModal = ({ plan, onClose, onSave }) => {
       await onSave(formData);
     } catch (err) {
       console.error("Error guardando plan:", err);
-      alert("Error al guardar el plan");
+      // Reemplazar alert nativo por SweetAlert2
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo guardar el plan. Por favor, intenta nuevamente.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -52,128 +60,147 @@ const PlansModal = ({ plan, onClose, onSave }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 sm:p-4"
       style={{ fontFamily: "Gotham, sans-serif" }}
     >
       <div 
-        className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 relative"
+        className="bg-white rounded-2xl shadow-lg w-full max-w-md mx-auto relative max-h-[90vh] overflow-y-auto"
         style={{ 
           fontFamily: "Gotham, sans-serif",
           color: "#27251F"
         }}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 hover:text-gray-800 transition"
-          style={{ color: "#27251F" }}
-        >
-          <X size={20} />
-        </button>
-
-        <h2 
-          className="text-xl font-semibold mb-4"
-          style={{ 
-            fontFamily: "Gotham, sans-serif",
-            color: "#27251F"
-          }}
-        >
-          {plan ? "Editar Plan" : "Nuevo Plan"}
-        </h2>
-
-        <div className="space-y-3">
-          <div>
-            <label 
-              className="block text-sm font-medium"
+        {/* Header sticky */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl">
+          <div className="flex justify-between items-center">
+            <h2 
+              className="text-lg sm:text-xl font-semibold"
               style={{ 
                 fontFamily: "Gotham, sans-serif",
                 color: "#27251F"
               }}
             >
-              Tipo de caja
-            </label>
-            <input
-              type="text"
-              name="boxType"
-              value={formData.boxType}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2"
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                borderColor: "#AB9470"
-              }}
-            />
-            {errors.boxType && <p className="text-red-500 text-sm">{errors.boxType}</p>}
-          </div>
-
-          <div>
-            <label 
-              className="block text-sm font-medium"
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                color: "#27251F"
-              }}
+              {plan ? "Editar Plan" : "Nuevo Plan"}
+            </h2>
+            <button
+              onClick={onClose}
+              className="hover:text-gray-800 transition p-1"
+              style={{ color: "#27251F" }}
             >
-              Tamaño
-            </label>
-            <input
-              type="text"
-              name="boxSize"
-              value={formData.boxSize}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2"
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                borderColor: "#AB9470"
-              }}
-            />
-            {errors.boxSize && <p className="text-red-500 text-sm">{errors.boxSize}</p>}
-          </div>
-
-          <div>
-            <label 
-              className="block text-sm font-medium"
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                color: "#27251F"
-              }}
-            >
-              Precio (€)
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-2"
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                borderColor: "#AB9470"
-              }}
-            />
-            {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="active"
-              checked={formData.active}
-              onChange={handleChange}
-            />
-            <label
-              style={{ 
-                fontFamily: "Gotham, sans-serif",
-                color: "#27251F"
-              }}
-            >
-              Activo
-            </label>
+              <X size={20} />
+            </button>
           </div>
         </div>
 
-        <div className="flex justify-end mt-6 gap-3">
-          <Button title="Cancelar" action={handleCancel} />
-          <Button title="Guardar" action={handleSubmit} type="submit" />
+        {/* Form content */}
+        <div className="p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-3">
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Tipo de caja
+              </label>
+              <input
+                type="text"
+                name="boxType"
+                value={formData.boxType}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+              />
+              {errors.boxType && <p className="text-red-500 text-sm mt-1">{errors.boxType}</p>}
+            </div>
+
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Tamaño
+              </label>
+              <input
+                type="text"
+                name="boxSize"
+                value={formData.boxSize}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+              />
+              {errors.boxSize && <p className="text-red-500 text-sm mt-1">{errors.boxSize}</p>}
+            </div>
+
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Precio (€)
+              </label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+              />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                name="active"
+                checked={formData.active}
+                onChange={handleChange}
+                className="w-4 h-4"
+              />
+              <label
+                className="text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Activo
+              </label>
+            </div>
+          </div>
+
+          {/* Botones responsive */}
+          <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t">
+            <Button 
+              title="Cancelar" 
+              action={handleCancel} 
+              className="w-full sm:w-auto order-2 sm:order-1"
+            />
+            <Button 
+              title="Guardar" 
+              action={handleSubmit} 
+              type="submit" 
+              className="w-full sm:w-auto order-1 sm:order-2"
+            />
+          </div>
         </div>
       </div>
     </div>
