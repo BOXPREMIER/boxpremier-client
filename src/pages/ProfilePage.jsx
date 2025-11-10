@@ -463,7 +463,7 @@ export default function ProfilePage() {
                 <div className="mt-6 flex justify-end">
                   {s.hasOrders ? (
                     <p className="text-sm text-gray-600 italic">
-                      Esta suscripción tiene pedido enviado o entregue. Contacta con el administrador para cancelarla.
+                      Contacta con el administrador para cancelar esa suscripción.
                     </p>
                   ) : (
                     <button
