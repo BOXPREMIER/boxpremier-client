@@ -1,46 +1,50 @@
-// // CustomAlert.jsx
-// import React from "react";
-// import ReactDOM from "react-dom";
+// src/components/ui/CustomAlert.js
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
-// const CustomAlertModal = ({ title, text, confirmText, onConfirm }) => (
-//   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-//     <div className="bg-white rounded-lg p-6 max-w-md w-full">
-//       <h3 className="text-lg font-semibold mb-2">{title}</h3>
-//       <p className="mb-4">{text}</p>
-//       <div className="flex justify-end">
-//         <button
-//           onClick={onConfirm}
-//           className="px-4 py-2 bg-secondary text-white rounded"
-//         >
-//           {confirmText || "Aceptar"}
-//         </button>
-//       </div>
-//     </div>
-//   </div>
-// );
+const MySwal = withReactContent(Swal);
 
-// let containerEl = null;
-
-// export const showCustomAlert = ({ title, text, confirmText, onConfirm }) => {
-//   if (!containerEl) {
-//     containerEl = document.createElement("div");
-//     document.body.appendChild(containerEl);
-//   }
-
-//   const handleClose = () => {
-//     if (containerEl) {
-//       ReactDOM.unmountComponentAtNode(containerEl);
-//     }
-//     if (typeof onConfirm === "function") onConfirm();
-//   };
-
-//   ReactDOM.render(
-//     <CustomAlertModal
-//       title={title}
-//       text={text}
-//       confirmText={confirmText}
-//       onConfirm={handleClose}
-//     />,
-//     containerEl
-//   );
-// };
+export const showCustomAlert = ({
+  title = "¿Estás seguro?",
+  text = "Esta acción no se puede revertir.",
+  confirmText = "Sí, continuar",
+  cancelText = "Cancelar",
+  imageUrl = "/logo-vinopremier.png",
+  onConfirm = () => {},
+  onCancel = () => {},
+}) => {
+  MySwal.fire({
+    title: `<span style="font-family: Gotham; font-weight: 700;">${title}</span>`,
+    text: text,
+    imageUrl,
+    imageWidth: 80,
+    imageHeight: 80,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    customClass: {
+      popup: "custom-alert-popup",
+      confirmButton: "custom-alert-confirm",
+      cancelButton: "custom-alert-cancel",
+      title: "custom-alert-title",
+      htmlContainer: "custom-alert-text",
+    },
+    buttonsStyling: false, // Importante para aplicar nuestro propio CSS
+  }).then((result) => {
+    if (result.isConfirmed) {
+      onConfirm();
+      MySwal.fire({
+        title: `<span style="font-family: Gotham; font-weight: 700;">¡Hecho!</span>`,
+        text: "La acción se realizó correctamente.",
+        icon: "success",
+        customClass: {
+          popup: "custom-alert-popup",
+          confirmButton: "custom-alert-confirm",
+        },
+        buttonsStyling: false,
+      });
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      onCancel();
+    }
+  });
+};
