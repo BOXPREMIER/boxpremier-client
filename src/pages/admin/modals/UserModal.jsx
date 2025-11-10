@@ -20,12 +20,13 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
     country: ""
   });
 
+  const [errors, setErrors] = useState({});
+
   // Cargar datos iniciales 
   useEffect(() => {
     if (initialData) {
-      setFormData((prev) => ({
-        ...prev,
-        _id: initialData._id || prev._id || null,
+      setFormData({
+        _id: initialData._id || null,
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         email: initialData.email || "",
@@ -38,7 +39,7 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
         city: initialData.city || "",
         province: initialData.province || "",
         country: initialData.country || ""
-      }));
+      });
     } else {
       // Reset completo cuando no hay initialData (nuevo usuario)
       setFormData({
@@ -57,6 +58,8 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
         country: ""
       });
     }
+    // Limpiar errores al abrir/cerrar modal
+    setErrors({});
   }, [initialData, open]); 
 
   // Cerrar modal al hacer clic fuera o presionar ESC
@@ -92,12 +95,57 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
     if (readOnly) return;
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Limpiar error del campo cuando el usuario escriba
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.firstName.trim()) newErrors.firstName = "El nombre es obligatorio";
+    if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
+    if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
+    
+    // Validación de contraseña
+    if (!formData._id) {
+      // Para creación: contraseña obligatoria
+      if (!formData.password) {
+        newErrors.password = "La contraseña es obligatoria";
+      } else if (formData.password.length < 6) {
+        newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      }
+    } else {
+      // Para edición: contraseña opcional pero si se ingresa, debe tener al menos 6 caracteres
+      if (formData.password && formData.password.length < 6) {
+        newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Guardar (asegurando el _id)
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ ...formData, _id: formData._id || initialData?._id || null });
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Preparar datos para enviar
+    const dataToSubmit = {
+      ...formData,
+      status: true,
+      preferences: {
+        emailNotifications: true
+      }
+    };
+
+    console.log("📤 Enviando datos de usuario:", dataToSubmit);
+    onSubmit(dataToSubmit);
   };
 
   if (!open) return null;
@@ -111,7 +159,7 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl">
           <h2 className="text-xl sm:text-2xl font-bold text-primary">
-            {initialData ? "Editar Usuario" : "Nuevo Usuario"}
+            {formData._id ? "Editar Usuario" : "Nuevo Usuario"}
           </h2>
         </div>
 
@@ -129,9 +177,12 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
                   onChange={handleChange}
                   autoComplete="off"
                   disabled={readOnly}
+                  className={`w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base ${
+                    errors.firstName ? 'border-red-500' : 'border-secondary'
+                  }`}
                   required
-                  className="w-full border border-secondary rounded-lg p-2 sm:p-3 text-sm sm:text-base"
                 />
+                {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
               </div>
 
               <div className="sm:col-span-2 md:col-span-1">
@@ -143,9 +194,12 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
                   onChange={handleChange}
                   autoComplete="off"
                   disabled={readOnly}
+                  className={`w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base ${
+                    errors.lastName ? 'border-red-500' : 'border-secondary'
+                  }`}
                   required
-                  className="w-full border border-secondary rounded-lg p-2 sm:p-3 text-sm sm:text-base"
                 />
+                {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
               </div>
 
               <div className="sm:col-span-2 md:col-span-1">
@@ -157,14 +211,17 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
                   onChange={handleChange}
                   autoComplete="off"
                   disabled={readOnly}
+                  className={`w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base ${
+                    errors.email ? 'border-red-500' : 'border-secondary'
+                  }`}
                   required
-                  className="w-full border border-secondary rounded-lg p-2 sm:p-3 text-sm sm:text-base"
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
 
               <div className="sm:col-span-2 md:col-span-1">
                 <label className="block text-sm font-medium mb-1">
-                  {initialData ? "Contraseña (dejar vacío para no cambiar)" : "Contraseña *"}
+                  {formData._id ? "Contraseña (dejar vacío para no cambiar)" : "Contraseña *"}
                 </label>
                 <input
                   type="password"
@@ -173,9 +230,17 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
                   onChange={handleChange}
                   autoComplete="off"
                   disabled={readOnly}
-                  required={!initialData}
-                  className="w-full border border-secondary rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                  className={`w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base ${
+                    errors.password ? 'border-red-500' : 'border-secondary'
+                  }`}
+                  required={!formData._id}
                 />
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                {formData._id && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Deja vacío si no quieres cambiar la contraseña
+                  </p>
+                )}
               </div>
 
               <div className="sm:col-span-2">
