@@ -138,9 +138,14 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       setSaving(true);
-      const updated = await updateMe(profile);
 
-      const newUser = { ...userStore, ...profile, ...updated };
+      const dataToUpdate = userStore?.userType === 'admin'
+        ? { firstName: profile.firstName, lastName: profile.lastName, email: profile.email }
+        : profile;
+
+      const updated = await updateMe(dataToUpdate);
+
+      const newUser = { ...userStore, ...dataToUpdate, ...updated };
       setUser(newUser);
 
       setIsEditing(false);
