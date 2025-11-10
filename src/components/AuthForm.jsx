@@ -3,18 +3,11 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { login, register } from "../services/AuthServices";
 import useAuthStore from "../store/authStore";
 
-const COLORS = {
-
-  white: "#FFFFFF",
-  gray: "#ADADAD",
-  black: "#000000",
-};
-
 export default function AuthForm({ mode = "login" }) {
   const isRegister = mode === "register";
   const navigate = useNavigate();
   const [search] = useSearchParams();
-  const next = search.get("next") || "/subscriptionPage";
+  const next = search.get("next") || "/app/subscription";
 
   const { setToken, setUser } = useAuthStore();
 
@@ -110,7 +103,7 @@ export default function AuthForm({ mode = "login" }) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#FFFFFF] flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen w-full bg-white flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-[820px]">
         <div
           className="mx-auto rounded-[14px] border shadow-[0_6px_20px_rgba(0,0,0,0.06)] px-8 py-10 sm:p-12 border-secondary"
@@ -125,10 +118,10 @@ export default function AuthForm({ mode = "login" }) {
           </div>
 
           <div className="mb-8 text-center">
-            <h1 className="text-lg sm:text-xl font-bold" style={{ color: COLORS.black }}>
+            <h1 className="text-lg sm:text-xl font-bold">
               {isRegister ? "Crea tu cuenta" : "Bienvenido de vuelta"}
             </h1>
-            <p className="mt-1 text-xs sm:text-[13px]" style={{ color: COLORS.gray }}>
+            <p className="mt-1 text-xs sm:text-[13px]" >
               {isRegister ? "Empieza a disfrutar de nuevos vinos hoy." : "Accede a tu cuenta"}
             </p>
           </div>
@@ -150,7 +143,7 @@ export default function AuthForm({ mode = "login" }) {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Nombre
                     </label>
                     <input
@@ -162,7 +155,7 @@ export default function AuthForm({ mode = "login" }) {
                     {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Apellido
                     </label>
                     <input
@@ -177,7 +170,7 @@ export default function AuthForm({ mode = "login" }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Teléfono
                     </label>
                     <input
@@ -189,7 +182,7 @@ export default function AuthForm({ mode = "login" }) {
                     {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Correo electrónico
                     </label>
                     <input
@@ -205,7 +198,7 @@ export default function AuthForm({ mode = "login" }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Contraseña
                     </label>
                     <input
@@ -218,7 +211,7 @@ export default function AuthForm({ mode = "login" }) {
                     {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    <label className="text-xs text-primary">
                       Confirmar contraseña
                     </label>
                     <input
@@ -235,10 +228,10 @@ export default function AuthForm({ mode = "login" }) {
                 </div>
 
                 <div className="mt-4">
-                  <p className="mb-2 text-sm font-semibold" style={{ color: COLORS.black }}>Dirección</p>
+                  <p className="mb-2 text-sm font-semibold">Dirección</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Calle</label>
+                      <label className="text-xs text-primary">Calle</label>
                       <input
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
@@ -247,7 +240,7 @@ export default function AuthForm({ mode = "login" }) {
                       {errors.street && <p className="mt-1 text-xs text-red-600">{errors.street}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Número</label>
+                      <label className="text-xs text-primary">Número</label>
                       <input
                         value={number}
                         onChange={(e) => setNumber(e.target.value)}
@@ -256,7 +249,7 @@ export default function AuthForm({ mode = "login" }) {
                       {errors.number && <p className="mt-1 text-xs text-red-600">{errors.number}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Piso</label>
+                      <label className="text-xs text-primary">Piso</label>
                       <input
                         value={floor}
                         onChange={(e) => setFloor(e.target.value)}
@@ -264,7 +257,7 @@ export default function AuthForm({ mode = "login" }) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Código Postal</label>
+                      <label className="text-xs text-primary">Código Postal</label>
                       <input
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
@@ -273,7 +266,7 @@ export default function AuthForm({ mode = "login" }) {
                       {errors.postalCode && <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Ciudad</label>
+                      <label className="text-xs text-primary">Ciudad</label>
                       <input
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
@@ -282,7 +275,7 @@ export default function AuthForm({ mode = "login" }) {
                       {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Provincia</label>
+                      <label className="text-xs text-primary">Provincia</label>
                       <input
                         value={province}
                         onChange={(e) => setProvince(e.target.value)}
@@ -293,7 +286,7 @@ export default function AuthForm({ mode = "login" }) {
                   </div>
                 </div>
 
-                <label className="mt-2 flex items-center gap-2 text-xs" style={{ color: COLORS.gray }}>
+                <label className="mt-2 flex items-center gap-2 text-xs text-gray-500" >
                   <input type="checkbox" className="rounded border" required /> Acepto los términos y política de privacidad
                 </label>
               </>
@@ -302,7 +295,7 @@ export default function AuthForm({ mode = "login" }) {
             {!isRegister && (
               <>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                  <label className="text-xs text-primary">
                     Correo electrónico
                   </label>
                   <input
@@ -316,7 +309,7 @@ export default function AuthForm({ mode = "login" }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                  <label className="text-xs text-primary">
                     Contraseña
                   </label>
                   <input
@@ -343,7 +336,7 @@ export default function AuthForm({ mode = "login" }) {
                   : "Iniciar sesión"}
             </button>
 
-            <p className="mt-4 text-center text-xs" style={{ color: COLORS.gray }}>
+            <p className="mt-4 text-center text-xs text-gray-500" >
               {isRegister ? (
                 <>
                   ¿Ya tienes cuenta?{" "}
