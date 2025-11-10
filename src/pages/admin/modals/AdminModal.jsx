@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Button from "../../components/Button";
+import Button from "../../../components/Button";
 
 const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = false }) => {
   const [formData, setFormData] = useState({

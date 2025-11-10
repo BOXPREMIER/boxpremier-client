@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
-import PlansModal from "./PlansModal";
+import PlansModal from "../modals/PlansModal";
 import {
   getAllPlans,
   createPlan,
   updatePlan,
   deletePlan,
-} from "../../services/SubscriptionPlanServices"; 
+} from "../../../services/SubscriptionPlanServices"; 
 
 const PlansTab = () => {
   const [plans, setPlans] = useState([]);

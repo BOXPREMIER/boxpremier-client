@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import Button from "../../components/Button";
+import Button from "../../../components/Button";
 
 const PlansModal = ({ plan, onClose, onSave }) => {
   const [formData, setFormData] = useState({

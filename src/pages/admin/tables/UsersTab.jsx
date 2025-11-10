@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getUsers, createUser, updateUser, deleteUser } from "../../services/UserServices";
-import { getSubscriptions } from "../../services/SubscriptionServices"; 
-import UserModal from "./UserModal";
-import AdminModal from "./AdminModal"; 
-import Button from "../../components/Button";
+import { getUsers, createUser, updateUser, deleteUser } from "../../../services/UserServices";
+import { getSubscriptions } from "../../../services/SubscriptionServices"; 
+import UserModal from "../modals/UserModal";
+import AdminModal from "../modals/AdminModal"; 
+import Button from "../../../components/Button";
 
 const UsersTab = () => {
   const [users, setUsers] = useState([]);
