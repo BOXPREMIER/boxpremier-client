@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Button = ({ title, action, tooltip, type = "button", "data-testid": testid }) => {
+const Button = ({ title, action, tooltip, type = "button", "data-testid": testid, bgColor }) => {
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -24,19 +24,21 @@ const Button = ({ title, action, tooltip, type = "button", "data-testid": testid
       disabled={loading}
       data-testid={testid}
       className={`
-        w-full md:w-auto
-        px-10 py-4
-        bg-secondary
-        text-white uppercase tracking-wider
+        w-full sm:w-auto
+        px-6 sm:px-8 md:px-10
+        py-3 sm:py-4
+        ${!bgColor ? "bg-secondary text-white" : "text-white"} uppercase tracking-wider
+        text-sm sm:text-base md:text-lg
         transition-all duration-300 ease-out
-        ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-secondary hover:scale-[1.02] cursor-pointer"}
+        ${loading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] cursor-pointer"}
         rounded-full shadow-md
-        focus:outline-none focus:ring-2 focus:ring-secondary/50
+        focus:outline-none
       `}
       style={{
         fontFamily: "Gotham, sans-serif",
-        fontWeight: 700, // Gotham Bold
+        fontWeight: 700,
         letterSpacing: "0.05em",
+        backgroundColor: bgColor || undefined, 
       }}
     >
       {loading ? "Cargando..." : title}
