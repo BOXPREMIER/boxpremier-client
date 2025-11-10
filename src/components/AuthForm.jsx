@@ -4,7 +4,7 @@ import { login, register } from "../services/AuthServices";
 import useAuthStore from "../store/authStore";
 
 const COLORS = {
-  gold: "#AD946C",
+
   white: "#FFFFFF",
   gray: "#ADADAD",
   black: "#000000",
@@ -113,8 +113,7 @@ export default function AuthForm({ mode = "login" }) {
     <div className="min-h-screen w-full bg-[#FFFFFF] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-[820px]">
         <div
-          className="mx-auto rounded-[14px] border shadow-[0_6px_20px_rgba(0,0,0,0.06)] px-8 py-10 sm:p-12"
-          style={{ borderColor: COLORS.gold }}
+          className="mx-auto rounded-[14px] border shadow-[0_6px_20px_rgba(0,0,0,0.06)] px-8 py-10 sm:p-12 border-secondary"
         >
           <div className="mb-8 flex justify-center">
             <img
@@ -149,175 +148,218 @@ export default function AuthForm({ mode = "login" }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <>
-                {/* Nome e Apellido, Teléfono e Correo, Contraseña e Confirmar contraseña */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#000000]">Nombre</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Nombre
+                    </label>
                     <input
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="given-name"
                     />
-                    {errors.firstName && (
-                      <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>
-                    )}
+                    {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
                   </div>
                   <div>
-                    <label className="text-xs text-[#000000]">Apellido</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Apellido
+                    </label>
                     <input
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="family-name"
                     />
-                    {errors.lastName && (
-                      <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>
-                    )}
+                    {errors.lastName && <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>}
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#000000]">Teléfono</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Teléfono
+                    </label>
                     <input
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="tel"
                     />
-                    {errors.phone && (
-                      <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
-                    )}
+                    {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="text-xs text-[#000000]">Correo electrónico</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Correo electrónico
+                    </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="email"
                     />
-                    {errors.email && (
-                      <p className="mt-1 text-xs text-red-600">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs text-[#000000]">Contraseña</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Contraseña
+                    </label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
-                      autoComplete="current-password"
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="new-password"
                     />
-                    {errors.password && (
-                      <p className="mt-1 text-xs text-red-600">{errors.password}</p>
+                    {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                      Confirmar contraseña
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      autoComplete="new-password"
+                    />
+                    {errors.confirmPassword && (
+                      <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
                     )}
                   </div>
-                  {isRegister && (
-                    <div>
-                      <label className="text-xs text-[#000000]">Confirmar contraseña</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
-                        autoComplete="new-password"
-                      />
-                      {errors.confirmPassword && (
-                        <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
-                      )}
-                    </div>
-                  )}
                 </div>
 
-                {/* Dirección */}
-                <div className="mt-6">
-                  <p className="mb-3 text-sm font-semibold">Dirección</p>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="mt-4">
+                  <p className="mb-2 text-sm font-semibold" style={{ color: COLORS.black }}>Dirección</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs">Calle</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Calle</label>
                       <input
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                       {errors.street && <p className="mt-1 text-xs text-red-600">{errors.street}</p>}
                     </div>
                     <div>
-                      <label className="text-xs">Número</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Número</label>
                       <input
                         value={number}
                         onChange={(e) => setNumber(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                       {errors.number && <p className="mt-1 text-xs text-red-600">{errors.number}</p>}
                     </div>
                     <div>
-                      <label className="text-xs">Piso</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Piso</label>
                       <input
                         value={floor}
                         onChange={(e) => setFloor(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                     </div>
                     <div>
-                      <label className="text-xs">Código Postal</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Código Postal</label>
                       <input
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                       {errors.postalCode && <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>}
                     </div>
                     <div>
-                      <label className="text-xs">Ciudad</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Ciudad</label>
                       <input
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                       {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
                     </div>
                     <div>
-                      <label className="text-xs">Provincia</label>
+                      <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>Provincia</label>
                       <input
                         value={province}
                         onChange={(e) => setProvince(e.target.value)}
-                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: COLORS.gold }}
+                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
                       />
                       {errors.province && <p className="mt-1 text-xs text-red-600">{errors.province}</p>}
                     </div>
                   </div>
                 </div>
 
-                {/* Checkbox de termos */}
-                {isRegister && (
-                  <label className="mt-2 flex items-center gap-2 text-xs" style={{ color: COLORS.gray }}>
-                    <input type="checkbox" className="rounded border" required /> Acepto los términos y política de privacidad
-                  </label>
-                )}
-
-                {/* Botão de submit */}
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="mt-4 w-full rounded-2xl px-6 py-3 font-semibold shadow transition"
-                  style={{ backgroundColor: COLORS.gold, color: COLORS.black }}
-                >
-                  {submitting ? "Procesando…" : isRegister ? "Crear cuenta" : "Iniciar sesión"}
-                </button>
+                <label className="mt-2 flex items-center gap-2 text-xs" style={{ color: COLORS.gray }}>
+                  <input type="checkbox" className="rounded border" required /> Acepto los términos y política de privacidad
+                </label>
               </>
             )}
+
+            {!isRegister && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                    autoComplete="email"
+                  />
+                  {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: COLORS.black }}>
+                    Contraseña
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                    autoComplete="current-password"
+                  />
+                  {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+                </div>
+              </>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-4 w-full rounded-2xl px-6 py-3 font-semibold shadow transition bg-secondary"
+            >
+              {submitting
+                ? "Procesando…"
+                : isRegister
+                  ? "Crear cuenta"
+                  : "Iniciar sesión"}
+            </button>
+
+            <p className="mt-4 text-center text-xs" style={{ color: COLORS.gray }}>
+              {isRegister ? (
+                <>
+                  ¿Ya tienes cuenta?{" "}
+                  <Link to={`/login?next=${encodeURIComponent(next)}`} className="underline">
+                    Inicia sesión
+                  </Link>
+                </>
+              ) : (
+                <>
+                  ¿No tienes cuenta?{" "}
+                  <Link to={`/register?next=${encodeURIComponent(next)}`} className="underline">
+                    Crea tu cuenta
+                  </Link>
+                </>
+              )}
+            </p>
           </form>
 
         </div>
