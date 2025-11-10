@@ -77,18 +77,26 @@ export default function AuthForm({ mode = "login" }) {
         if (res?.token && res?.user) {
           setToken(res.token);
           setUser(res.user);
-          navigate(next, { replace: true });
+
+          if (res.user.userType === "admin") {
+            navigate("/admin/dashboard", { replace: true });
+          } else {
+            navigate("/app/home", { replace: true });
+          }
         } else {
-          navigate(`/login?next=${encodeURIComponent(next)}`, {
-            replace: true,
-          });
+          navigate(`/login?next=${encodeURIComponent(next)}`, { replace: true });
         }
       } else {
         const res = await login({ email, password });
         if (res?.token && res?.user) {
           setToken(res.token);
           setUser(res.user);
-          navigate(next, { replace: true });
+
+          if (res.user.userType === "admin") {
+            navigate("/app/admin", { replace: true });
+          } else {
+            navigate("/app/home", { replace: true });
+          }
         } else {
           setErrors({ general: "No se recibió token. Intenta de nuevo." });
         }
@@ -149,7 +157,7 @@ export default function AuthForm({ mode = "login" }) {
                     <input
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="given-name"
                     />
                     {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
@@ -161,7 +169,7 @@ export default function AuthForm({ mode = "login" }) {
                     <input
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="family-name"
                     />
                     {errors.lastName && <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>}
@@ -176,7 +184,7 @@ export default function AuthForm({ mode = "login" }) {
                     <input
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="tel"
                     />
                     {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
@@ -189,7 +197,7 @@ export default function AuthForm({ mode = "login" }) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="email"
                     />
                     {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
@@ -205,7 +213,7 @@ export default function AuthForm({ mode = "login" }) {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="new-password"
                     />
                     {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
@@ -218,7 +226,7 @@ export default function AuthForm({ mode = "login" }) {
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       autoComplete="new-password"
                     />
                     {errors.confirmPassword && (
@@ -235,7 +243,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={street}
                         onChange={(e) => setStreet(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                       {errors.street && <p className="mt-1 text-xs text-red-600">{errors.street}</p>}
                     </div>
@@ -244,7 +252,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={number}
                         onChange={(e) => setNumber(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                       {errors.number && <p className="mt-1 text-xs text-red-600">{errors.number}</p>}
                     </div>
@@ -253,7 +261,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={floor}
                         onChange={(e) => setFloor(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                     </div>
                     <div>
@@ -261,7 +269,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                       {errors.postalCode && <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>}
                     </div>
@@ -270,7 +278,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                       {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
                     </div>
@@ -279,7 +287,7 @@ export default function AuthForm({ mode = "login" }) {
                       <input
                         value={province}
                         onChange={(e) => setProvince(e.target.value)}
-                        className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       />
                       {errors.province && <p className="mt-1 text-xs text-red-600">{errors.province}</p>}
                     </div>
@@ -302,7 +310,7 @@ export default function AuthForm({ mode = "login" }) {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                     autoComplete="email"
                   />
                   {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
@@ -316,7 +324,7 @@ export default function AuthForm({ mode = "login" }) {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 border-secondary"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                     autoComplete="current-password"
                   />
                   {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
