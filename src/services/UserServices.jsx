@@ -11,7 +11,7 @@ export const getUser = async (id) => {
   const { data } = await API.get(`/users/${id}`);
   return data.data;
 };
-
+ 
 // Crear usuario
 export const createUser = async (userData) => {
   const { data } = await API.post("/users", userData);
@@ -20,7 +20,7 @@ export const createUser = async (userData) => {
 
 // Actualizar usuario
 export const updateUser = async (id, userData) => {
-  const { data } = await API.patch(`/users/${id}`, userData);
+  const { data } = await API.put(`/users/${id}`, userData);
   return data.data;
 };
 
@@ -30,9 +30,9 @@ export const deleteUser = async (id) => {
   return data.data;
 };
 
-//INGRID ESTUVO POR AQUI
-export async function getUserById(userId) {
-  const { data } = await API.get(`/users/${userId}`)
-  return data.data
-}
 
+
+export const updatePaymentMethod = async (paymentData) => {
+  const { data } = await API.patch('/users/me/payment-method', paymentData);
+  return data.data;
+};

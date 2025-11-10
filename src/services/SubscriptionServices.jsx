@@ -1,14 +1,21 @@
 import API from './Api';
 import useAuthStore from '../store/authStore';
 
-export async function createSubscription({ planId, boxType, wineType, payMethod = 'multisafepay' }) {
+export async function createSubscription({ planId, wineType, isGift, giftInfo, payMethod = 'card' }) {
     const { user } = useAuthStore.getState();
     if (!user?._id && !user?.id) throw new Error('Necesitas iniciar sesión');
+
     const payload = {
         subscriptionPlanId: planId,
         wineType,
         payMethod
     };
+
+    if (isGift && giftInfo) {
+        payload.isGift = true;
+        payload.giftInfo = giftInfo;
+    }
+
     const { data } = await API.post('/subs', payload);
     return data.data;
 }

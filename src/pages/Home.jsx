@@ -13,7 +13,7 @@ export default function Home() {
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
 
-  // 🔹 Hero Section
+ 
   const heroRef = useRef(null);
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
@@ -46,10 +46,10 @@ export default function Home() {
           }}
         />
 
-        {/* 🔸 Difuminado inferior */}
+        {/*  Difuminado inferior */}
         <div className="absolute bottom-0 w-full h-48 bg-gradient-to-b from-transparent to-white"></div>
 
-        {/* 🔹 Texto sobre el fondo */}
+        
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6 md:px-8">
           <motion.p 
             className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 text-white drop-shadow-lg leading-tight"
@@ -66,7 +66,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔸 Sección que va cubriendo la imagen con fondo blanco */}
+      
       <motion.div
         style={{
           backgroundColor: useTransform(backgroundOpacity, [0, 1], ["rgba(255,255,255,0)", "rgba(255,255,255,1)"]),
@@ -133,7 +133,7 @@ export default function Home() {
             <p className="text-sm sm:text-base text-gray-700 font-bold">Productos de calidad</p>
           </div>
 
-          {/* 🔹 Nuevo bloque: Opciones de regalo */}
+          {/*  Nuevo bloque: Opciones de regalo */}
           <div className="flex flex-col items-center text-center w-full md:w-1/3">
             <img 
               src="/gift.png" 
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* 🔹 Botón "Conoce más" */}
+        {/*  Botón "Conoce más" */}
         <div className="flex justify-center mt-8 mb-12">
           <Button
             title="Conoce más"
@@ -153,7 +153,7 @@ export default function Home() {
           />
         </div>
 
-        {/* 🔹 Parallax Section */}
+        {/*  Parallax Section */}
         <div ref={ref} className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] overflow-hidden mt-8">
           <motion.div
             className="absolute inset-0"
@@ -182,7 +182,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 🔹 Customer Reviews Section */}
+        {/*  Customer Reviews Section */}
         <div className="mt-12 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto">
           <h2 
             className="text-center text-black font-bold text-2xl sm:text-3xl mb-6"
@@ -191,7 +191,7 @@ export default function Home() {
             Algunos comentarios de nuestros clientes Vino Premier
           </h2>
 
-          {/* Mantiene el carrusel intacto sin corte */}
+          
           <div className="overflow-x-auto flex gap-4 pb-4 snap-x snap-mandatory scroll-smooth">
             {[
               { text: "“Muy buena selección de vinos y envío rápido.”", author: "– María G." },
@@ -206,7 +206,7 @@ export default function Home() {
                   className="min-w-[260px] sm:min-w-[300px] bg-white rounded-xl border border-[#AD946C] p-4 sm:p-6 flex-shrink-0 snap-start"
                   style={{ fontFamily: 'Gotham, sans-serif' }}
                 >
-                  {/* ⭐ Estrellas interactivas */}
+                  {/*  Estrellas interactivas */}
                   <div className="flex justify-start mb-3 text-[#AD946C]">
                     {[...Array(5)].map((_, index) => (
                       <button
