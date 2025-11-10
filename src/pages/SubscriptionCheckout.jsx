@@ -4,9 +4,8 @@ import useAuthStore from "../store/authStore";
 import { createSubscription } from "../services/SubscriptionServices";
 import { getAllPlans } from "../services/SubscriptionPlanServices";
 import { createUser, updatePaymentMethod } from "../services/UserServices";
-import { login } from "../services/authServices";
+import { login } from "../services/AuthServices";
 
-const COLORS = { gold: "#AD946C", gray: "#ADADAD", black: "#000000" };
 const WINE_TYPES = [
   { label: "mixto", value: "mixed" },
   { label: "tinto", value: "red" },
@@ -31,6 +30,8 @@ export default function SubscriptionCheckout() {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [error, setError] = useState(null);
 
+  const [mode, setMode] = useState("plan");
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -46,10 +47,23 @@ export default function SubscriptionCheckout() {
   const [province, setProvince] = useState("");
   const [country, setCountry] = useState("ES");
 
+  const [recipientFirstName, setRecipientFirstName] = useState("");
+  const [recipientLastName, setRecipientLastName] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
+  const [giftMessage, setGiftMessage] = useState("");
+
+  const [recipientStreet, setRecipientStreet] = useState("");
+  const [recipientNumber, setRecipientNumber] = useState("");
+  const [recipientFloor, setRecipientFloor] = useState("");
+  const [recipientPostalCode, setRecipientPostalCode] = useState("");
+  const [recipientCity, setRecipientCity] = useState("");
+  const [recipientProvince, setRecipientProvince] = useState("");
+  const [recipientCountry, setRecipientCountry] = useState("ES");
+
   const [planId, setPlanId] = useState(initialPlanId || "");
   const [boxType, setBoxType] = useState(initialBox);
   const [wineType, setWineType] = useState(initialWine);
-  const [isGift, setIsGift] = useState(false);
 
   const [payMethod, setPayMethod] = useState("card");
   const [cardNumber, setCardNumber] = useState("");
@@ -60,23 +74,22 @@ export default function SubscriptionCheckout() {
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName || "");
-      setLastName(user.lastName || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+      setEmail(user.email);
+      setPhone(user.phone);
 
-      setStreet(user.street || "");
-      setNumber(user.number || "");
-      setFloor(user.floor || "");
-      setPostalCode(user.postalCode || "");
-      setCity(user.city || "");
-      setProvince(user.province || "");
+      setStreet(user.street);
+      setNumber(user.number);
+      setFloor(user.floor);
+      setPostalCode(user.postalCode);
+      setCity(user.city);
+      setProvince(user.province);
       setCountry(user.country || "ES");
 
       if (user.paymentMethod) {
-        setCardNumber(`**** **** **** ${user.paymentMethod.lastFourDigits}` || "");
-        setCardHolder(user.paymentMethod.cardHolderName || "");
-        setExpirationDate(user.paymentMethod.expirationDate || "");
+        setCardHolder(user.paymentMethod.cardHolderName);
+        setExpirationDate(user.paymentMethod.expirationDate);
       }
     }
   }, [user]);
@@ -124,6 +137,17 @@ export default function SubscriptionCheckout() {
       return;
     }
 
+    if (mode === "regalo") {
+      if (!recipientFirstName || !recipientLastName || !recipientEmail || !recipientPhone) {
+        setError("Completa todos los datos del destinatario");
+        return;
+      }
+      if (!recipientStreet || !recipientNumber || !recipientPostalCode || !recipientCity || !recipientProvince) {
+        setError("Completa la dirección del destinatario");
+        return;
+      }
+    }
+
     if (!isLoggedIn && password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
       return;
@@ -132,6 +156,14 @@ export default function SubscriptionCheckout() {
     if (payMethod === "card" && (!cardNumber || !cardHolder || !expirationDate || !cvv)) {
       setError("Completa todos los datos de la tarjeta");
       return;
+    }
+
+    if (payMethod === "card") {
+      const cleanNumber = cardNumber.replace(/\s/g, "");
+      if (cleanNumber.length < 13) {
+        setError("Número de tarjeta inválido");
+        return;
+      }
     }
 
     try {
@@ -158,7 +190,9 @@ export default function SubscriptionCheckout() {
         setAuth(authData.token, authData.user);
 
         if (payMethod === "card") {
-          const lastFour = cardNumber.slice(-4);
+          const cleanNumber = cardNumber.replace(/\s/g, "");
+          const lastFour = cleanNumber.slice(-4);
+
           await updatePaymentMethod({
             type: "card",
             lastFourDigits: lastFour,
@@ -168,9 +202,8 @@ export default function SubscriptionCheckout() {
           });
         }
       } else if (payMethod === "card") {
-        const lastFour = cardNumber.includes("*")
-          ? user.paymentMethod?.lastFourDigits
-          : cardNumber.slice(-4);
+        const cleanNumber = cardNumber.replace(/\s/g, "");
+        const lastFour = cleanNumber.slice(-4);
 
         await updatePaymentMethod({
           type: "card",
@@ -181,184 +214,403 @@ export default function SubscriptionCheckout() {
         });
       }
 
-      await createSubscription({
+      const subscriptionData = {
         planId,
         wineType,
-      });
+      };
+
+      if (mode === "regalo") {
+        subscriptionData.isGift = true;
+        subscriptionData.giftInfo = {
+          recipientName: `${recipientFirstName} ${recipientLastName}`,
+          recipientEmail,
+          recipientPhone,
+          giftMessage,
+          recipientAddress: {
+            street: recipientStreet,
+            number: recipientNumber,
+            floor: recipientFloor,
+            postalCode: recipientPostalCode,
+            city: recipientCity,
+            province: recipientProvince,
+            country: recipientCountry
+          }
+        };
+      }
+
+      await createSubscription(subscriptionData);
 
       navigate("/account/subscription", { state: { createdId: planId } });
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "No se pudo crear la suscripción");
+      const apiError = err?.response?.data?.message;
+      setError(apiError || err.message || "No se pudo crear la suscripción");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#FFFFFF] text-[#000000]">
+    <div className="min-h-screen w-full bg-[#FFFFFF] text-primary">
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6 text-center">
           <img src="/plan.PNG" alt="BOX PREMIER" className="mx-auto h-16 w-auto object-contain" />
           <p className="mt-1 text-xl font-semibold">Suscripción</p>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="rounded-2xl border p-6 sm:p-8"
-          style={{ borderColor: COLORS.gold }}
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs text-[#000000]">Nombre</label>
-              <input
-                className="mt-1 w-full rounded-xl border px-3 py-2"
-                style={{ borderColor: COLORS.gold }}
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                autoComplete="given-name"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[#000000]">Apellidos</label>
-              <input
-                className="mt-1 w-full rounded-xl border px-3 py-2"
-                style={{ borderColor: COLORS.gold }}
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                autoComplete="family-name"
-                required
-              />
-            </div>
+        <div className="mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setMode("plan")}
+              className={`rounded-2xl border-2 px-6 py-4 font-semibold transition ${mode === "plan"
+                ? "border-secondary bg-[#FFF8F1] text-primary"
+                : "border-[#ADADAD] text-[#ADADAD] hover:border-secondary"
+                }`}
+            >
+              Elegir plan
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("regalo")}
+              className={`rounded-2xl border-2 px-6 py-4 font-semibold transition ${mode === "regalo"
+                ? "border-secondary bg-[#FFF8F1] text-primary"
+                : "border-[#ADADAD] text-[#ADADAD] hover:border-secondary"
+                }`}
+            >
+              Enviar regalo
+            </button>
+          </div>
+        </div>
 
-            <div>
-              <label className="text-xs text-[#000000]">Correo Electrónico</label>
-              <input
-                type="email"
-                className="mt-1 w-full rounded-xl border px-3 py-2"
-                style={{ borderColor: COLORS.gold }}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs text-[#000000]">Número de Teléfono</label>
-              <input
-                className="mt-1 w-full rounded-xl border px-3 py-2"
-                style={{ borderColor: COLORS.gold }}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                autoComplete="tel"
-                required
-              />
-            </div>
-
-            {!isLoggedIn && (
-              <>
+        <form onSubmit={onSubmit} className="rounded-2xl border p-6 sm:p-8 border-secondary">
+          {mode === "plan" && (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs text-[#000000]">Contraseña</label>
+                  <label className="text-xs text-primary">Nombre</label>
                   <input
-                    type="password"
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    style={{ borderColor: COLORS.gold }}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="new-password"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    autoComplete="given-name"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#000000]">Confirmar contraseña</label>
+                  <label className="text-xs text-primary">Apellidos</label>
                   <input
-                    type="password"
-                    className="mt-1 w-full rounded-xl border px-3 py-2"
-                    style={{ borderColor: COLORS.gold }}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    autoComplete="family-name"
                     required
                   />
                 </div>
-              </>
-            )}
-          </div>
 
-          <div className="mt-6">
-            <p className="mb-3 text-sm font-semibold">Dirección</p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="text-xs">Calle</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  required
-                />
+                <div>
+                  <label className="text-xs text-primary">Correo Electrónico</label>
+                  <input
+                    type="email"
+                    className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-primary">Número de Teléfono</label>
+                  <input
+                    className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    autoComplete="tel"
+                    required
+                  />
+                </div>
+
+                {!isLoggedIn && (
+                  <>
+                    <div>
+                      <label className="text-xs text-primary">Contraseña</label>
+                      <input
+                        type="password"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-primary">Confirmar contraseña</label>
+                      <input
+                        type="password"
+                        className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
               </div>
-              <div>
-                <label className="text-xs">Número</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value)}
-                  required
-                />
+
+              <div className="mt-6">
+                <p className="mb-3 text-sm font-semibold">Dirección</p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-xs">Calle</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Número</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={number}
+                      onChange={(e) => setNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Piso</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={floor}
+                      onChange={(e) => setFloor(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Código Postal</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Ciudad</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Estado/Provincia</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={province}
+                      onChange={(e) => setProvince(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="text-xs">Piso</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={floor}
-                  onChange={(e) => setFloor(e.target.value)}
-                />
+            </>
+          )}
+
+          {mode === "regalo" && (
+            <>
+              <div className="mb-6">
+                <p className="mb-3 text-sm font-semibold">Tus datos (quien envía el regalo)</p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-xs text-primary">Nombre</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Apellidos</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Correo Electrónico</label>
+                    <input
+                      type="email"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Teléfono</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {!isLoggedIn && (
+                    <>
+                      <div>
+                        <label className="text-xs text-primary">Contraseña</label>
+                        <input
+                          type="password"
+                          className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-primary">Confirmar contraseña</label>
+                        <input
+                          type="password"
+                          className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="text-xs">Código Postal</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
-                  required
-                />
+
+              <div className="mb-6">
+                <p className="mb-3 text-sm font-semibold">Datos del destinatario</p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-xs text-primary">Nombre</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientFirstName}
+                      onChange={(e) => setRecipientFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Apellidos</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientLastName}
+                      onChange={(e) => setRecipientLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Correo Electrónico</label>
+                    <input
+                      type="email"
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientEmail}
+                      onChange={(e) => setRecipientEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-primary">Teléfono</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientPhone}
+                      onChange={(e) => setRecipientPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="text-xs text-primary">Mensaje personalizado</label>
+                  <textarea
+                    className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary resize-none"
+                    value={giftMessage}
+                    onChange={(e) => setGiftMessage(e.target.value)}
+                    rows="3"
+                    placeholder="Escribe un mensaje para el destinatario"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="text-xs">Ciudad</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                />
+
+              <div className="mb-6">
+                <p className="mb-3 text-sm font-semibold">Dirección de envío</p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-xs">Calle</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientStreet}
+                      onChange={(e) => setRecipientStreet(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Número</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientNumber}
+                      onChange={(e) => setRecipientNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Piso</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientFloor}
+                      onChange={(e) => setRecipientFloor(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Código Postal</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientPostalCode}
+                      onChange={(e) => setRecipientPostalCode(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Ciudad</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientCity}
+                      onChange={(e) => setRecipientCity(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs">Estado/Provincia</label>
+                    <input
+                      className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
+                      value={recipientProvince}
+                      onChange={(e) => setRecipientProvince(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="text-xs">Estado/Provincia</label>
-                <input
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-          </div>
+            </>
+          )}
 
           <div className="mt-6">
             <p className="mb-3 text-sm font-semibold">Elige tu plan</p>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-end">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-xs">Planes</label>
                 <select
-                  className="mt-1 w-full rounded-xl border px-3 py-2"
-                  style={{ borderColor: COLORS.gold }}
+                  className="mt-1 w-full rounded-xl border px-3 py-2 border-secondary"
                   value={planId}
                   onChange={(e) => {
                     const p = plans.find((pl) => pl._id === e.target.value);
@@ -378,11 +630,6 @@ export default function SubscriptionCheckout() {
                   ))}
                 </select>
               </div>
-
-              <label className="flex items-center gap-2 text-xs">
-                <input type="checkbox" checked={isGift} onChange={(e) => setIsGift(e.target.checked)} />
-                Enviar como regalo
-              </label>
             </div>
 
             <div className="mt-4">
@@ -393,7 +640,9 @@ export default function SubscriptionCheckout() {
                     type="button"
                     key={t.value}
                     onClick={() => setWineType(t.value)}
-                    className={`rounded-xl border px-3 py-2 capitalize ${wineType === t.value ? "border-[#AD946C] bg-[#FFF8F1]" : "border-[#ADADAD] hover:bg-[#F8F8F8]"
+                    className={`rounded-xl border px-3 py-2 capitalize ${wineType === t.value
+                      ? "border-secondary bg-[#FFF8F1]"
+                      : "border-[#ADADAD] hover:bg-[#F8F8F8]"
                       }`}
                   >
                     {t.label}
@@ -436,8 +685,7 @@ export default function SubscriptionCheckout() {
                   <input
                     type="text"
                     placeholder="1234 5678 9012 3456"
-                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                    style={{ borderColor: COLORS.gold }}
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                     value={cardNumber}
                     onChange={(e) => setCardNumber(e.target.value)}
                     maxLength="19"
@@ -449,8 +697,7 @@ export default function SubscriptionCheckout() {
                   <input
                     type="text"
                     placeholder="Nombre como aparece en la tarjeta"
-                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                    style={{ borderColor: COLORS.gold }}
+                    className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                     value={cardHolder}
                     onChange={(e) => setCardHolder(e.target.value)}
                     required
@@ -462,8 +709,7 @@ export default function SubscriptionCheckout() {
                     <input
                       type="text"
                       placeholder="MM/AA"
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       value={expirationDate}
                       onChange={(e) => setExpirationDate(e.target.value)}
                       maxLength="5"
@@ -475,8 +721,7 @@ export default function SubscriptionCheckout() {
                     <input
                       type="text"
                       placeholder="123"
-                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: COLORS.gold }}
+                      className="mt-1 w-full rounded-xl border px-3 py-2 text-sm border-secondary"
                       value={cvv}
                       onChange={(e) => setCvv(e.target.value)}
                       maxLength="3"
@@ -489,16 +734,19 @@ export default function SubscriptionCheckout() {
           </div>
 
           {error && (
-            <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-              {typeof error === "object" ? error.message || JSON.stringify(error) : error}
-            </p>
+            <div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+              {Array.isArray(error)
+                ? error.map((err, i) => <p key={i}>{err.message}</p>)
+                : <p>{error}</p>
+              }
+            </div>
           )}
 
           <div className="mt-8 flex justify-center">
             <button
               type="submit"
               disabled={submitting || !planId}
-              className="rounded-2xl bg-[#AD946C] px-8 py-3 font-semibold text-[#000000] hover:opacity-90 disabled:opacity-60"
+              className="rounded-2xl bg-secondary px-8 py-3 font-semibold text-primary hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? "Procesando…" : "Suscribir"}
             </button>
