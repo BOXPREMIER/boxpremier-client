@@ -223,7 +223,7 @@ export default function ProfilePage() {
       <header className="mb-6">
         <h1 className="text-3xl font-semibold tracking-tight">Mi cuenta</h1>
         <p className="text-sm" style={{ color: "#ADADAD" }}>
-          Administra tu cuenta y suscripciones como quieras.
+          Administra tu cuenta como quieras.
         </p>
       </header>
 
@@ -231,9 +231,11 @@ export default function ProfilePage() {
         <button className={tabButton(tab === "perfil")} onClick={() => setTab("perfil")}>
           <span className="inline-flex items-center gap-2">Perfil</span>
         </button>
-        <button className={tabButton(tab === "suscripciones")} onClick={() => setTab("suscripciones")}>
-          <span className="inline-flex items-center gap-2">Suscripciones</span>
-        </button>
+        {userStore?.userType === 'customer' && (
+          <button className={tabButton(tab === "suscripciones")} onClick={() => setTab("suscripciones")}>
+            <span className="inline-flex items-center gap-2">Suscripciones</span>
+          </button>
+        )}
         <button className={tabButton(tab === "ajustes")} onClick={() => setTab("ajustes")}>
           <span className="inline-flex items-center gap-2">Ajustes</span>
         </button>
@@ -275,7 +277,7 @@ export default function ProfilePage() {
                   disabled={!isEditing}
                 />
               </div>
-              <div>
+              <div className={userStore?.userType === 'admin' ? 'md:col-span-2' : ''}>
                 <label className="text-sm">Correo Electrónico</label>
                 <input
                   type="email"
@@ -285,76 +287,81 @@ export default function ProfilePage() {
                   disabled={!isEditing}
                 />
               </div>
-              <div>
-                <label className="text-sm">Número de Teléfono</label>
-                <input
-                  className={field}
-                  value={profile.phone}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
+
+              {userStore?.userType === 'customer' && (
+                <div>
+                  <label className="text-sm">Número de Teléfono</label>
+                  <input
+                    className={field}
+                    value={profile.phone}
+                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    disabled={!isEditing}
+                  />
+                </div>
+              )}
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium mb-2">Dirección</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm">Calle</label>
-                  <input
-                    className={field}
-                    value={profile.street}
-                    onChange={(e) => setProfile({ ...profile, street: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Número</label>
-                  <input
-                    className={field}
-                    value={profile.number}
-                    onChange={(e) => setProfile({ ...profile, number: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Piso</label>
-                  <input
-                    className={field}
-                    value={profile.floor}
-                    onChange={(e) => setProfile({ ...profile, floor: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Código Postal</label>
-                  <input
-                    className={field}
-                    value={profile.postalCode}
-                    onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Ciudad</label>
-                  <input
-                    className={field}
-                    value={profile.city}
-                    onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Estado/Provincia</label>
-                  <input
-                    className={field}
-                    value={profile.province}
-                    onChange={(e) => setProfile({ ...profile, province: e.target.value })}
-                    disabled={!isEditing}
-                  />
+            {userStore?.userType === 'customer' && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Dirección</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm">Calle</label>
+                    <input
+                      className={field}
+                      value={profile.street}
+                      onChange={(e) => setProfile({ ...profile, street: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Número</label>
+                    <input
+                      className={field}
+                      value={profile.number}
+                      onChange={(e) => setProfile({ ...profile, number: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Piso</label>
+                    <input
+                      className={field}
+                      value={profile.floor}
+                      onChange={(e) => setProfile({ ...profile, floor: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Código Postal</label>
+                    <input
+                      className={field}
+                      value={profile.postalCode}
+                      onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Ciudad</label>
+                    <input
+                      className={field}
+                      value={profile.city}
+                      onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Estado/Provincia</label>
+                    <input
+                      className={field}
+                      value={profile.province}
+                      onChange={(e) => setProfile({ ...profile, province: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex justify-end gap-3">
               {!isEditing ? (
