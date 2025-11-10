@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import Button from "../components/button"; 
+import ScrollButton from "../components/ScrollButton"; 
 
 export default function SuscriptionPage() {
   const heroRef = useRef(null);
@@ -19,9 +20,60 @@ export default function SuscriptionPage() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  
+  const robustScrollToPlanes = () => {
+    const element = document.getElementById("planes");
+    if (!element) {
+      console.debug("[scrollToPlanes] elemento #planes no encontrado");
+      return;
+    }
+
+    console.debug("[scrollToPlanes] intentanto scrollIntoView");
+    
+    try {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (e) {
+  
+      console.debug("[scrollToPlanes] scrollIntoView falló:", e);
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.pageYOffset, behavior: "smooth" });
+    }
+
+    
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    const checkAndRetry = () => {
+      attempts += 1;
+      const rect = element.getBoundingClientRect();
+      const inView = rect.top >= 0 && rect.top < window.innerHeight;
+      console.debug(`[scrollToPlanes] intento ${attempts} rect.top=${rect.top} inView=${inView}`);
+      if (inView || attempts >= maxAttempts) {
+        if (!inView) {
+        
+          console.debug("[scrollToPlanes] última opción: anchor temporal");
+          const a = document.createElement("a");
+          a.href = "#planes";
+          a.style.position = "absolute";
+          a.style.left = "-9999px";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+        return;
+      }
+      
+      requestAnimationFrame(() => {
+        setTimeout(checkAndRetry, 20);
+      });
+    };
+
+   
+    setTimeout(checkAndRetry, 20);
+  };
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Hero Parallax - Responsive y más grande en pantallas grandes */}
+      {/* Hero Parallax */}
       <div
         ref={heroRef}
         className="w-full relative bg-cover bg-center bg-no-repeat
@@ -68,20 +120,11 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "/SuscriptionCheckout"}
+              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
             />
-            <Button
-              title="Conoce los planes"
-              tooltip="Ver los planes disponibles"
-              bgColor="rgba(225, 206, 178, 0.44)"
-              action={() => {
-                const element = document.getElementById("planes");
-                if (element) {
-                  const y = element.getBoundingClientRect().top + window.pageYOffset - 80;
-                  window.scrollTo({ top: y, behavior: "smooth" });
-                }
-              }}
-            />
+            
+            {/*  ScrollButton */}
+            <ScrollButton />
           </div>
         </div>
       </div>
@@ -156,7 +199,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "/SuscriptionCheckout"}
+              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
             />
           </div>
         </div>
@@ -213,7 +256,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "/SuscriptionCheckout"}
+              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
             />
           </div>
         </div>
@@ -271,10 +314,11 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "/SuscriptionCheckout"}
+              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
             />
           </div>
         </div>
+
       </div>
 
       {/* Sección FAQ / Respuestas */}
