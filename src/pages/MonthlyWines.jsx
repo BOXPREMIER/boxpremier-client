@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getMonthlyWines } from "../services/MonthlyWines";
-import { Link, useNavigate } from "react-router-dom"; // 👈 añadido useNavigate
-import Button from "../components/Button"; // 👈 importación del botón
+import { Link, useNavigate } from "react-router-dom";
+import Button from "../components/Button"; 
 
 export default function MonthlyWines() {
   const [months, setMonths] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const navigate = useNavigate(); // 👈 hook para navegación
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -170,15 +170,15 @@ export default function MonthlyWines() {
           title="Suscríbete"
           action={() => {
             navigate("/app/subscription");
-            // aseguramos el scroll al inicio una vez navegado:
+            
             requestAnimationFrame(() => {
               try {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               } catch (e) {
-                // fallback sin smooth si algo falla
+                
                 window.scrollTo(0, 0);
               }
-              // pequeño timeout adicional por si el comportamiento del router requiere un tick
+              
               setTimeout(() => window.scrollTo(0, 0), 50);
             });
           }}

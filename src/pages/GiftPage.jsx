@@ -201,7 +201,7 @@ const GiftPage = () => {
           </p>
         </div>
 
-        {/* Botón "Regala" al final */}
+        {/* Botón "Regala" */}
         <div className="mt-8">
           <Button
             title="Regala"
