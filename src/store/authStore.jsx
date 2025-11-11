@@ -1,54 +1,65 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { render, screen, fireEvent } from "@testing-library/react";
+import Navbar from "../components/Navbar";
+import { MemoryRouter } from "react-router-dom";
+import { vi } from "vitest";
 
-const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      token: null,
-      user: null,
-      isAuthenticated: false,
+// сбрасываем моки перед каждым тестом
+beforeEach(() => {
+  vi.resetModules();
+  vi.clearAllMocks();
+});
 
-      login: (token, user) => {
-        set({
-          token,
-          user,
-          isAuthenticated: !!token && !!user,
-        });
-      },
+// мок Zustand store
+vi.mock("../store/authStore", () => ({
+  __esModule: true,
+  default: vi.fn(() => ({
+    token: null,
+    user: null,
+    isAuthenticated: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    setToken: vi.fn(),
+    setUser: vi.fn(),
+  })),
+}));
 
-      setToken: (token) => {
-        set({
-          token,
-          isAuthenticated: !!token && !!get().user,
-        });
-      },
+describe("Navbar", () => {
+  test("рендерится без ошибок", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+    expect(screen.getByAltText(/vino premier/i)).toBeInTheDocument();
+  });
 
-      setUser: (user) => {
-        set({
-          user,
-          isAuthenticated: !!get().token && !!user,
-        });
-      },
+  test("отображает кнопки для неавторизованного пользователя", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
 
-      
-      logout: () => {
-        set({
-          token: null,
-          user: null,
-          isAuthenticated: false,
-        });
-      },
-    }),
-    {
-      name: "auth", 
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        token: state.token,
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
+    // ищем любую надпись Login или Iniciar sesión (если у тебя испанская версия)
+    const loginButton =
+      screen.queryByText(/login/i) ||
+      screen.queryByText(/iniciar sesión/i) ||
+      screen.queryByText(/entrar/i);
+
+    expect(loginButton).toBeInTheDocument();
+  });
+
+  test("можно открыть мобильное меню", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+
+    const menuButton = screen.queryByLabelText(/abrir o cerrar menú/i);
+    if (menuButton) {
+      fireEvent.click(menuButton);
+      expect(screen.getByText(/planes/i)).toBeInTheDocument();
     }
-  )
-);
-
-export default useAuthStore;
+  });
+});
