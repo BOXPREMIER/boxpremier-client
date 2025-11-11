@@ -428,7 +428,7 @@ export default function ProfilePage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-1">
-                      {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
+                      {s.subscriptionPlan?.boxType}
                     </h3>
                     <p className="text-sm" style={{ color: "#6B6B6B" }}>
                       {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
