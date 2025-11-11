@@ -26,6 +26,12 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
             setUsers(customers);
         } catch (error) {
             console.error("Error al cargar usuarios:", error);
+            showCustomAlert({
+                title: "Error",
+                text: "Error al cargar usuarios.",
+                confirmText: "Cerrar",
+                type: "error"
+            });
         }
     };
 
@@ -83,6 +89,7 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
                 title: "Error",
                 text: "Error al cargar las suscripciones del cliente.",
                 confirmText: "Cerrar",
+                type: "error"
             });
         } finally {
             setLoading(false);
@@ -123,6 +130,7 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
                 title: "Error al crear pedido",
                 text: "Ocurrió un error al crear el pedido. Inténtalo de nuevo.",
                 confirmText: "Cerrar",
+                type: "error"
             });
         } finally {
             setLoading(false);

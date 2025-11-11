@@ -92,7 +92,7 @@ export default function ProfilePage() {
           title: "Error",
           text: "No se pudo cargar tu perfil.",
           confirmText: "Cerrar",
-          showCancelButton: false,
+          type: "error"
         });
       }
     })();
@@ -138,6 +138,12 @@ export default function ProfilePage() {
       } catch (e) {
         console.error(e);
         setSub([]);
+        showCustomAlert({
+          title: "Error",
+          text: "No se pudieron cargar las suscripciones.",
+          confirmText: "Cerrar",
+          type: "error"
+        });
       } finally {
         setLoadingSub(false);
       }
@@ -176,7 +182,7 @@ export default function ProfilePage() {
         title: "Error",
         text: "No se pudo actualizar el perfil.",
         confirmText: "Cerrar",
-        showCancelButton: false,
+        type: "error"
       });
 
     } finally {
@@ -210,7 +216,7 @@ export default function ProfilePage() {
             title: "Error",
             text: "No se pudo cancelar la suscripción ni el pedido.",
             confirmText: "Cerrar",
-            showCancelButton: false,
+            type: "error"
           });
         } finally {
           setCanceling(false);
@@ -236,7 +242,7 @@ export default function ProfilePage() {
         title: "Error",
         text: "La nueva contraseña y su confirmación no coinciden.",
         confirmText: "Cerrar",
-        showCancelButton: false,
+        type: "error"
       });
 
     }
@@ -257,7 +263,7 @@ export default function ProfilePage() {
         title: "Error",
         text: "No se pudo cambiar la contraseña.",
         confirmText: "Cerrar",
-        showCancelButton: false,
+        type: "error"
       });
     } finally {
       setChanging(false);
@@ -332,6 +338,7 @@ export default function ProfilePage() {
                   value={profile.firstName}
                   onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
                   disabled={!isEditing}
+                  required
                 />
               </div>
               <div>
@@ -351,6 +358,7 @@ export default function ProfilePage() {
                   value={profile.email}
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   disabled={true}
+                  required
                 />
               </div>
 
@@ -362,6 +370,7 @@ export default function ProfilePage() {
                     value={profile.phone}
                     onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
               )}
@@ -378,6 +387,7 @@ export default function ProfilePage() {
                       value={profile.street}
                       onChange={(e) => setProfile({ ...profile, street: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -387,6 +397,7 @@ export default function ProfilePage() {
                       value={profile.number}
                       onChange={(e) => setProfile({ ...profile, number: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -405,6 +416,7 @@ export default function ProfilePage() {
                       value={profile.postalCode}
                       onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -414,6 +426,7 @@ export default function ProfilePage() {
                       value={profile.city}
                       onChange={(e) => setProfile({ ...profile, city: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -423,6 +436,7 @@ export default function ProfilePage() {
                       value={profile.province}
                       onChange={(e) => setProfile({ ...profile, province: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                 </div>

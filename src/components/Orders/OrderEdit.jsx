@@ -63,7 +63,7 @@ const OrderEdit = ({ order, onClose, onSuccess }) => {
                 title: "Error",
                 text: "Error al actualizar el pedido.",
                 confirmText: "Cerrar",
-                showCancelButton: false,
+                type: "error"
             });
         } finally {
             setLoading(false);
