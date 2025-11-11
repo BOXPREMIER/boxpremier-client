@@ -149,7 +149,7 @@ export default function Home() {
           <Button
             title="Conoce más"
             tooltip="Ir a la página de suscripción"
-            action={() => navigate("/app/subscriptiogit n")} 
+            action={() => navigate("/app/subscription")} 
           />
         </div>
 
