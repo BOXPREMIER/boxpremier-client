@@ -5,6 +5,7 @@ import PaymentFilters from "../../components/Payments/PaymentFilter";
 import PaymentCreateModal from "../../components/Payments/PaymentCreate";
 import PaymentDetailsModal from "../../components/Payments/PaymentDetailModal";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
+import Button from "../../components/Button"
 
 // Color común (marrón) para íconos
 const ICON_CLASS = "w-10 h-10 text-[#AD946C]";
@@ -208,12 +209,10 @@ const PaymentsTab = () => {
 
       <div className="flex gap-3">
         {isAdmin && (
-          <button
-            onClick={handleOpenCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:brightness-90 transition-colors cursor-pointer"
-          >
-            Crear Pago Manual
-          </button>
+          <Button
+  title="Crear Pago Manual"
+  action={handleOpenCreate}
+/>
         )}
       </div>
 
@@ -367,14 +366,13 @@ const PaymentsTab = () => {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => handleOpenDetails(payment)}
-                            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:brightness-90 transition-colors cursor-pointer"
-                          >
-                            Ver / Editar
-                          </button>
-                        </div>
-                      </td>
+
+    <Button
+       title="Ver / Editar"
+       action={() => handleOpenDetails(payment)}
+     />
+   </div>
+ </td>               
                     </tr>
                   );
                 })
