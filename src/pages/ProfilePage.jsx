@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import useAuthStore from "../store/authStore";
 import { getSubscriptions, cancelSubscription } from "../services/SubscriptionServices";
 import { getMe, updateMe, changeMyPassword } from "../services/ProfileServices";
-import { getAllOrders, cancelOrder } from "../services/OrderServices";
+import { getAllOrders } from "../services/OrderServices";
 import SubscriptionDetailsModal from "../components/SubscriptionDetailsModal";
+import { useLocation } from "react-router-dom";
+import { showCustomAlert } from "../components/CustomAlert";
 
 const tabButton = (active) =>
   `px-4 py-1 rounded-full text-sm border transition font-gotham ${active ? "bg-[#F5F5F5] border-[#ADADAD]" : "border-[#ADADAD] hover:bg-[#F5F5F5]"}`;
@@ -19,6 +21,14 @@ export default function ProfilePage() {
   const { user: userStore, setUser } = useAuthStore();
   const [tab, setTab] = useState("perfil");
   const [orders, setOrders] = useState([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.openTab) {
+      setTab(location.state.openTab);
+    }
+  }, [location.state]);
+
 
   const [profile, setProfile] = useState({
     firstName: "",
@@ -78,7 +88,12 @@ export default function ProfilePage() {
         }
       } catch (e) {
         console.error(e);
-        alert("No se pudo cargar tu perfil");
+        showCustomAlert({
+          title: "Error",
+          text: "No se pudo cargar tu perfil.",
+          confirmText: "Cerrar",
+          showCancelButton: false,
+        });
       }
     })();
   }, []);
@@ -149,10 +164,21 @@ export default function ProfilePage() {
       setUser(newUser);
 
       setIsEditing(false);
-      alert("Perfil actualizado");
+      showCustomAlert({
+        title: "Éxito",
+        text: "Perfil actualizado.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
     } catch (e) {
       console.error(e);
-      alert("No se pudo actualizar el perfil");
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo actualizar el perfil.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
+
     } finally {
       setSaving(false);
     }
@@ -160,53 +186,79 @@ export default function ProfilePage() {
 
   const onCancelPlan = async (subId) => {
     if (!subId) return;
-    if (!confirm("¿Seguro que quieres cancelar tu plan?")) return;
 
-    try {
-      setCanceling(true);
+    showCustomAlert({
+      title: "¿Seguro que quieres cancelar tu plan?",
+      text: "Esta acción no se puede revertir.",
+      confirmText: "Sí, cancelar",
+      cancelText: "No, mantener",
+      onConfirm: async () => {
+        try {
+          setCanceling(true);
 
-      await cancelSubscription(subId);
+          await cancelSubscription(subId);
 
-      const activeOrder = orders.find(
-        (o) =>
-          (String(o.subscriptionId?._id) === String(subId) ||
-            String(o.subscriptionId) === String(subId)) &&
-          !["shipped", "delivered", "cancelled"].includes(o.status)
-      );
-
-      // if (activeOrder) {
-      //   await cancelOrder(activeOrder._id);
-      //   console.log("Pedido cancelado:", activeOrder._id);
-      // }
-
-      setSub((prev) =>
-        prev.map((s) =>
-          s._id === subId ? { ...s, status: "canceled" } : s
-        )
-      );
-    } catch (e) {
-      console.error(e);
-      alert("No se pudo cancelar la suscripción ni el pedido");
-    } finally {
-      setCanceling(false);
-    }
+          setSub((prev) =>
+            prev.map((s) =>
+              s._id === subId ? { ...s, status: "canceled" } : s
+            )
+          );
+          window.location.reload();
+        } catch (e) {
+          console.error(e);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo cancelar la suscripción ni el pedido.",
+            confirmText: "Cerrar",
+            showCancelButton: false,
+          });
+        } finally {
+          setCanceling(false);
+        }
+      },
+      onCancel: () => {
+      },
+    });
   };
 
 
   const onChangePassword = async (e) => {
     e.preventDefault();
-    if (!pwd.newPassword) return alert("Introduce la nueva contraseña");
+    if (!pwd.newPassword) return showCustomAlert({
+      title: "Atención",
+      text: "Introduce la nueva contraseña.",
+      confirmText: "Cerrar",
+      showCancelButton: false,
+    });
+
     if (pwd.newPassword !== pwd.confirmPassword) {
-      return alert("La nueva contraseña y su confirmación no coinciden");
+      return showCustomAlert({
+        title: "Error",
+        text: "La nueva contraseña y su confirmación no coinciden.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
+
     }
     try {
       setChanging(true);
       await changeMyPassword({ newPassword: pwd.newPassword });
       setPwd({ currentPassword: "", newPassword: "", confirmPassword: "" });
-      alert("Contraseña actualizada");
+      showCustomAlert({
+        title: "Éxito",
+        text: "Contraseña actualizada.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
+
     } catch (e) {
       console.error(e);
-      alert("No se pudo cambiar la contraseña");
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo cambiar la contraseña.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
     } finally {
       setChanging(false);
     }
@@ -233,7 +285,7 @@ export default function ProfilePage() {
     setIsSubModalOpen(true);
   };
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary" >
       <header className="mb-6">
         <h1 className="text-3xl font-semibold tracking-tight">Mi cuenta</h1>
         <p className="text-sm" style={{ color: "#ADADAD" }}>
@@ -412,149 +464,155 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {tab === "suscripciones" && (
-        <section className={card}>
-          <h2 className="text-2xl font-semibold mb-2">Suscripciones Actuales</h2>
-          <p className="text-sm" style={{ color: "#ADADAD" }}>
-            Administra tus suscripciones como quieras.
-          </p>
-          {loadingSub ? (
-            <p>Cargando...</p>
-          ) : sub.length === 0 ? (
-            <p>No tienes suscripciones activas.</p>
-          ) : (
-            sub.map((s) => (
-              <div
-                key={s._id}
-                onClick={() => handleOpenSubDetails(s)}
-                className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
-                style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-1">
-                      {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
-                    </h3>
-                    <p className="text-sm" style={{ color: "#6B6B6B" }}>
-                      {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
-                    </p>
-                  </div>
-                </div>
+      {
+        tab === "suscripciones" && (
+          <section className={card}>
+            <h2 className="text-2xl font-semibold mb-2">Suscripciones Actuales</h2>
+            <p className="text-sm" style={{ color: "#ADADAD" }}>
+              Administra tus suscripciones como quieras.
+            </p>
+            {loadingSub ? (
+              <p>Cargando...</p>
+            ) : sub.length === 0 ? (
+              <p>No tienes suscripciones activas.</p>
+            ) : (
+              sub.map((s) => (
                 <div
-                  className="border-t mt-4 pt-4 text-sm space-y-2"
-                  style={{ borderColor: "#D9C7AE" }}
+                  key={s._id}
+                  onClick={() => handleOpenSubDetails(s)}
+                  className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
+                  style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
                 >
-                  <div className="flex justify-between">
-                    <span>Fecha de suscripción:</span>
-                    <span>
-                      {new Date(s.startDate).toLocaleDateString("es-ES", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-1">
+                        {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
+                      </h3>
+                      <p className="text-sm" style={{ color: "#6B6B6B" }}>
+                        {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Próximo cobro:</span>
-                    <span>
-                      {new Date(s.nextPayDate).toLocaleDateString("es-ES", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
+                  <div
+                    className="border-t mt-4 pt-4 text-sm space-y-2"
+                    style={{ borderColor: "#D9C7AE" }}
+                  >
+                    <div className="flex justify-between">
+                      <span>Fecha de suscripción:</span>
+                      <span>
+                        {new Date(s.startDate).toLocaleDateString("es-ES", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Próximo cobro:</span>
+                      <span>
+                        {new Date(s.nextPayDate).toLocaleDateString("es-ES", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end">
+                    {s.hasOrders ? (
+                      <p className="text-sm text-gray-600 italic">
+                        Contacta con el administrador para cancelar esa suscripción.
+                      </p>
+                    ) : (
+                      <button
+                        onClick={() => { console.log("Clicou no botão, subId:", s._id); onCancelPlan(s._id) }}
+                        disabled={canceling || s.status == "canceled"}
+                        className="px-5 py-2 rounded-full text-white cursor-pointer"
+                        style={{
+                          backgroundColor: "#7B1D1D",
+                          opacity: canceling || s.status == "canceled" ? 0.6 : 1,
+                        }}
+                      >
+                        {canceling ? "Cancelando..." : "Cancelar plan"}
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="mt-6 flex justify-end">
-                  {s.hasOrders ? (
-                    <p className="text-sm text-gray-600 italic">
-                      Contacta con el administrador para cancelar esa suscripción.
-                    </p>
-                  ) : (
-                    <button
-                      onClick={() => { console.log("Clicou no botão, subId:", s._id); onCancelPlan(s._id) }}
-                      disabled={canceling || s.status == "canceled"}
-                      className="px-5 py-2 rounded-full text-white cursor-pointer"
-                      style={{
-                        backgroundColor: "#7B1D1D",
-                        opacity: canceling || s.status == "canceled" ? 0.6 : 1,
-                      }}
-                    >
-                      {canceling ? "Cancelando..." : "Cancelar plan"}
-                    </button>
-                  )}
+              ))
+            )}
+          </section>
+        )
+      }
+
+      {
+        tab === "ajustes" && (
+          <section className={card}>
+            <h2 className="text-xl font-semibold mb-6">Modificar Contraseña</h2>
+
+            <form onSubmit={onChangePassword} className="space-y-5 max-w-xl">
+              <div>
+                <label className="text-sm">Nueva Contraseña</label>
+                <div className="relative">
+                  <input
+                    className={field}
+                    type={show.n ? "text" : "password"}
+                    value={pwd.newPassword}
+                    onChange={(e) => setPwd({ ...pwd, newPassword: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    onClick={() => setShow((s) => ({ ...s, n: !s.n }))}
+                    title={show.n ? "Ocultar" : "Mostrar"}
+                  >
+                    {show.n ? "🙈" : "👁️"}
+                  </button>
                 </div>
               </div>
-            ))
-          )}
-        </section>
-      )}
 
-      {tab === "ajustes" && (
-        <section className={card}>
-          <h2 className="text-xl font-semibold mb-6">Modificar Contraseña</h2>
+              <div>
+                <label className="text-sm">Confirmar Nueva Contraseña</label>
+                <div className="relative">
+                  <input
+                    className={field}
+                    type={show.r ? "text" : "password"}
+                    value={pwd.confirmPassword}
+                    onChange={(e) => setPwd({ ...pwd, confirmPassword: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    onClick={() => setShow((s) => ({ ...s, r: !s.r }))}
+                    title={show.r ? "Ocultar" : "Mostrar"}
+                  >
+                    {show.r ? "🙈" : "👁️"}
+                  </button>
+                </div>
+              </div>
 
-          <form onSubmit={onChangePassword} className="space-y-5 max-w-xl">
-            <div>
-              <label className="text-sm">Nueva Contraseña</label>
-              <div className="relative">
-                <input
-                  className={field}
-                  type={show.n ? "text" : "password"}
-                  value={pwd.newPassword}
-                  onChange={(e) => setPwd({ ...pwd, newPassword: e.target.value })}
-                />
+              <div className="pt-2">
                 <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  onClick={() => setShow((s) => ({ ...s, n: !s.n }))}
-                  title={show.n ? "Ocultar" : "Mostrar"}
+                  type="submit"
+                  disabled={changing}
+                  className="px-6 py-2 rounded-full text-white"
+                  style={{ backgroundColor: "#AD946C" }}
                 >
-                  {show.n ? "🙈" : "👁️"}
+                  {changing ? "Actualizando..." : "Actualizar"}
                 </button>
               </div>
-            </div>
+            </form>
+          </section>
+        )
+      }
 
-            <div>
-              <label className="text-sm">Confirmar Nueva Contraseña</label>
-              <div className="relative">
-                <input
-                  className={field}
-                  type={show.r ? "text" : "password"}
-                  value={pwd.confirmPassword}
-                  onChange={(e) => setPwd({ ...pwd, confirmPassword: e.target.value })}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                  onClick={() => setShow((s) => ({ ...s, r: !s.r }))}
-                  title={show.r ? "Ocultar" : "Mostrar"}
-                >
-                  {show.r ? "🙈" : "👁️"}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={changing}
-                className="px-6 py-2 rounded-full text-white"
-                style={{ backgroundColor: "#AD946C" }}
-              >
-                {changing ? "Actualizando..." : "Actualizar"}
-              </button>
-            </div>
-          </form>
-        </section>
-      )}
-
-      {isSubModalOpen && selectedSub && (
-        <SubscriptionDetailsModal
-          subscription={selectedSub}
-          onClose={() => setIsSubModalOpen(false)}
-        />
-      )}
-    </div>
+      {
+        isSubModalOpen && selectedSub && (
+          <SubscriptionDetailsModal
+            subscription={selectedSub}
+            onClose={() => setIsSubModalOpen(false)}
+          />
+        )
+      }
+    </div >
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { updateOrderStatus, updateOrderTracking, updateOrderAddress } from "../../services/OrderServices";
+import { showCustomAlert } from "../CustomAlert";
+
 const OrderEdit = ({ order, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         status: order.status,
@@ -57,7 +59,12 @@ const OrderEdit = ({ order, onClose, onSuccess }) => {
             onSuccess();
         } catch (error) {
             console.error("Error al actualizar pedido:", error);
-            alert("Error al actualizar el pedido");
+            showCustomAlert({
+                title: "Error",
+                text: "Error al actualizar el pedido.",
+                confirmText: "Cerrar",
+                showCancelButton: false,
+            });
         } finally {
             setLoading(false);
         }

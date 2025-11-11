@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { getAllOrders } from "../../services/OrderServices";
 import { getBoxesByType, getWinesByType } from "../../services/AdminServices";
 import { exportOrdersCSV } from "../../services/AdminServices";
-import { Package, Truck, CheckCircle, Wine, Box, Download, Plus } from "lucide-react";
+import { Package, Truck, CheckCircle, Wine, Box } from "lucide-react";
 import OrderDetailsModal from "../../components/Orders/OrderDetailsModal";
 import OrderEdit from "../../components/Orders/OrderEdit";
 import OrderFilters from "../../components/Orders/OrderFilters";
 import OrderCreateModal from "../../components/Orders/OrderCreateModal";
 import Button from '../../components/Button';
+import { showCustomAlert } from "../../components/CustomAlert";
 
 const OrdersTab = () => {
     const [orders, setOrders] = useState([]);
@@ -98,7 +99,12 @@ const OrdersTab = () => {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Error al exportar CSV:", error);
-            alert("Error al exportar datos");
+            showCustomAlert({
+                title: "Error",
+                text: "Error al exportar datos.",
+                confirmText: "Cerrar",
+                showCancelButton: false,
+            });
         }
     };
 

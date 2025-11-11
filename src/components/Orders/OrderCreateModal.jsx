@@ -3,6 +3,7 @@ import { X, Search } from "lucide-react";
 import { getUsers } from "../../services/UserServices";
 import { getUserSubscriptions } from "../../services/SubscriptionServices";
 import { createOrder, getAllOrders } from "../../services/OrderServices";
+import { showCustomAlert } from "../CustomAlert";
 
 
 const OrderCreateModal = ({ onClose, onSuccess }) => {
@@ -61,7 +62,16 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
             setSubscriptions(subsWithFlag);
 
             if (subsWithFlag.length === 0) {
-                alert("Este cliente no tiene suscripciones activas");
+                showCustomAlert({
+                    title: "Sin suscripciones activas",
+                    text: "Este cliente no tiene suscripciones activas.",
+                    confirmText: "Entendido",
+                    showCancelButton: false,
+                    onConfirm: () => {
+                        setStep(1);
+                        setSelectedUser(null);
+                    },
+                });
                 setStep(1);
                 setSelectedUser(null);
             } else {
@@ -69,7 +79,11 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
             }
         } catch (error) {
             console.error("Error al cargar suscripciones:", error);
-            alert("Error al cargar suscripciones del cliente");
+            showCustomAlert({
+                title: "Error",
+                text: "Error al cargar las suscripciones del cliente.",
+                confirmText: "Cerrar",
+            });
         } finally {
             setLoading(false);
         }
@@ -82,7 +96,12 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
 
     const handleSelectSubscription = (subscription) => {
         if (subscription.hasOrderThisMonth) {
-            alert("Esta suscripción ya tiene un pedido creado este mes");
+            showCustomAlert({
+                title: "Suscripción ya usada",
+                text: "Esta suscripción ya tiene un pedido creado este mes.",
+                confirmText: "Entendido",
+                showCancelButton: false,
+            });
             return;
         }
         setSelectedSubscription(subscription);
@@ -100,7 +119,11 @@ const OrderCreateModal = ({ onClose, onSuccess }) => {
             onClose();
         } catch (error) {
             console.error("Error al crear pedido:", error);
-            alert("Error al crear el pedido");
+            showCustomAlert({
+                title: "Error al crear pedido",
+                text: "Ocurrió un error al crear el pedido. Inténtalo de nuevo.",
+                confirmText: "Cerrar",
+            });
         } finally {
             setLoading(false);
         }
