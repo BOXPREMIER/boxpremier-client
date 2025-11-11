@@ -5,7 +5,7 @@ import PaymentFilters from "../../components/Payments/PaymentFilter";
 import PaymentCreateModal from "../../components/Payments/PaymentCreate";
 import PaymentDetailsModal from "../../components/Payments/PaymentDetailModal";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
-import Button from "../../components/Button"
+import Button from "../../components/Button";
 
 // Color común (marrón) para íconos
 const ICON_CLASS = "w-10 h-10 text-[#AD946C]";
@@ -38,7 +38,10 @@ const PaymentsTab = () => {
       if (Array.isArray(payload.payments)) return payload.payments;
       if (Array.isArray(payload.results)) return payload.results;
     }
-    console.warn("[Payments] GET /payments no devolvió un array. Payload:", payload);
+    console.warn(
+      "[Payments] GET /payments no devolvió un array. Payload:",
+      payload
+    );
     return [];
   };
 
@@ -66,13 +69,14 @@ const PaymentsTab = () => {
 
     if (search) {
       const q = safe(search);
-      filtered = filtered.filter((p) =>
-        safe(p._id || p.id).includes(q) ||
-        safe(p.subscriptionId?._id).includes(q) ||
-        safe(p.subscriptionId?.user?.email).includes(q) ||
-        safe(p.subscriptionId?.user?.firstName).includes(q) ||
-        safe(p.subscriptionId?.user?.lastName).includes(q) ||
-        safe(p.gateway).includes(q)
+      filtered = filtered.filter(
+        (p) =>
+          safe(p._id || p.id).includes(q) ||
+          safe(p.subscriptionId?._id).includes(q) ||
+          safe(p.subscriptionId?.user?.email).includes(q) ||
+          safe(p.subscriptionId?.user?.firstName).includes(q) ||
+          safe(p.subscriptionId?.user?.lastName).includes(q) ||
+          safe(p.gateway).includes(q)
       );
     }
 
@@ -141,8 +145,14 @@ const PaymentsTab = () => {
         return;
       }
 
-      setPayments((prev) => [createdPayment, ...prev.filter((p) => (p._id || p.id) !== paymentId)]);
-      setFilteredPayments((prev) => [createdPayment, ...prev.filter((p) => (p._id || p.id) !== paymentId)]);
+      setPayments((prev) => [
+        createdPayment,
+        ...prev.filter((p) => (p._id || p.id) !== paymentId),
+      ]);
+      setFilteredPayments((prev) => [
+        createdPayment,
+        ...prev.filter((p) => (p._id || p.id) !== paymentId),
+      ]);
 
       console.log("Pago insertado correctamente en la tabla");
     } catch (e) {
@@ -157,7 +167,10 @@ const PaymentsTab = () => {
     dateString ? new Date(dateString).toLocaleDateString("es-ES") : "-";
 
   const formatCurrency = (amount) =>
-    new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(amount || 0);
+    new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount || 0);
 
   const userLabel = (p) => {
     if (p?.subscriptionId?.user) {
@@ -209,10 +222,7 @@ const PaymentsTab = () => {
 
       <div className="flex gap-3">
         {isAdmin && (
-          <Button
-  title="Crear Pago Manual"
-  action={handleOpenCreate}
-/>
+          <Button title="Crear Pago Manual" action={handleOpenCreate} />
         )}
       </div>
 
@@ -232,7 +242,9 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pendientes</p>
-              <p className="text-3xl font-bold text-[#AD946C]">{stats.pending}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">
+                {stats.pending}
+              </p>
             </div>
             <Clock className={ICON_CLASS} />
           </div>
@@ -242,9 +254,11 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Completados</p>
-              <p className="text-3xl font-bold text-[#AD946C]">{stats.completed}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">
+                {stats.completed}
+              </p>
             </div>
-              <CheckCircle className={ICON_CLASS} />
+            <CheckCircle className={ICON_CLASS} />
           </div>
         </div>
 
@@ -252,7 +266,9 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Fallidos</p>
-              <p className="text-3xl font-bold text-[#AD946C]">{stats.failed}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">
+                {stats.failed}
+              </p>
             </div>
             <XCircle className={ICON_CLASS} />
           </div>
@@ -268,7 +284,9 @@ const PaymentsTab = () => {
           <button
             onClick={() => setFilter("pending")}
             className={`px-4 py-2 rounded transition-colors ${
-              filter === "pending" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+              filter === "pending"
+                ? "bg-primary text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
             Pendientes ({stats.pending})
@@ -276,7 +294,9 @@ const PaymentsTab = () => {
           <button
             onClick={() => setFilter("completed")}
             className={`px-4 py-2 rounded transition-colors ${
-              filter === "completed" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+              filter === "completed"
+                ? "bg-primary text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
             Completados ({stats.completed})
@@ -284,7 +304,9 @@ const PaymentsTab = () => {
           <button
             onClick={() => setFilter("failed")}
             className={`px-4 py-2 rounded transition-colors ${
-              filter === "failed" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+              filter === "failed"
+                ? "bg-primary text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
             Fallidos ({stats.failed})
@@ -292,7 +314,9 @@ const PaymentsTab = () => {
           <button
             onClick={() => setFilter("all")}
             className={`px-4 py-2 rounded transition-colors ${
-              filter === "all" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+              filter === "all"
+                ? "bg-primary text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
             Todos ({stats.total})
@@ -338,13 +362,18 @@ const PaymentsTab = () => {
                 filteredPayments.map((payment) => {
                   const pid = payment._id || payment.id;
                   return (
-                    <tr key={pid} className="border-b hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={pid}
+                      className="border-b hover:bg-gray-50 transition-colors"
+                    >
                       <td className="p-4 font-mono text-sm text-gray-600">
                         #{pid?.slice(-6) || pid}
                       </td>
                       <td className="p-4">
                         <div className="font-medium">{userLabel(payment)}</div>
-                        <div className="text-sm text-gray-500">{userEmail(payment)}</div>
+                        <div className="text-sm text-gray-500">
+                          {userEmail(payment)}
+                        </div>
                       </td>
                       <td className="p-4">
                         <span className="font-semibold text-lg">
@@ -366,13 +395,12 @@ const PaymentsTab = () => {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
-
-    <Button
-       title="Ver / Editar"
-       action={() => handleOpenDetails(payment)}
-     />
-   </div>
- </td>               
+                          <Button
+                            title="Ver / Editar"
+                            action={() => handleOpenDetails(payment)}
+                          />
+                        </div>
+                      </td>
                     </tr>
                   );
                 })
