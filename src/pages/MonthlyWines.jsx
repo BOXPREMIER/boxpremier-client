@@ -168,7 +168,20 @@ export default function MonthlyWines() {
 
         <Button
           title="Suscríbete"
-          action={() => navigate("/suscriptionpage")} 
+          action={() => {
+            navigate("/app/subscription");
+            // aseguramos el scroll al inicio una vez navegado:
+            requestAnimationFrame(() => {
+              try {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              } catch (e) {
+                // fallback sin smooth si algo falla
+                window.scrollTo(0, 0);
+              }
+              // pequeño timeout adicional por si el comportamiento del router requiere un tick
+              setTimeout(() => window.scrollTo(0, 0), 50);
+            });
+          }}
         />
       </div>
     </section>

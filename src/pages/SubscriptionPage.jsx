@@ -20,7 +20,6 @@ export default function SuscriptionPage() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  
   const robustScrollToPlanes = () => {
     const element = document.getElementById("planes");
     if (!element) {
@@ -33,12 +32,10 @@ export default function SuscriptionPage() {
     try {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (e) {
-  
       console.debug("[scrollToPlanes] scrollIntoView falló:", e);
       window.scrollTo({ top: element.getBoundingClientRect().top + window.pageYOffset, behavior: "smooth" });
     }
 
-    
     let attempts = 0;
     const maxAttempts = 8;
 
@@ -49,7 +46,6 @@ export default function SuscriptionPage() {
       console.debug(`[scrollToPlanes] intento ${attempts} rect.top=${rect.top} inView=${inView}`);
       if (inView || attempts >= maxAttempts) {
         if (!inView) {
-        
           console.debug("[scrollToPlanes] última opción: anchor temporal");
           const a = document.createElement("a");
           a.href = "#planes";
@@ -61,13 +57,11 @@ export default function SuscriptionPage() {
         }
         return;
       }
-      
       requestAnimationFrame(() => {
         setTimeout(checkAndRetry, 20);
       });
     };
 
-   
     setTimeout(checkAndRetry, 20);
   };
 
@@ -120,7 +114,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => window.open("http://localhost:5173/app/Subscription/Checkout", "_blank")}
             />
             
             {/*  ScrollButton */}
@@ -199,7 +193,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => window.open("http://localhost:5173/app/Subscription/Checkout", "_blank")}
             />
           </div>
         </div>
@@ -256,7 +250,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => window.open("http://localhost:5173/app/Subscription/Checkout", "_blank")}
             />
           </div>
         </div>
@@ -314,7 +308,7 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => window.open("http://localhost:5173/app/Subscription/Checkout", "_blank")}
             />
           </div>
         </div>

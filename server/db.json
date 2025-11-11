@@ -1,7 +1,7 @@
 {
   "monthlyWines": [
     {
-      "month": "january",
+      "month": "Enero",
       "wines": [
         {
           "name": "Quintela Colheita",
@@ -21,7 +21,7 @@
       ]
     },
     {
-      "month": "february",
+      "month": "Febrero",
       "wines": [
         {
           "name": "Tuccibel Roble",
@@ -41,7 +41,7 @@
       ]
     },
     {
-      "month": "march",
+      "month": "Marzo",
       "wines": [
         {
           "name": "OMMO Verdejo Bulería",
@@ -61,7 +61,7 @@
       ]
     },
     {
-      "month": "april",
+      "month": "Abril",
       "wines": [
         {
           "name": "Raimat Albariño Saira Ecológico",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "month": "may",
+      "month": "Mayo",
       "wines": [
         {
           "name": "Kolenda Lagar d'Amprius",
@@ -101,7 +101,7 @@
       ]
     },
     {
-      "month": "june",
+      "month": "Junio",
       "wines": [
         {
           "name": "La Font del Mosquit",
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "month": "july",
+      "month": "Julio",
       "wines": [
         {
           "name": "CIPMA I Marisol Rubio",
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "month": "august",
+      "month": "Agosto",
       "wines": [
         {
           "name": "Dulce Picardías",
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "month": "september",
+      "month": "Septiembre",
       "wines": [
         {
           "name": "Vile La Finca Albarín",
@@ -181,7 +181,7 @@
       ]
     },
     {
-      "month": "october",
+      "month": "Octubre",
       "wines": [
         {
           "name": "Abulaga",
@@ -201,7 +201,7 @@
       ]
     },
     {
-      "month": "november",
+      "month": "Noviembre",
       "wines": [
         {
           "name": "?",
@@ -221,7 +221,7 @@
       ]
     },
     {
-      "month": "december",
+      "month": "Diciembre",
       "wines": [
         {
           "name": "?",
