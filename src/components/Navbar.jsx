@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-import Logo from "../assets/full-logo-white.png"; // большое лого (слева)
-import logo2 from "../assets/logo2.png"; // круглое лого (по центру)
+import Logo from "../assets/full-logo-white.png";
+import logo2 from "../assets/logo2.png";
 
 const NavLinks = ({ isMobile = false, closeMenu }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -54,7 +54,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg z-50">
                 <NavLink
-                  to="/app/admin/profile" // профиль админа
+                  to="/app/admin/profile"
                   className="block px-4 py-2 hover:bg-gray-100"
                   onClick={() => {
                     setIsDropdownOpen(false);
@@ -79,7 +79,6 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
         </>
       ) : (
         <>
-          {/* Для обычного пользователя */}
           <NavLink
             to="/app/subscription"
             className={linkClass}
@@ -113,7 +112,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg z-50">
                   <NavLink
-                    to="/app/profile" // профиль юзера
+                    to="/app/profile"
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => {
                       setIsDropdownOpen(false);
@@ -150,7 +149,6 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
   );
 };
 
-// Navbar principal
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
@@ -159,7 +157,6 @@ const NavBar = () => {
   return (
     <nav className="w-full bg-black text-white px-6 py-3 relative">
       <div className="flex items-center justify-between relative">
-        {/* Лого большое слева */}
         <Link to="/" aria-label="Ir al inicio">
           <img
             src={Logo}
@@ -168,9 +165,8 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* Круглое лого посередине */}
         <Link
-          to={isAdmin ? "/app/admin/users" : "/app/main"} // только это поменяли
+          to={isAdmin ? "/app/admin/users" : "/app/main"}
           aria-label="Ir a la página principal"
           className="absolute left-1/2 transform -translate-x-1/2"
         >
@@ -181,7 +177,6 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* Кнопка меню (мобильная версия) */}
         <button
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
@@ -190,13 +185,11 @@ const NavBar = () => {
           {isMenuOpen ? "✕" : "☰"}
         </button>
 
-        {/* Навигация для десктопа */}
         <div className="hidden md:flex">
           <NavLinks />
         </div>
       </div>
 
-      {/* Мобильное меню */}
       {isMenuOpen && (
         <div className="md:hidden">
           <NavLinks isMobile closeMenu={() => setIsMenuOpen(false)} />
