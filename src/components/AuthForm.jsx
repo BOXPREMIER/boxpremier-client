@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { login, register } from "../services/AuthServices";
 import useAuthStore from "../store/authStore";
+import { showCustomAlert } from "../components/CustomAlert";
 
 export default function AuthForm({ mode = "login" }) {
   const isRegister = mode === "register";
@@ -53,6 +54,12 @@ export default function AuthForm({ mode = "login" }) {
     const v = validate();
     if (Object.keys(v).length) {
       setErrors(v);
+      showCustomAlert({
+        title: "Error",
+        text: "Por favor completa todos los campos requeridos correctamente.",
+        confirmText: "Cerrar",
+        type: "error"
+      });
       return;
     }
 
@@ -98,12 +105,24 @@ export default function AuthForm({ mode = "login" }) {
             navigate("/app/home", { replace: true });
           }
         } else {
-          setErrors({ general: "No se recibió token. Intenta de nuevo." });
+          showCustomAlert({
+            title: "Error",
+            text: "No se recibió token. Intenta de nuevo.",
+            confirmText: "Cerrar",
+            type: "error"
+          });
         }
       }
     } catch (err) {
-      setErrors({
-        general: err?.response?.data?.message || "Error de autenticación",
+      const msg = err?.response?.data?.message === "Invalid credentials"
+        ? "Credenciales inválidas."
+        : err?.response?.data?.message || "Error de autenticación";
+
+      showCustomAlert({
+        title: "Error",
+        text: msg,
+        confirmText: "Cerrar",
+        type: "error"
       });
     } finally {
       setSubmitting(false);
