@@ -4,9 +4,10 @@ import useAuthStore from "../../store/authStore";
 import PaymentFilters from "../../components/Payments/PaymentFilter";
 import PaymentCreateModal from "../../components/Payments/PaymentCreate";
 import PaymentDetailsModal from "../../components/Payments/PaymentDetailModal";
-import PaymentEditModal from "../../components/Payments/PaymentEdit";
-import PaymentRowActions from "../../components/Payments/PaymentRowActions";
-import PaymentStatusBadge from "../../components/Payments/PaymentStatusBadge";
+import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
+
+// Clase común para el color de íconos (marrón)
+const ICON_CLASS = "w-10 h-10 text-[#8B5E3C]";
 
 const PaymentsTab = () => {
   const [payments, setPayments] = useState([]);
@@ -17,6 +18,8 @@ const PaymentsTab = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  
+  const [filter, setFilter] = useState("all");
 
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.userType === "admin";
@@ -54,7 +57,7 @@ const PaymentsTab = () => {
     }
   };
 
-  const handleApplyFilters = ({ search, status }) => {
+  const handleApplyFilters = ({ search, date }) => {
     const safe = (v) => (v ?? "").toString().toLowerCase();
     let filtered = [...payments];
 
@@ -71,14 +74,17 @@ const PaymentsTab = () => {
       );
     }
 
-    // Filtrar por estado
-    if (status && status !== "all") {
+    // Filtrar por fecha
+    if (date) {
       filtered = filtered.filter((p) => {
-        const pStatus = safe(p.status);
-        const targetStatus = safe(status);
-        
-        return pStatus === targetStatus;
+        const paymentDate = new Date(p.createdAt).toISOString().split("T")[0];
+        return paymentDate === date;
       });
+    }
+
+    // Aplicar el filtro de estado actual
+    if (filter && filter !== "all") {
+      filtered = filtered.filter((p) => safe(p.status) === safe(filter));
     }
 
     setFilteredPayments(filtered);
@@ -117,8 +123,6 @@ const PaymentsTab = () => {
     }
   };
 
-  const handleUpdateStatus = (id, status) => handleUpdatePayment(id, { status });
-
   const handlePaymentCreated = (createdPayment) => {
     try {
       console.log("Pago recibido en PaymentsTab:", createdPayment);
@@ -150,15 +154,7 @@ const PaymentsTab = () => {
   };
 
   const formatDate = (dateString) =>
-    dateString
-      ? new Date(dateString).toLocaleDateString("es-ES", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "-";
+    dateString ? new Date(dateString).toLocaleDateString("es-ES") : "-";
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(amount || 0);
@@ -166,194 +162,242 @@ const PaymentsTab = () => {
   const userLabel = (p) => {
     if (p?.subscriptionId?.user) {
       const u = p.subscriptionId.user;
-      return `${u.firstName ?? ""} ${u.lastName ?? ""} (${u.email})`.trim();
+      return `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim();
     }
-    return p?.subscriptionId?._id ?? "-";
+    return "-";
   };
 
+  const userEmail = (p) => {
+    if (p?.subscriptionId?.user) {
+      return p.subscriptionId.user.email || "-";
+    }
+    return "-";
+  };
+
+  // Estadísticas con solo los 3 estados válidos
+  const stats = useMemo(() => {
+    return {
+      total: payments.length,
+      pending: payments.filter(p => p.status === "pending").length,
+      completed: payments.filter(p => p.status === "completed").length,
+      failed: payments.filter(p => p.status === "failed").length,
+    };
+  }, [payments]);
+
+  // Total solo de pagos completados
   const totalMonto = useMemo(
-    () => filteredPayments.reduce((sum, p) => sum + (p?.amount || 0), 0),
-    [filteredPayments]
+    () => payments
+      .filter(p => p.status === "completed")
+      .reduce((sum, p) => sum + (p?.amount || 0), 0),
+    [payments]
   );
-  const totalPendientes = useMemo(
-    () => filteredPayments.filter((p) => p?.status === "pending").length,
-    [filteredPayments]
-  );
+
+  // Aplicar filtro de estado
+  useEffect(() => {
+    handleApplyFilters({ search: "", date: "" });
+  }, [filter, payments]);
+
+  // Colores y etiquetas solo para los 3 estados válidos
+  const statusColors = {
+    pending: "bg-yellow-100 text-yellow-800",
+    completed: "bg-green-100 text-green-800",
+    failed: "bg-red-100 text-red-800"
+  };
+
+  const statusLabels = {
+    pending: "Pendiente",
+    completed: "Completado",
+    failed: "Fallido"
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header con botón */}
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Gestión de Pagos</h1>
-            <p className="text-gray-600">Administra y monitorea todos los pagos del sistema</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Dashboard de Pagos</h2>
+      </div>
+
+      <div className="flex gap-3">
+        {isAdmin && (
+          <button
+            onClick={handleOpenCreate}
+            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:brightness-90 transition-colors cursor-pointer"
+          >
+            Crear Pago Manual
+          </button>
+        )}
+      </div>
+
+      {/* Tarjetas de estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Pagos</p>
+              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.total}</p>
+            </div>
+            <Package className={ICON_CLASS} />
           </div>
-          
-          {isAdmin && (
-            <button
-              onClick={handleOpenCreate}
-              className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium shadow-sm whitespace-nowrap"
-            >
-              CREAR PEDIDO MANUAL
-            </button>
-          )}
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-red-800">{error}</p>
+        <div className="bg-white p-6 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Pendientes</p>
+              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.pending}</p>
+            </div>
+            <Clock className={ICON_CLASS} />
           </div>
-        )}
+        </div>
 
-        {/* Filtros con pestañas */}
-        <PaymentFilters 
-          onApplyFilters={handleApplyFilters} 
-          payments={payments}
-        /> 
-
-        {/* Stats */}
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Pagos</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredPayments.length}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">💳</span>
-                </div>
-              </div>
+        <div className="bg-white p-6 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Completados</p>
+              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.completed}</p>
             </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Monto Total</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalMonto)}</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">💰</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Pendientes</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalPendientes}</p>
-                </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">⏳</span>
-                </div>
-              </div>
-            </div>
+            <CheckCircle className={ICON_CLASS} />
           </div>
-        )}
+        </div>
 
-        {/* Tabla */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="bg-white p-6 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Fallidos</p>
+              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.failed}</p>
             </div>
-          ) : filteredPayments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-              <p className="text-lg font-medium mb-2">No se encontraron pagos</p>
-              <p className="text-sm">Intenta ajustar los filtros de búsqueda</p>
-            </div>
-          ) : (
-            <>
-              {/* Desktop */}
-              <div className="hidden lg:block overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gateway</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredPayments.map((payment) => {
-                      const pid = payment._id || payment.id;
-                      return (
-                        <tr key={pid} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{pid}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{userLabel(payment)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {formatCurrency(payment.amount)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{payment.gateway}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <PaymentStatusBadge status={payment.status} />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {formatDate(payment.createdAt)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <PaymentRowActions
-                              paymentId={pid}
-                              payment={payment}
-                              isAdmin={isAdmin}
-                              onView={() => handleOpenDetails(payment)}
-                              onUpdateStatus={handleUpdateStatus}
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile */}
-              <div className="lg:hidden divide-y divide-gray-200">
-                {filteredPayments.map((payment) => {
-                  const pid = payment._id || payment.id;
-                  return (
-                    <div key={pid} className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">#{pid}</p>
-                          <p className="text-sm text-gray-600">{userLabel(payment)}</p>
-                        </div>
-                        <PaymentStatusBadge status={payment.status} />
-                      </div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-lg font-semibold text-gray-900">
-                          {formatCurrency(payment.amount)}
-                        </span>
-                        <span className="text-sm text-gray-600">{payment.gateway}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">{formatDate(payment.createdAt)}</span>
-                        <PaymentRowActions
-                          compact
-                          paymentId={pid}
-                          payment={payment}
-                          isAdmin={isAdmin}
-                          onView={() => handleOpenDetails(payment)}
-                          onUpdateStatus={handleUpdateStatus}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
+            <XCircle className={ICON_CLASS} />
+          </div>
         </div>
       </div>
 
-      {/* Modales */}
+      {/* Componente de filtros */}
+      <PaymentFilters onApplyFilters={handleApplyFilters} />
+
+      {/* Botones de filtro por estado */}
+      <div className="bg-white p-4 rounded-lg border shadow-sm">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setFilter("pending")}
+            className={`px-4 py-2 rounded transition-colors ${
+              filter === "pending" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Pendientes ({stats.pending})
+          </button>
+          <button
+            onClick={() => setFilter("completed")}
+            className={`px-4 py-2 rounded transition-colors ${
+              filter === "completed" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Completados ({stats.completed})
+          </button>
+          <button
+            onClick={() => setFilter("failed")}
+            className={`px-4 py-2 rounded transition-colors ${
+              filter === "failed" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Fallidos ({stats.failed})
+          </button>
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded transition-colors ${
+              filter === "all" ? "bg-primary text-white" : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            Todos ({stats.total})
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-sm text-red-800">{error}</p>
+        </div>
+      )}
+
+      {/* Tabla de pagos */}
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-sm text-gray-600 bg-gray-50 border-b">
+                <th className="p-4 font-semibold">ID</th>
+                <th className="p-4 font-semibold">Cliente</th>
+                <th className="p-4 font-semibold">Total</th>
+                <th className="p-4 font-semibold">Estado</th>
+                <th className="p-4 font-semibold">Gateway</th>
+                <th className="p-4 font-semibold">Fecha</th>
+                <th className="p-4 font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="p-8 text-center text-gray-500">
+                    Cargando datos...
+                  </td>
+                </tr>
+              ) : filteredPayments.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="p-8 text-center text-gray-500">
+                    No hay pagos con este filtro
+                  </td>
+                </tr>
+              ) : (
+                filteredPayments.map((payment) => {
+                  const pid = payment._id || payment.id;
+                  return (
+                    <tr key={pid} className="border-b hover:bg-gray-50 transition-colors">
+                      <td className="p-4 font-mono text-sm text-gray-600">
+                        #{pid?.slice(-6) || pid}
+                      </td>
+                      <td className="p-4">
+                        <div className="font-medium">
+                          {userLabel(payment)}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {userEmail(payment)}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="font-semibold text-lg">
+                          {formatCurrency(payment.amount)}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${statusColors[payment.status]}`}>
+                          {statusLabels[payment.status] || payment.status}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-sm font-mono text-gray-600">
+                          {payment.gateway || "-"}
+                        </span>
+                      </td>
+                      <td className="p-4 text-sm text-gray-600">
+                        {formatDate(payment.createdAt)}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleOpenDetails(payment)}
+                            className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:brightness-90 transition-colors cursor-pointer"
+                          >
+                            Ver / Editar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {showCreateModal && (
         <PaymentCreateModal
           isAdmin={isAdmin}
