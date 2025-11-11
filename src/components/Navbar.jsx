@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import Logo from "../assets/full-logo-white.png"; // большое лого (слева)
 import logo2 from "../assets/logo2.png"; // круглое лого (по центру)
@@ -19,17 +19,15 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     "usuario";
 
   const linkClass = ({ isActive }) =>
-    `hover:text-[#C9A35C] transition-colors ${
-      isActive ? "text-[#C9A35C]" : ""
+    `hover:text-[#C9A35C] transition-colors ${isActive ? "text-[#C9A35C]" : ""
     }`;
-
+  const navigate = useNavigate();
   return (
     <div
-      className={`${
-        isMobile
-          ? "flex flex-col items-start gap-3 mt-4"
-          : "flex items-center gap-6"
-      } text-sm font-semibold tracking-wide`}
+      className={`${isMobile
+        ? "flex flex-col items-start gap-3 mt-4"
+        : "flex items-center gap-6"
+        } text-sm font-semibold tracking-wide`}
     >
       {/* 🔸 Enlaces principales */}
       <NavLink
@@ -83,6 +81,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
                   logout();
                   setIsDropdownOpen(false);
                   if (closeMenu) closeMenu();
+                  navigate("/");
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >

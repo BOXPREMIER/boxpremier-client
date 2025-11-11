@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Star } from 'lucide-react';
-import Button from "../components/button";
+import Button from "../components/Button.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -149,7 +149,7 @@ export default function Home() {
           <Button
             title="Conoce más"
             tooltip="Ir a la página de suscripción"
-            action={() => navigate("/app/subscriptiogit n")} 
+            action={() => navigate("/app/subscription")} 
           />
         </div>
 

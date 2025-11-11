@@ -3,6 +3,7 @@ import useAuthStore from "../store/authStore";
 import { getSubscriptions, cancelSubscription } from "../services/SubscriptionServices";
 import { getMe, updateMe, changeMyPassword } from "../services/ProfileServices";
 import { getAllOrders, cancelOrder } from "../services/OrderServices";
+import SubscriptionDetailsModal from "../components/SubscriptionDetailsModal";
 
 const tabButton = (active) =>
   `px-4 py-1 rounded-full text-sm border transition font-gotham ${active ? "bg-[#F5F5F5] border-[#ADADAD]" : "border-[#ADADAD] hover:bg-[#F5F5F5]"}`;
@@ -37,6 +38,8 @@ export default function ProfilePage() {
   const [sub, setSub] = useState([]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [selectedSub, setSelectedSub] = useState(null);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   const [pwd, setPwd] = useState({
     currentPassword: "",
@@ -136,7 +139,10 @@ export default function ProfilePage() {
     try {
       setSaving(true);
       const updated = await updateMe(profile);
-      setUser((prev) => ({ ...prev, ...profile, ...updated }));
+
+      const newUser = { ...userStore, ...profile, ...updated };
+      setUser(newUser);
+
       setIsEditing(false);
       alert("Perfil actualizado");
     } catch (e) {
@@ -217,13 +223,16 @@ export default function ProfilePage() {
       country: userStore.country || "ES",
     });
   };
-
+  const handleOpenSubDetails = (subscription) => {
+    setSelectedSub(subscription);
+    setIsSubModalOpen(true);
+  };
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary">
       <header className="mb-6">
         <h1 className="text-3xl font-semibold tracking-tight">Mi cuenta</h1>
         <p className="text-sm" style={{ color: "#ADADAD" }}>
-          Administra tu cuenta y suscripciones como quieras.
+          Administra tu cuenta como quieras.
         </p>
       </header>
 
@@ -231,9 +240,11 @@ export default function ProfilePage() {
         <button className={tabButton(tab === "perfil")} onClick={() => setTab("perfil")}>
           <span className="inline-flex items-center gap-2">Perfil</span>
         </button>
-        <button className={tabButton(tab === "suscripciones")} onClick={() => setTab("suscripciones")}>
-          <span className="inline-flex items-center gap-2">Suscripciones</span>
-        </button>
+        {userStore?.userType === 'customer' && (
+          <button className={tabButton(tab === "suscripciones")} onClick={() => setTab("suscripciones")}>
+            <span className="inline-flex items-center gap-2">Suscripciones</span>
+          </button>
+        )}
         <button className={tabButton(tab === "ajustes")} onClick={() => setTab("ajustes")}>
           <span className="inline-flex items-center gap-2">Ajustes</span>
         </button>
@@ -275,86 +286,91 @@ export default function ProfilePage() {
                   disabled={!isEditing}
                 />
               </div>
-              <div>
+              <div className={userStore?.userType === 'admin' ? 'md:col-span-2' : ''}>
                 <label className="text-sm">Correo Electrónico</label>
                 <input
                   type="email"
                   className={field}
                   value={profile.email}
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                  disabled={!isEditing}
+                  disabled={true}
                 />
               </div>
-              <div>
-                <label className="text-sm">Número de Teléfono</label>
-                <input
-                  className={field}
-                  value={profile.phone}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
+
+              {userStore?.userType === 'customer' && (
+                <div>
+                  <label className="text-sm">Número de Teléfono</label>
+                  <input
+                    className={field}
+                    value={profile.phone}
+                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    disabled={!isEditing}
+                  />
+                </div>
+              )}
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium mb-2">Dirección</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm">Calle</label>
-                  <input
-                    className={field}
-                    value={profile.street}
-                    onChange={(e) => setProfile({ ...profile, street: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Número</label>
-                  <input
-                    className={field}
-                    value={profile.number}
-                    onChange={(e) => setProfile({ ...profile, number: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Piso</label>
-                  <input
-                    className={field}
-                    value={profile.floor}
-                    onChange={(e) => setProfile({ ...profile, floor: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Código Postal</label>
-                  <input
-                    className={field}
-                    value={profile.postalCode}
-                    onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Ciudad</label>
-                  <input
-                    className={field}
-                    value={profile.city}
-                    onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                    disabled={!isEditing}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm">Estado/Provincia</label>
-                  <input
-                    className={field}
-                    value={profile.province}
-                    onChange={(e) => setProfile({ ...profile, province: e.target.value })}
-                    disabled={!isEditing}
-                  />
+            {userStore?.userType === 'customer' && (
+              <div>
+                <h3 className="text-sm font-medium mb-2">Dirección</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm">Calle</label>
+                    <input
+                      className={field}
+                      value={profile.street}
+                      onChange={(e) => setProfile({ ...profile, street: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Número</label>
+                    <input
+                      className={field}
+                      value={profile.number}
+                      onChange={(e) => setProfile({ ...profile, number: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Piso</label>
+                    <input
+                      className={field}
+                      value={profile.floor}
+                      onChange={(e) => setProfile({ ...profile, floor: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Código Postal</label>
+                    <input
+                      className={field}
+                      value={profile.postalCode}
+                      onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Ciudad</label>
+                    <input
+                      className={field}
+                      value={profile.city}
+                      onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Estado/Provincia</label>
+                    <input
+                      className={field}
+                      value={profile.province}
+                      onChange={(e) => setProfile({ ...profile, province: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="flex justify-end gap-3">
               {!isEditing ? (
@@ -405,13 +421,14 @@ export default function ProfilePage() {
             sub.map((s) => (
               <div
                 key={s._id}
-                className="rounded-xl p-6 mt-4"
+                onClick={() => handleOpenSubDetails(s)}
+                className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
                 style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-1">
-                      {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
+                      {s.subscriptionPlan?.boxType}
                     </h3>
                     <p className="text-sm" style={{ color: "#6B6B6B" }}>
                       {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
@@ -525,6 +542,13 @@ export default function ProfilePage() {
             </div>
           </form>
         </section>
+      )}
+
+      {isSubModalOpen && selectedSub && (
+        <SubscriptionDetailsModal
+          subscription={selectedSub}
+          onClose={() => setIsSubModalOpen(false)}
+        />
       )}
     </div>
   );
