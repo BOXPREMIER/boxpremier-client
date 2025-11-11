@@ -6,8 +6,11 @@ import PaymentCreateModal from "../../components/Payments/PaymentCreate";
 import PaymentDetailsModal from "../../components/Payments/PaymentDetailModal";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
 
-// Clase común para el color de íconos (marrón)
-const ICON_CLASS = "w-10 h-10 text-[#8B5E3C]";
+// Color común (marrón) para íconos
+const ICON_CLASS = "w-10 h-10 text-[#AD946C]";
+// Badge marrón para estados
+const STATUS_BADGE_CLASS =
+  "inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary text-white";
 
 const PaymentsTab = () => {
   const [payments, setPayments] = useState([]);
@@ -18,7 +21,6 @@ const PaymentsTab = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  
   const [filter, setFilter] = useState("all");
 
   const user = useAuthStore((s) => s.user);
@@ -61,7 +63,6 @@ const PaymentsTab = () => {
     const safe = (v) => (v ?? "").toString().toLowerCase();
     let filtered = [...payments];
 
-    // Filtrar por búsqueda
     if (search) {
       const q = safe(search);
       filtered = filtered.filter((p) =>
@@ -74,7 +75,6 @@ const PaymentsTab = () => {
       );
     }
 
-    // Filtrar por fecha
     if (date) {
       filtered = filtered.filter((p) => {
         const paymentDate = new Date(p.createdAt).toISOString().split("T")[0];
@@ -82,7 +82,6 @@ const PaymentsTab = () => {
       });
     }
 
-    // Aplicar el filtro de estado actual
     if (filter && filter !== "all") {
       filtered = filtered.filter((p) => safe(p.status) === safe(filter));
     }
@@ -126,7 +125,7 @@ const PaymentsTab = () => {
   const handlePaymentCreated = (createdPayment) => {
     try {
       console.log("Pago recibido en PaymentsTab:", createdPayment);
-      
+
       if (!createdPayment) {
         console.error("No se recibió pago");
         fetchData();
@@ -134,7 +133,7 @@ const PaymentsTab = () => {
       }
 
       const paymentId = createdPayment._id || createdPayment.id;
-      
+
       if (!paymentId) {
         console.error("Pago sin ID:", createdPayment);
         fetchData();
@@ -143,7 +142,7 @@ const PaymentsTab = () => {
 
       setPayments((prev) => [createdPayment, ...prev.filter((p) => (p._id || p.id) !== paymentId)]);
       setFilteredPayments((prev) => [createdPayment, ...prev.filter((p) => (p._id || p.id) !== paymentId)]);
-      
+
       console.log("Pago insertado correctamente en la tabla");
     } catch (e) {
       console.error("Error al insertar el pago:", e);
@@ -174,40 +173,31 @@ const PaymentsTab = () => {
     return "-";
   };
 
-  // Estadísticas con solo los 3 estados válidos
   const stats = useMemo(() => {
     return {
       total: payments.length,
-      pending: payments.filter(p => p.status === "pending").length,
-      completed: payments.filter(p => p.status === "completed").length,
-      failed: payments.filter(p => p.status === "failed").length,
+      pending: payments.filter((p) => p.status === "pending").length,
+      completed: payments.filter((p) => p.status === "completed").length,
+      failed: payments.filter((p) => p.status === "failed").length,
     };
   }, [payments]);
 
-  // Total solo de pagos completados
   const totalMonto = useMemo(
-    () => payments
-      .filter(p => p.status === "completed")
-      .reduce((sum, p) => sum + (p?.amount || 0), 0),
+    () =>
+      payments
+        .filter((p) => p.status === "completed")
+        .reduce((sum, p) => sum + (p?.amount || 0), 0),
     [payments]
   );
 
-  // Aplicar filtro de estado
   useEffect(() => {
     handleApplyFilters({ search: "", date: "" });
   }, [filter, payments]);
 
-  // Colores y etiquetas solo para los 3 estados válidos
-  const statusColors = {
-    pending: "bg-yellow-100 text-yellow-800",
-    completed: "bg-green-100 text-green-800",
-    failed: "bg-red-100 text-red-800"
-  };
-
   const statusLabels = {
     pending: "Pendiente",
     completed: "Completado",
-    failed: "Fallido"
+    failed: "Fallido",
   };
 
   return (
@@ -233,7 +223,7 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Pagos</p>
-              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.total}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">{stats.total}</p>
             </div>
             <Package className={ICON_CLASS} />
           </div>
@@ -243,7 +233,7 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pendientes</p>
-              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.pending}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">{stats.pending}</p>
             </div>
             <Clock className={ICON_CLASS} />
           </div>
@@ -253,9 +243,9 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Completados</p>
-              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.completed}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">{stats.completed}</p>
             </div>
-            <CheckCircle className={ICON_CLASS} />
+              <CheckCircle className={ICON_CLASS} />
           </div>
         </div>
 
@@ -263,7 +253,7 @@ const PaymentsTab = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Fallidos</p>
-              <p className="text-3xl font-bold text-[#8B5E3C]">{stats.failed}</p>
+              <p className="text-3xl font-bold text-[#AD946C]">{stats.failed}</p>
             </div>
             <XCircle className={ICON_CLASS} />
           </div>
@@ -354,12 +344,8 @@ const PaymentsTab = () => {
                         #{pid?.slice(-6) || pid}
                       </td>
                       <td className="p-4">
-                        <div className="font-medium">
-                          {userLabel(payment)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {userEmail(payment)}
-                        </div>
+                        <div className="font-medium">{userLabel(payment)}</div>
+                        <div className="text-sm text-gray-500">{userEmail(payment)}</div>
                       </td>
                       <td className="p-4">
                         <span className="font-semibold text-lg">
@@ -367,7 +353,7 @@ const PaymentsTab = () => {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${statusColors[payment.status]}`}>
+                        <span className={STATUS_BADGE_CLASS}>
                           {statusLabels[payment.status] || payment.status}
                         </span>
                       </td>
@@ -408,10 +394,10 @@ const PaymentsTab = () => {
       )}
 
       {showDetailsModal && selectedPayment && (
-        <PaymentDetailsModal 
-          payment={selectedPayment} 
+        <PaymentDetailsModal
+          payment={selectedPayment}
           onClose={handleCloseDetails}
-          onUpdatePayment={handleUpdatePayment}  
+          onUpdatePayment={handleUpdatePayment}
         />
       )}
     </div>
