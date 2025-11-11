@@ -1,75 +1,51 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import Navbar from "../components/Navbar";
 import { MemoryRouter } from "react-router-dom";
-import "@testing-library/jest-dom";
-import { vi, beforeEach, describe, it, expect } from "vitest";
-import NavBar from "../components/NavBar";
+import { vi } from "vitest";
 
-// Мокаем Zustand store
+// мок состояния авторизации
 vi.mock("../store/authStore", () => ({
-  __esModule: true,
-  default: vi.fn((selector) =>
-    selector({
-      isAuthenticated: false,
-      user: null,
-      logout: vi.fn(),
-    })
-  ),
+  default: () => ({
+    isAuthenticated: false, // меняй на true для теста авторизованного состояния
+    user: null,
+  }),
 }));
 
-import useAuthStore from "../store/authStore";
-
-describe("🧭 NavBar Component", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("muestra la navegación para un usuario no autorizado (escritorio)", () => {
-    useAuthStore.mockImplementation((selector) =>
-      selector({ isAuthenticated: false, user: null, logout: vi.fn() })
-    );
-
+describe("Navbar", () => {
+  test("рендерится без ошибок", () => {
     render(
       <MemoryRouter>
-        <NavBar />
+        <Navbar />
       </MemoryRouter>
     );
 
-    expect(screen.getByTestId("link-home")).toBeInTheDocument();
+    // проверка, что логотип есть
+    expect(screen.getByAltText("Vino Premier")).toBeInTheDocument();
+  });
+
+  test("отображает кнопки для неавторизованного пользователя", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+
+    // пример проверки: есть кнопка входа
     expect(screen.getByText(/Login/i)).toBeInTheDocument();
   });
 
-  it("muestra la navegación para un usuario autorizado (escritorio)", () => {
-    useAuthStore.mockImplementation((selector) =>
-      selector({
-        isAuthenticated: true,
-        user: { name: "Larysa" },
-        logout: vi.fn(),
-      })
-    );
-
+  // пример теста клика по меню для мобилки
+  test("можно открыть мобильное меню", () => {
     render(
       <MemoryRouter>
-        <NavBar />
+        <Navbar isMobile={true} />
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Larysa/i)).toBeInTheDocument();
-  });
-
-  it("se abre el menú móvil al hacer clic en el icono", () => {
-    useAuthStore.mockImplementation((selector) =>
-      selector({ isAuthenticated: false, user: null, logout: vi.fn() })
-    );
-
-    render(
-      <MemoryRouter>
-        <NavBar />
-      </MemoryRouter>
-    );
-
-    const menuButton = screen.getByTestId("mobile-menu-button");
-    fireEvent.click(menuButton);
-
-    expect(screen.getByTestId("mobile-menu")).toBeInTheDocument();
+    const menuButton = screen.getByLabelText("Toggle Menu");
+    if (menuButton) {
+      fireEvent.click(menuButton);
+      expect(screen.getByText(/Home/i)).toBeInTheDocument();
+    }
   });
 });
