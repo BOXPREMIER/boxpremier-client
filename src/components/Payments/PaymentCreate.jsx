@@ -3,8 +3,14 @@ import { X, Search } from "lucide-react";
 import { getUsers } from "../../services/UserServices";
 import { getUserSubscriptions } from "../../services/SubscriptionServices";
 import { createPayment, getPaymentById } from "../../services/PaymentsServices";
+import Button from "../Button";
 
-const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = null }) => {
+const PaymentCreateModal = ({
+  onClose,
+  onSuccess,
+  isAdmin = true,
+  currentUser = null,
+}) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
@@ -22,7 +28,12 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
   const [amount, setAmount] = useState("");
   const [gateway, setGateway] = useState("paypal");
 
-  const winetype = { mixed: "mixto", rose: "rosé", red: "tinto", sparkling: "espumoso" };
+  const winetype = {
+    mixed: "mixto",
+    rose: "rosé",
+    red: "tinto",
+    sparkling: "espumoso",
+  };
 
   useEffect(() => {
     if (!isAdmin && currentUser) {
@@ -41,7 +52,9 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
       setLoading(true);
       setErr(null);
       const data = await getUsers();
-      const customers = Array.isArray(data) ? data.filter((u) => u.userType === "customer") : [];
+      const customers = Array.isArray(data)
+        ? data.filter((u) => u.userType === "customer")
+        : [];
       setUsers(customers);
     } catch (e) {
       console.error(e);
@@ -56,7 +69,9 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
       setLoading(true);
       setErr(null);
       const subs = await getUserSubscriptions(userId);
-      const active = (subs || []).filter((s) => !["paused", "canceled", "expired"].includes(s.status));
+      const active = (subs || []).filter(
+        (s) => !["paused", "canceled", "expired"].includes(s.status)
+      );
       setSubscriptions(active);
     } catch (e) {
       console.error(e);
@@ -95,10 +110,12 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
     return `${firstName ?? ""} ${lastName ?? ""} - ${email ?? ""}`.trim();
   }, [selectedUser]);
 
-  const canSubmit = selectedSubscription && amount && Number(amount) > 0 && gateway;
+  const canSubmit =
+    selectedSubscription && amount && Number(amount) > 0 && gateway;
 
   const unwrap = (x) => x?.data ?? x?.payment ?? x;
-  const extractId = (x) => x?._id || x?.id || x?.insertedId || x?.data?._id || x?.payment?._id;
+  const extractId = (x) =>
+    x?._id || x?.id || x?.insertedId || x?.data?._id || x?.payment?._id;
 
   const handleCreatePayment = async () => {
     if (!canSubmit) return;
@@ -133,21 +150,25 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
             createdAt: created?.createdAt || new Date().toISOString(),
             subscriptionId: {
               _id: selectedSubscription._id,
-              user: selectedUser
-            }
+              user: selectedUser,
+            },
           };
         }
       }
 
       // 3) Si aún no tenemos el usuario poblado, lo añadimos manualmente
-      if (created && selectedUser && (!created.subscriptionId?.user || !created.subscriptionId.user._id)) {
+      if (
+        created &&
+        selectedUser &&
+        (!created.subscriptionId?.user || !created.subscriptionId.user._id)
+      ) {
         created = {
           ...created,
           subscriptionId: {
             ...(created.subscriptionId || {}),
             _id: selectedSubscription._id,
-            user: selectedUser
-          }
+            user: selectedUser,
+          },
         };
       }
 
@@ -185,7 +206,10 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
               {step === 3 && "Paso 3: Datos del pago"}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -213,9 +237,13 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
 
               <div className="max-h-96 overflow-y-auto space-y-2">
                 {loading ? (
-                  <p className="text-center text-gray-500 py-8">Cargando clientes...</p>
+                  <p className="text-center text-gray-500 py-8">
+                    Cargando clientes...
+                  </p>
                 ) : filteredUsers.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No se encontraron clientes</p>
+                  <p className="text-center text-gray-500 py-8">
+                    No se encontraron clientes
+                  </p>
                 ) : (
                   filteredUsers.map((user) => (
                     <button
@@ -238,16 +266,24 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
           {step === 2 && (
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-lg p-4 mb-4">
-                <p className="text-sm font-medium text-primary">Cliente seleccionado:</p>
+                <p className="text-sm font-medium text-primary">
+                  Cliente seleccionado:
+                </p>
                 <p className="text-secondary">{userBadge}</p>
               </div>
 
-              <h3 className="font-semibold text-lg mb-3">Selecciona una suscripción activa:</h3>
+              <h3 className="font-semibold text-lg mb-3">
+                Selecciona una suscripción activa:
+              </h3>
 
               {loading ? (
-                <p className="text-center text-gray-500 py-8">Cargando suscripciones...</p>
+                <p className="text-center text-gray-500 py-8">
+                  Cargando suscripciones...
+                </p>
               ) : subscriptions.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">Este cliente no tiene suscripciones activas</p>
+                <p className="text-center text-gray-500 py-8">
+                  Este cliente no tiene suscripciones activas
+                </p>
               ) : (
                 <div className="space-y-3">
                   {subscriptions.map((sub) => (
@@ -258,23 +294,34 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <span className="font-medium capitalize">Box {sub.boxType}</span>
+                          <span className="font-medium capitalize">
+                            Box {sub.boxType}
+                          </span>
                           <span className="mx-2">•</span>
-                          <span className="capitalize">{winetype[sub.wineType] || sub.wineType}</span>
+                          <span className="capitalize">
+                            {winetype[sub.wineType] || sub.wineType}
+                          </span>
                         </div>
-                        <span className="text-green-600 text-sm font-medium">Activa</span>
+                        <span className="text-green-600 text-sm font-medium">
+                          Activa
+                        </span>
                       </div>
                       <div className="text-sm text-gray-600">
                         {sub.boxSize} botellas
                         {typeof sub?.subscriptionPlan?.price === "number" &&
-                          ` - €${Number(sub.subscriptionPlan.price).toFixed(2)}`}
+                          ` - €${Number(sub.subscriptionPlan.price).toFixed(
+                            2
+                          )}`}
                       </div>
                     </button>
                   ))}
                 </div>
               )}
 
-              <button onClick={goBack} className="text-primary hover:text-blue-800 text-sm mt-4 cursor-pointer">
+              <button
+                onClick={goBack}
+                className="text-primary hover:text-[#AD946C] text-sm mt-4 cursor-pointer"
+              >
                 ← Volver a selección de cliente
               </button>
             </div>
@@ -284,7 +331,9 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
           {step === 3 && (
             <div className="space-y-4">
               <div className="bg-white border border-primary rounded-lg p-4">
-                <h3 className="font-semibold text-primary mb-3">Datos del pago</h3>
+                <h3 className="font-semibold text-primary mb-3">
+                  Datos del pago
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="block text-gray-600">Cliente</span>
@@ -297,7 +346,9 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Monto (€)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Monto (€)
+                  </label>
                   <input
                     type="number"
                     step="0.01"
@@ -311,7 +362,9 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gateway</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gateway
+                  </label>
                   <select
                     value={gateway}
                     onChange={(e) => setGateway(e.target.value)}
@@ -329,7 +382,7 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
                   setStep(2);
                   setSelectedSubscription(null);
                 }}
-                className="text-primary hover:text-blue-800 text-sm mt-2 cursor-pointer"
+                className="text-primary hover:text-[#AD946C] text-sm mt-2 cursor-pointer"
               >
                 ← Volver a selección de suscripción
               </button>
@@ -349,20 +402,26 @@ const PaymentCreateModal = ({ onClose, onSuccess, isAdmin = true, currentUser = 
           {step >= 2 && step < 3 && (
             <button
               onClick={() => setStep(3)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+              className="px-6 py-2 bg-[#AD946C] text-white rounded-lg hover:bg-transparent-90"
               disabled={loading || (step === 2 && !selectedSubscription)}
             >
               Siguiente
             </button>
           )}
           {step === 3 && (
-            <button
-              onClick={handleCreatePayment}
-              disabled={!canSubmit || loading}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-300"
+            <div
+              className={
+                !canSubmit || loading ? "opacity-50 pointer-events-none" : ""
+              }
             >
-              {loading ? "Creando..." : "Crear Pago"}
-            </button>
+              <Button
+                title="Crear Pago"
+                action={handleCreatePayment}
+                bgColor="#AD946C"
+                data-testid="create-payment"
+                tooltip="Crear Pago"
+              />
+            </div>
           )}
         </div>
       </div>
