@@ -1,10 +1,12 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import Button from "../components/button"; 
-import ScrollButton from "../components/ScrollButton"; 
+import { useNavigate } from "react-router-dom";
+import Button from "../components/button";
+import ScrollButton from "../components/ScrollButton";
 
 export default function SuscriptionPage() {
   const heroRef = useRef(null);
+  const navigate = useNavigate();
 
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
@@ -20,7 +22,6 @@ export default function SuscriptionPage() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  
   const robustScrollToPlanes = () => {
     const element = document.getElementById("planes");
     if (!element) {
@@ -29,16 +30,17 @@ export default function SuscriptionPage() {
     }
 
     console.debug("[scrollToPlanes] intentanto scrollIntoView");
-    
+
     try {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (e) {
-  
       console.debug("[scrollToPlanes] scrollIntoView falló:", e);
-      window.scrollTo({ top: element.getBoundingClientRect().top + window.pageYOffset, behavior: "smooth" });
+      window.scrollTo({
+        top: element.getBoundingClientRect().top + window.pageYOffset,
+        behavior: "smooth",
+      });
     }
 
-    
     let attempts = 0;
     const maxAttempts = 8;
 
@@ -46,10 +48,11 @@ export default function SuscriptionPage() {
       attempts += 1;
       const rect = element.getBoundingClientRect();
       const inView = rect.top >= 0 && rect.top < window.innerHeight;
-      console.debug(`[scrollToPlanes] intento ${attempts} rect.top=${rect.top} inView=${inView}`);
+      console.debug(
+        `[scrollToPlanes] intento ${attempts} rect.top=${rect.top} inView=${inView}`
+      );
       if (inView || attempts >= maxAttempts) {
         if (!inView) {
-        
           console.debug("[scrollToPlanes] última opción: anchor temporal");
           const a = document.createElement("a");
           a.href = "#planes";
@@ -61,13 +64,11 @@ export default function SuscriptionPage() {
         }
         return;
       }
-      
       requestAnimationFrame(() => {
         setTimeout(checkAndRetry, 20);
       });
     };
 
-   
     setTimeout(checkAndRetry, 20);
   };
 
@@ -106,7 +107,7 @@ export default function SuscriptionPage() {
             className="mt-4 text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold"
             style={{ fontFamily: "Gotham, sans-serif" }}
           >
-            Prueba increíbles vinos por solo <br/>30€ al mes!
+            Prueba increíbles vinos por solo <br />30€ al mes!
           </p>
 
           <p
@@ -120,10 +121,20 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => {
+                navigate("/app/Subscription/Checkout");
+
+                requestAnimationFrame(() => {
+                  try {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } catch (e) {
+                    window.scrollTo(0, 0);
+                  }
+                  setTimeout(() => window.scrollTo(0, 0), 50);
+                });
+              }}
             />
-            
-            {/*  ScrollButton */}
+
             <ScrollButton />
           </div>
         </div>
@@ -141,7 +152,7 @@ export default function SuscriptionPage() {
           className="mt-4 text-lg sm:text-xl font-light max-w-2xl mx-auto"
           style={{ fontFamily: "Gotham, sans-serif" }}
         >
-          Elige el que mejor acompañe tu estilo de disfrutar el vino. <br/>
+          Elige el que mejor acompañe tu estilo de disfrutar el vino. <br />
           Paga como prefieras y cancela cuando quieras.
         </p>
       </div>
@@ -187,24 +198,36 @@ export default function SuscriptionPage() {
             </div>
           </div>
 
-          {/* Detalles */}
           <div className="mt-4 text-left w-full">
             <p className="font-bold text-xl text-black mb-2">Incluye:</p>
             <ul className="text-gray-700 text-base list-disc list-inside space-y-1 mb-4">
               <li>Envío gratuito todos los meses.</li>
               <li>Cada mes recibirás una caja sorpresa con 3 botellas.</li>
               <li>Vinos de distintas regiones y denominaciones.</li>
-              <li>Selección exclusiva de nuestros sumilleres, quienes eligen cada etiqueta para ofrecerte una experiencia distinta en cada entrega.</li>
+              <li>
+                Selección exclusiva de nuestros sumilleres, quienes eligen cada
+                etiqueta para ofrecerte una experiencia distinta en cada entrega.
+              </li>
             </ul>
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => {
+                navigate("/app/Subscription/Checkout");
+                requestAnimationFrame(() => {
+                  try {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } catch (e) {
+                    window.scrollTo(0, 0);
+                  }
+                  setTimeout(() => window.scrollTo(0, 0), 50);
+                });
+              }}
             />
           </div>
         </div>
 
-        {/* Segundo cuadro + detalles */}
+        {/* Segundo cuadro */}
         <div className="w-full sm:w-80 flex flex-col items-center">
           <div className="relative border-[2px] border-[#AD946C] rounded-xl w-full cursor-pointer group transition-all duration-300">
             <div
@@ -243,25 +266,43 @@ export default function SuscriptionPage() {
             </div>
           </div>
 
-          {/* Detalles */}
           <div className="mt-4 text-left w-full">
             <p className="font-bold text-xl text-black mb-2">Incluye:</p>
             <ul className="text-gray-700 text-base list-disc list-inside space-y-1 mb-4">
               <li>Envío gratuito mensual, directo a tu puerta.</li>
-              <li>Cada mes recibirás una caja sorpresa con 3 botellas de alta gama y denominaciones premium.</li>
+              <li>
+                Cada mes recibirás una caja sorpresa con 3 botellas de alta gama
+                y denominaciones premium.
+              </li>
               <li>Vinos de distintas regiones y denominaciones.</li>
-              <li>Selección exclusiva de nuestros sumilleres, con etiquetas de producción limitada y bodegas de renombre.</li>
-              <li>Fichas de cata detalladas y recomendaciones de maridaje para cada vino.</li>
+              <li>
+                Selección exclusiva de nuestros sumilleres, con etiquetas de
+                producción limitada y bodegas de renombre.
+              </li>
+              <li>
+                Fichas de cata detalladas y recomendaciones de maridaje para cada
+                vino.
+              </li>
             </ul>
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => {
+                navigate("/app/Subscription/Checkout");
+                requestAnimationFrame(() => {
+                  try {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } catch (e) {
+                    window.scrollTo(0, 0);
+                  }
+                  setTimeout(() => window.scrollTo(0, 0), 50);
+                });
+              }}
             />
           </div>
         </div>
 
-        {/* Tercer cuadro + detalles */}
+        {/* Tercer cuadro */}
         <div className="w-full sm:w-80 flex flex-col items-center">
           <div className="relative border-[2px] border-[#AD946C] rounded-xl w-full cursor-pointer group transition-all duration-300">
             <div
@@ -300,11 +341,12 @@ export default function SuscriptionPage() {
             </div>
           </div>
 
-          {/* Detalles */}
           <div className="mt-4 text-left w-full">
             <p className="font-bold text-xl text-black mb-2">Incluye:</p>
             <ul className="text-gray-700 text-base list-disc list-inside space-y-1 mb-4">
-              <li>Sorprende a alguien especial con una caja única de 3 botellas.</li>
+              <li>
+                Sorprende a alguien especial con una caja única de 3 botellas.
+              </li>
               <li>Una sola entrega, sin suscripción.</li>
               <li>Envío gratuito directo a quien quieras regalarla.</li>
               <li>Vinos de distintas regiones y denominaciones.</li>
@@ -314,16 +356,27 @@ export default function SuscriptionPage() {
             <Button
               title="Suscríbete"
               tooltip="Ir al formulario de suscripción"
-              action={() => window.location.href = "http://localhost:5173/app/Subscription/Checkout"}
+              action={() => {
+                navigate("/app/Subscription/Checkout");
+                requestAnimationFrame(() => {
+                  try {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } catch (e) {
+                    window.scrollTo(0, 0);
+                  }
+                  setTimeout(() => window.scrollTo(0, 0), 50);
+                });
+              }}
             />
           </div>
         </div>
-
       </div>
 
-      {/* Sección FAQ / Respuestas */}
+      {/* Sección FAQ */}
       <div className="w-full py-16 px-4">
-        <h2 className="text-3xl font-bold text-black mb-6 text-center">Todo lo que necesitas saber</h2>
+        <h2 className="text-3xl font-bold text-black mb-6 text-center">
+          Todo lo que necesitas saber
+        </h2>
 
         {/* Tipos de Suscripción */}
         <div className="mb-4">
@@ -337,11 +390,38 @@ export default function SuscriptionPage() {
           </div>
           {openIndex === 0 && (
             <div className="px-4 py-2 text-gray-700 space-y-2">
-              <p>En Vinopremier.com, creemos que disfrutar del vino debe ser una experiencia flexible, personalizada y sin complicaciones. Por eso, con BoxPremier te ofrecemos tres formas de vivir esta experiencia, adaptadas a tu estilo y preferencias.</p>
+              <p>
+                En Vinopremier.com, creemos que disfrutar del vino debe ser una
+                experiencia flexible, personalizada y sin complicaciones. Por eso,
+                con BoxPremier te ofrecemos tres formas de vivir esta experiencia,
+                adaptadas a tu estilo y preferencias.
+              </p>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong>Suscripción Básica:</strong> Ideal para quienes desean iniciarse en el mundo del vino o disfrutar cada mes de nuevas etiquetas cuidadosamente seleccionadas. Recibirás vinos de excelente calidad, perfectos para el día a día, elegidos por nuestros expertos para sorprenderte en cada entrega. Se paga mensualmente y puedes cancelarla en cualquier momento, sin compromisos ni contratos.</li>
-                <li><strong>Suscripción Prestige:</strong> Pensada para los paladares más exigentes. Con esta suscripción, recibirás vinos de gama alta y edición especial, seleccionados por nuestros enólogos entre bodegas destacadas. Cada caja es una experiencia única que combina elegancia, exclusividad y descubrimiento. También se paga mensualmente y puedes cancelarla cuando quieras.</li>
-                <li><strong>BoxPremier Regalo:</strong> La opción perfecta para sorprender a alguien especial. Se trata de una caja única (pago único) con vinos de la misma categoría que la suscripción Básica, cuidadosamente presentada para regalar una experiencia inolvidable. No requiere renovación ni suscripción: compras, enviamos y haces feliz a un amante del vino.</li>
+                <li>
+                  <strong>Suscripción Básica:</strong> Ideal para quienes desean
+                  iniciarse en el mundo del vino o disfrutar cada mes de nuevas
+                  etiquetas cuidadosamente seleccionadas. Recibirás vinos de
+                  excelente calidad, perfectos para el día a día, elegidos por
+                  nuestros expertos para sorprenderte en cada entrega. Se paga
+                  mensualmente y puedes cancelarla en cualquier momento, sin
+                  compromisos ni contratos.
+                </li>
+                <li>
+                  <strong>Suscripción Prestige:</strong> Pensada para los
+                  paladares más exigentes. Con esta suscripción, recibirás vinos de
+                  gama alta y edición especial, seleccionados por nuestros enólogos
+                  entre bodegas destacadas. Cada caja es una experiencia única que
+                  combina elegancia, exclusividad y descubrimiento. También se paga
+                  mensualmente y puedes cancelarla cuando quieras.
+                </li>
+                <li>
+                  <strong>BoxPremier Regalo:</strong> La opción perfecta para
+                  sorprender a alguien especial. Se trata de una caja única (pago
+                  único) con vinos de la misma categoría que la suscripción Básica,
+                  cuidadosamente presentada para regalar una experiencia
+                  inolvidable. No requiere renovación ni suscripción: compras,
+                  enviamos y haces feliz a un amante del vino.
+                </li>
               </ul>
             </div>
           )}
@@ -359,13 +439,20 @@ export default function SuscriptionPage() {
           </div>
           {openIndex === 1 && (
             <div className="px-4 py-2 text-gray-700 space-y-2">
-              <p>Tú eliges el tipo de vino que deseas recibir: Tinto, blanco, rosado o espumoso. Cada selección es una sorpresa exclusiva, cuidadosamente elegida por nuestros expertos para mantener la emoción y el descubrimiento en cada entrega.</p>
+              <p>
+                Tú eliges el tipo de vino que deseas recibir: Tinto, blanco,
+                rosado o espumoso. Cada selección es una sorpresa exclusiva,
+                cuidadosamente elegida por nuestros expertos para mantener la
+                emoción y el descubrimiento en cada entrega.
+              </p>
             </div>
           )}
         </div>
 
-        {/* Mensaje final */}
-        <p className="mt-4 text-gray-700 text-base font-bold">En BoxPremier, tú decides el ritmo. Sin contratos, sin complicaciones, solo vinos excepcionales que llegan directo a tu puerta.</p>
+        <p className="mt-4 text-gray-700 text-base font-bold">
+          En BoxPremier, tú decides el ritmo. Sin contratos, sin complicaciones,
+          solo vinos excepcionales que llegan directo a tu puerta.
+        </p>
       </div>
     </div>
   );
