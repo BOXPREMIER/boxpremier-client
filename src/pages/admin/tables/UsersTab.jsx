@@ -4,7 +4,7 @@ import { getSubscriptions } from "../../../services/SubscriptionServices";
 import UserModal from "../modals/UserModal";
 import AdminModal from "../modals/AdminModal"; 
 import Button from "../../../components/Button";
-import Swal from 'sweetalert2';
+import { showCustomAlert } from "../../../components/CustomAlert";
 
 const UsersTab = () => {
   const [users, setUsers] = useState([]);
@@ -31,7 +31,11 @@ const UsersTab = () => {
       setUsers(enrichedUsers);
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
-      Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudieron cargar los usuarios",
+        type: "error"
+      });
     } finally {
       setLoading(false);
     }
@@ -82,18 +86,18 @@ const UsersTab = () => {
         };
 
         console.log("📤 Creando nuevo usuario:", finalData);
-        await createUser(finalData);
+        await createUser(finalData); // ✅ IMPORTANTE: Esta línea estaba faltando
         
-        Swal.fire({
+        showCustomAlert({
           title: "¡Usuario creado!",
           text: "El nuevo usuario se creó correctamente.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#3085d6",
-        }).then(() => {
-          setModalOpen(false);
-          setSelectedUser(null);
+          confirmText: "Aceptar"
         });
+
+        await fetchUsers();
+        setModalOpen(false);
+        setSelectedUser(null);
+
       } else {
         // Para edición: enviar solo campos modificados
         const originalUser = users.find(u => u._id === userData._id);
@@ -143,31 +147,26 @@ const UsersTab = () => {
 
         // Si no hay campos para actualizar
         if (Object.keys(updateData).length <= 3) { // Solo userType, status, preferences
-          Swal.fire({
+          showCustomAlert({
             title: "Sin cambios",
             text: "No se detectaron cambios para guardar.",
-            icon: "info",
-            confirmButtonText: "Aceptar",
-            confirmButtonColor: "#3085d6",
+            confirmText: "Aceptar"
           });
           return;
         }
 
-        await updateUser(userData._id, updateData);
+        await updateUser(userData._id, updateData); // ✅ IMPORTANTE: Esta línea estaba faltando
         
-        Swal.fire({
+        showCustomAlert({
           title: "¡Usuario actualizado!",
           text: "Los cambios se guardaron correctamente.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#3085d6",
-        }).then(() => {
-          setModalOpen(false);
-          setSelectedUser(null);
+          confirmText: "Aceptar"
         });
-      }
 
-      await fetchUsers();
+        await fetchUsers();
+        setModalOpen(false);
+        setSelectedUser(null);
+      }
 
     } catch (error) {
       console.error("Error al guardar usuario:", error);
@@ -182,50 +181,43 @@ const UsersTab = () => {
         }
       }
       
-      Swal.fire({
+      showCustomAlert({
         title: "Error",
         text: errorMessage,
-        icon: "error",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#d33",
+        type: "error"
       });
     }
   };
 
+  // ✅ AGREGAR: Función handleDeleteUser que faltaba
   const handleDeleteUser = async (id) => {
-    const result = await Swal.fire({
+    showCustomAlert({
       title: "¿Estás seguro?",
       text: "No podrás revertir esta acción.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar"
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteUser(id);
-        await fetchUsers();
-        Swal.fire({
-          title: "Eliminado!",
-          text: "El usuario ha sido eliminado.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#3085d6",
-        });
-      } catch (error) {
-        console.error("Error al eliminar usuario:", error);
-        Swal.fire({
-          title: "Error",
-          text: "No se pudo eliminar el usuario.",
-          icon: "error",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#d33",
-        });
+      confirmText: "Sí, eliminar",
+      cancelText: "Cancelar",
+      onConfirm: async () => {
+        try {
+          await deleteUser(id);
+          await fetchUsers();
+          showCustomAlert({
+            title: "Eliminado!",
+            text: "El usuario ha sido eliminado.",
+            confirmText: "Aceptar"
+          });
+        } catch (error) {
+          console.error("Error al eliminar usuario:", error);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo eliminar el usuario.",
+            type: "error"
+          });
+        }
+      },
+      onCancel: () => {
+        // No hacer nada si cancela
       }
-    }
+    });
   };
 
   const usersByType = users.filter(u => {
