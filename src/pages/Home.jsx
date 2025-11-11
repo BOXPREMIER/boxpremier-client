@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Star } from 'lucide-react';
-import Button from "../components/button";
+import Button from "../components/Button.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {

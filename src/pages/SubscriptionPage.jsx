@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/button";
+import Button from "../components/Button";
 import ScrollButton from "../components/ScrollButton";
 
 export default function SuscriptionPage() {

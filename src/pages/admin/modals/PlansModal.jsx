@@ -1,246 +1,253 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2, Plus } from "lucide-react";
-import PlansModal from "../modals/PlansModal";
-import {
-  getAllPlans,
-  createPlan,
-  updatePlan,
-  deletePlan,
-} from "../../../services/SubscriptionPlanServices"; 
-import { showCustomAlert } from "../../../components/CustomAlert"; 
+import { X } from "lucide-react";
+import Button from "../../../components/Button";
+import { showCustomAlert } from "../../../components/CustomAlert";
 
-const PlansTab = () => {
-  const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+const PlansModal = ({ plan, onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    boxType: "",
+    boxSize: "", 
+    price: "",
+    active: true,
+  });
+  const [errors, setErrors] = useState({});
 
-  // 📦 Cargar planes al montar el componente
   useEffect(() => {
-    fetchPlans();
-  }, []);
-
-  const fetchPlans = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllPlans();
-      setPlans(data);
-    } catch (error) {
-      console.error("Error al cargar los planes:", error);
-      showCustomAlert({
-        title: "Error",
-        text: "No se pudieron cargar los planes",
-        type: "error"
+    if (plan) {
+      setFormData({
+        boxType: plan.boxType || "",
+        boxSize: String(plan.boxSize || ""), 
+        price: String(plan.price || ""), 
+        active: plan.active ?? true,
       });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOpenModal = (plan = null) => {
-    setSelectedPlan(plan);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPlan(null);
-  };
-
-  const handleSave = async (formData) => {
-    try {
-      if (selectedPlan) {
-        // ✏️ Editar plan existente
-        await updatePlan(selectedPlan._id, formData);
-        await fetchPlans();
-        handleCloseModal();
-      } else {
-        // ➕ Crear nuevo plan
-        await createPlan(formData);
-        await fetchPlans();
-        handleCloseModal();
-      }
-    } catch (error) {
-      console.error("Error al guardar el plan:", error);
-      showCustomAlert({
-        title: "Error",
-        text: "No se pudo guardar el plan. Por favor, intenta nuevamente.",
-        type: "error"
+    } else {
+      // Resetear el formulario cuando no hay plan (crear nuevo)
+      setFormData({
+        boxType: "",
+        boxSize: "",
+        price: "",
+        active: true,
       });
-      throw error;
     }
+  }, [plan]);
+
+  const validate = () => {
+    const newErrors = {};
+    
+    // Validar boxType
+    if (!String(formData.boxType || "").trim()) {
+      newErrors.boxType = "El tipo de caja es obligatorio";
+    }
+    
+    // Validar boxSize - convertir a número y validar
+    const boxSizeNum = parseInt(formData.boxSize);
+    if (isNaN(boxSizeNum) || boxSizeNum <= 0) {
+      newErrors.boxSize = "El tamaño debe ser un número válido mayor a 0";
+    }
+    
+    // Validar precio
+    const priceValue = parseFloat(formData.price);
+    if (isNaN(priceValue) || priceValue < 0) {
+      newErrors.price = "El precio debe ser un número válido";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleDelete = async (id) => {
-    showCustomAlert({
-      title: "¿Estás seguro?",
-      text: "No podrás revertir esta acción.",
-      confirmText: "Sí, eliminar",
-      cancelText: "Cancelar",
-      onConfirm: async () => {
-        try {
-          await deletePlan(id);
-          setPlans(plans.filter((plan) => plan._id !== id));
-        } catch (error) {
-          console.error("Error al eliminar el plan:", error);
-          showCustomAlert({
-            title: "Error",
-            text: "No se pudo eliminar el plan.",
-            type: "error"
-          });
-        }
-      }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: type === "checkbox" ? checked : value 
     });
   };
 
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    
+    try {
+      // Preparar datos para enviar - convertir a los tipos correctos para MongoDB
+      const dataToSave = {
+        boxType: formData.boxType,
+        boxSize: parseInt(formData.boxSize), // Convertir a número para MongoDB
+        price: parseFloat(formData.price),   // Convertir a número para MongoDB
+        active: formData.active
+      };
+      
+      await onSave(dataToSave);
+    } catch (err) {
+      console.error("Error guardando plan:", err);
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo guardar el plan. Por favor, intenta nuevamente.",
+        type: "error",
+       
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    if (onClose) onClose();
+  };
+
   return (
-    <div className="p-4 sm:p-6">
-      {/* Header responsive */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">
-          Planes de Suscripción
-        </h2>
-        <button
-          onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-2 bg-secondary text-white px-4 py-2 sm:py-2 rounded-lg hover:scale-[1.02] cursor-pointer transition-transform w-full sm:w-auto"
-        >
-          <Plus size={18} /> 
-          <span className="text-sm sm:text-base">Nuevo Plan</span>
-        </button>
-      </div>
-
-      {/* Vista de escritorio - Tabla */}
-      <div className="hidden lg:block overflow-x-auto bg-white rounded-xl shadow-md">
-        <table className="w-full border-collapse">
-          <thead className="bg-secondary text-white">
-            <tr>
-              <th className="p-3 text-left">Tipo</th>
-              <th className="p-3 text-left">Tamaño</th>
-              <th className="p-3 text-left">Precio</th>
-              <th className="p-3 text-left">Activo</th>
-              <th className="p-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="p-4 text-center">
-                  Cargando planes...
-                </td>
-              </tr>
-            ) : plans.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="p-4 text-center">
-                  No hay planes disponibles.
-                </td>
-              </tr>
-            ) : (
-              plans.map((plan) => (
-                <tr key={plan._id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{plan.boxType}</td>
-                  <td className="p-3">{plan.boxSize}</td>
-                  <td className="p-3">${plan.price.toFixed(2)}</td>
-                  <td className="p-3">
-                    {plan.active ? (
-                      <span className="text-green-600 font-semibold">Activo</span>
-                    ) : (
-                      <span className="text-red-500 font-semibold">Inactivo</span>
-                    )}
-                  </td>
-                  <td className="p-3 text-center">
-                    <div className="flex justify-center gap-3">
-                      <button
-                        onClick={() => handleOpenModal(plan)}
-                        className="text-secondary hover:scale-110 cursor-pointer transition"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(plan._id)}
-                        className="text-primary hover:scale-110 cursor-pointer transition"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Vista móvil - Cards */}
-      <div className="lg:hidden space-y-4">
-        {loading ? (
-          <div className="text-center p-4 bg-white rounded-xl shadow-md">
-            Cargando planes...
+    <div 
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-2 sm:p-4"
+      style={{ fontFamily: "Gotham, sans-serif" }}
+    >
+      <div 
+        className="bg-white rounded-2xl shadow-lg w-full max-w-md mx-auto relative max-h-[90vh] overflow-y-auto"
+        style={{ 
+          fontFamily: "Gotham, sans-serif",
+          color: "#27251F"
+        }}
+      >
+        {/* Header sticky */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl">
+          <div className="flex justify-between items-center">
+            <h2 
+              className="text-lg sm:text-xl font-semibold"
+              style={{ 
+                fontFamily: "Gotham, sans-serif",
+                color: "#27251F"
+              }}
+            >
+              {plan ? "Editar Plan" : "Nuevo Plan"}
+            </h2>
+            <button
+              onClick={onClose}
+              className="hover:text-gray-800 transition p-1"
+              style={{ color: "#27251F" }}
+            >
+              <X size={20} />
+            </button>
           </div>
-        ) : plans.length === 0 ? (
-          <div className="text-center p-4 bg-white rounded-xl shadow-md">
-            No hay planes disponibles.
-          </div>
-        ) : (
-          plans.map((plan) => (
-            <div key={plan._id} className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
-              {/* Información principal */}
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <span className="block text-sm font-medium text-gray-500">Tipo</span>
-                  <span className="text-base font-semibold">{plan.boxType}</span>
-                </div>
-                <div>
-                  <span className="block text-sm font-medium text-gray-500">Tamaño</span>
-                  <span className="text-base font-semibold">{plan.boxSize}</span>
-                </div>
-                <div>
-                  <span className="block text-sm font-medium text-gray-500">Precio</span>
-                  <span className="text-base font-semibold text-green-600">
-                    ${plan.price.toFixed(2)}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-sm font-medium text-gray-500">Estado</span>
-                  <span className={`text-sm font-semibold ${
-                    plan.active ? "text-green-600" : "text-red-500"
-                  }`}>
-                    {plan.active ? "Activo" : "Inactivo"}
-                  </span>
-                </div>
-              </div>
+        </div>
 
-              {/* Acciones */}
-              <div className="flex gap-2 pt-3 border-t border-gray-100">
-                <button
-                  onClick={() => handleOpenModal(plan)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-secondary text-white py-2 px-3 rounded-lg hover:bg-secondary/90 transition-colors text-sm"
-                >
-                  <Pencil size={16} />
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(plan._id)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-white py-2 px-3 rounded-lg hover:bg-primary/90 transition-colors text-sm"
-                >
-                  <Trash2 size={16} />
-                  Eliminar
-                </button>
-              </div>
+        {/* Form content */}
+        <div className="p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-3">
+            {/* Box Type - Cambiar a select para coincidir con el enum del schema */}
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Tipo de caja
+              </label>
+              
+ <input
+                type="text"
+                name="boxType"
+                value={formData.boxType}
+                onChange={handleChange}
+               
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+                placeholder="Basic"
+              />
+              
+              {errors.boxType && <p className="text-red-500 text-sm mt-1">{errors.boxType}</p>}
             </div>
-          ))
-        )}
-      </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <PlansModal
-          plan={selectedPlan}
-          onClose={handleCloseModal}
-          onSave={handleSave}
-        />
-      )}
+            {/* Box Size - Input numérico pero manejado como string en el estado */}
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Tamaño
+              </label>
+              <input
+                type="number"
+                name="boxSize"
+                value={formData.boxSize}
+                onChange={handleChange}
+                min="1"
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+                placeholder="Ej: 3"
+              />
+              {errors.boxSize && <p className="text-red-500 text-sm mt-1">{errors.boxSize}</p>}
+            </div>
+
+            <div>
+              <label 
+                className="block text-sm font-medium mb-1"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Precio (€)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  borderColor: "#AB9470"
+                }}
+                placeholder="Ej: 29.99"
+              />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                name="active"
+                checked={formData.active}
+                onChange={handleChange}
+                className="w-4 h-4"
+              />
+              <label
+                className="text-sm sm:text-base"
+                style={{ 
+                  fontFamily: "Gotham, sans-serif",
+                  color: "#27251F"
+                }}
+              >
+                Activo
+              </label>
+            </div>
+          </div>
+
+          {/* Botones responsive */}
+          <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 pt-4 border-t">
+            <Button 
+              title="Cancelar" 
+              action={handleCancel} 
+              className="w-full sm:w-auto order-2 sm:order-1"
+            />
+            <Button 
+              title="Guardar" 
+              action={handleSubmit} 
+              type="submit" 
+              className="w-full sm:w-auto order-1 sm:order-2"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default PlansTab;
+export default PlansModal;
