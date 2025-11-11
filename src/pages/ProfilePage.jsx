@@ -139,7 +139,10 @@ export default function ProfilePage() {
     try {
       setSaving(true);
       const updated = await updateMe(profile);
-      setUser((prev) => ({ ...prev, ...profile, ...updated }));
+
+      const newUser = { ...userStore, ...profile, ...updated };
+      setUser(newUser);
+
       setIsEditing(false);
       alert("Perfil actualizado");
     } catch (e) {
@@ -290,7 +293,7 @@ export default function ProfilePage() {
                   className={field}
                   value={profile.email}
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                  disabled={!isEditing}
+                  disabled={true}
                 />
               </div>
 

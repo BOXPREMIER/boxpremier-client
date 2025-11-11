@@ -62,32 +62,31 @@ const UsersTab = () => {
 
   const handleSubmitUser = async (userData) => {
     try {
-      const cleanedData = Object.fromEntries(
-        Object.entries(userData).filter(([key, value]) => {
-          if (value === "" || value === null || value === undefined) return false;
-          if (key === 'subscription' || key === 'plan' || key === 'status' || key === 'fullName') return false;
-          return true;
-        })
-      );
+      // Para creación: enviar todos los datos necesarios
+      if (!userData._id) {
+        const cleanedData = Object.fromEntries(
+          Object.entries(userData).filter(([key, value]) => {
+            if (value === "" || value === null || value === undefined) return false;
+            if (key === 'subscription' || key === 'plan' || key === 'status' || key === 'fullName') return false;
+            return true;
+          })
+        );
 
-      const finalData = {
-        ...cleanedData,
-        userType: isAdminModal ? "admin" : "customer",
-        status: true,
-        preferences: {
-          emailNotifications: true
-        }
-      };
+        const finalData = {
+          ...cleanedData,
+          userType: isAdminModal ? "admin" : "customer",
+          status: true,
+          preferences: {
+            emailNotifications: true
+          }
+        };
 
-      if (finalData._id === null) {
-        delete finalData._id;
-      }
-
-      if (userData._id) {
-        await updateUser(userData._id, finalData);
+        console.log("📤 Creando nuevo usuario:", finalData);
+        await createUser(finalData);
+        
         Swal.fire({
-          title: "¡Usuario actualizado!",
-          text: "Los cambios se guardaron correctamente.",
+          title: "¡Usuario creado!",
+          text: "El nuevo usuario se creó correctamente.",
           icon: "success",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#3085d6",
@@ -96,10 +95,69 @@ const UsersTab = () => {
           setSelectedUser(null);
         });
       } else {
-        await createUser(finalData);
+        // Para edición: enviar solo campos modificados
+        const originalUser = users.find(u => u._id === userData._id);
+        if (!originalUser) {
+          throw new Error("Usuario original no encontrado");
+        }
+
+        const updateData = {};
+        const fieldsToCheck = [
+          'firstName', 'lastName', 'email', 'password', 'phone', 
+          'street', 'number', 'floor', 'postalCode', 'city', 'province', 'country'
+        ];
+
+        fieldsToCheck.forEach(field => {
+          const newValue = userData[field];
+          const originalValue = originalUser[field];
+          
+          // Manejar casos especiales
+          if (field === 'password') {
+            // Solo enviar password si no está vacío
+            if (newValue && newValue.trim() !== '') {
+              updateData[field] = newValue;
+            }
+          } else if (field === 'floor') {
+            // Para floor, considerar null/undefined/string vacío como equivalentes
+            const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
+            const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
+            if (normalizedNew !== normalizedOriginal) {
+              updateData[field] = normalizedNew || '';
+            }
+          } else {
+            // Para otros campos, comparar normalmente
+            const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
+            const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
+            if (normalizedNew !== normalizedOriginal) {
+              updateData[field] = normalizedNew;
+            }
+          }
+        });
+
+        // Siempre incluir campos de sistema
+        updateData.userType = isAdminModal ? "admin" : "customer";
+        updateData.status = true;
+        updateData.preferences = { emailNotifications: true };
+
+        console.log("📤 Actualizando usuario - Campos modificados:", updateData);
+
+        // Si no hay campos para actualizar
+        if (Object.keys(updateData).length <= 3) { // Solo userType, status, preferences
+          Swal.fire({
+            title: "Sin cambios",
+            text: "No se detectaron cambios para guardar.",
+            icon: "info",
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: "#3085d6",
+          });
+          return;
+        }
+
+        await updateUser(userData._id, updateData);
+        
         Swal.fire({
-          title: "¡Usuario creado!",
-          text: "El nuevo usuario se creó correctamente.",
+          title: "¡Usuario actualizado!",
+          text: "Los cambios se guardaron correctamente.",
           icon: "success",
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#3085d6",
@@ -122,10 +180,6 @@ const UsersTab = () => {
         } else if (error.response.data.message) {
           errorMessage = error.response.data.message;
         }
-      } else {
-        errorMessage = error.response?.data?.message || 
-                      error.response?.data?.error || 
-                      "No se pudo guardar el usuario. Por favor, verifica los datos.";
       }
       
       Swal.fire({
@@ -188,7 +242,6 @@ const UsersTab = () => {
       u.lastName?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Función para formatear dirección
   const formatAddress = (user) => {
     const parts = [user.street, user.number, user.floor, user.city, user.postalCode].filter(Boolean);
     return parts.length > 0 ? parts.join(', ') : "-";
@@ -389,7 +442,7 @@ const UsersTab = () => {
                   title="Eliminar" 
                   action={() => handleDeleteUser(user._id)} 
                   tooltip="Eliminar usuario"
-                  className="flex-1 text-sm py-2  "
+                  className="flex-1 text-sm py-2"
                 />
               </div>
             </div>
