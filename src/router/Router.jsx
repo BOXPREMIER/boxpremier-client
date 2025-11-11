@@ -9,9 +9,8 @@ import { authGuard, adminGuard } from "../validators/routeValidator";
 import SubscriptionCheckout from "../pages/SubscriptionCheckout";
 import MainPage from "../pages/MainPage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import UsersTab from "../pages/admin/UsersTab";
-import PlansTab from "../pages/admin/PlansTab";
-import SubscriptionsTab from "../pages/admin/SubscriptionTab"
+import UsersTab from "../pages/admin/tables/UsersTab";
+import PlansTab from "../pages/admin/tables/PlansTab";
 import OrdersTab from "../pages/admin/OrdersTab";
 import PaymentsTab from "../pages/admin/PaymentsTab";
 import GiftPage from "../pages/GiftPage";
@@ -30,7 +29,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> }, // /app
       { path: "profile", element: <ProfilePage />, loader: authGuard }, // /app/profile
       { path: "subscription", element: <SubscriptionPage /> }, // /app/subscription
-      { path: "subscription/checkout", element: <SubscriptionCheckout /> }, // /app/subscription/checkout
+      { path: "subscription/checkout", element: <SubscriptionCheckout />, loader: authGuard }, // /app/subscription/checkout
       { path: "gift", element: <GiftPage /> },
       { path: "monthly-wines", element: <MonthlyWines /> },
       {
@@ -38,7 +37,6 @@ const router = createBrowserRouter([
         children: [
           { path: "users", element: <UsersTab />, },
           { path: "plans", element: <PlansTab />, },
-          { path: "subscriptions", element: <SubscriptionsTab />, },
           { path: "orders", element: <OrdersTab />, },
           { path: "payments", element: <PaymentsTab />, },
         ],

@@ -1,4 +1,3 @@
-// src/components/ui/CustomAlert.js
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -12,8 +11,26 @@ export const showCustomAlert = ({
   imageUrl = "/logo-vinopremier.png",
   onConfirm = () => {},
   onCancel = () => {},
-}) => {
-  MySwal.fire({
+  type = "confirm" //agregado ingrid
+}) => { // manejar caso de error
+  if (type === "error") {
+    MySwal.fire({
+      title: `<span style="font-family: Gotham; font-weight: 700;">${title}</span>`,
+      text: text,
+      icon: "error", 
+      customClass: {
+        popup: "custom-alert-popup",
+        confirmButton: "custom-alert-confirm",
+        title: "custom-alert-title",
+        htmlContainer: "custom-alert-text",
+      },
+      buttonsStyling: false,
+      confirmButtonText: "Aceptar" 
+    });
+    return; 
+  }   
+
+    MySwal.fire({
     title: `<span style="font-family: Gotham; font-weight: 700;">${title}</span>`,
     text: text,
     imageUrl,
