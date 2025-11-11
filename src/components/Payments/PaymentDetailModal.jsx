@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import Button from "../../components/Button";
 
 const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true }) => {
   if (!payment) return null;
 
-  // --- state que faltaba ---
+  // --- state ---
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(payment?.status || "pending");
   const [saving, setSaving] = useState(false);
@@ -54,8 +55,6 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true
       const paymentId = payment._id || payment.id;
       await onUpdatePayment(paymentId, { status: selectedStatus });
       setShowEditModal(false);
-      // opcional: cerrar detalles después de guardar
-      // onClose();
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
       alert("Error al actualizar el estado del pedido");
@@ -63,6 +62,8 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true
       setSaving(false);
     }
   };
+
+  const saveDisabled = saving || selectedStatus === payment.status;
 
   return (
     <>
@@ -72,6 +73,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true
           {/* Header */}
           <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-gray-900">Detalles del Pago</h2>
+            {/* Botón de cierre (icon-only) */}
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -240,20 +242,9 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true
 
           {/* Footer */}
           <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
-            >
-              Cerrar
-            </button>
-
+            <Button title="Cerrar" action={onClose} />
             {isAdmin && (
-              <button
-                onClick={handleEditClick}
-                className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
-              >
-                Editar Pedido
-              </button>
+              <Button title="Editar Pedido" action={handleEditClick} bgColor="#AD946C" />
             )}
           </div>
         </div>
@@ -298,20 +289,15 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true
               </div>
 
               <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors font-medium"
-                  disabled={saving}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSaveStatus}
-                  className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={saving || selectedStatus === payment.status}
-                >
-                  {saving ? "Guardando..." : "Guardar"}
-                </button>
+                {/* Cancelar (bloqueado mientras guarda) */}
+                <div className={saving ? "opacity-50 pointer-events-none" : ""}>
+                  <Button title="Cancelar" action={() => setShowEditModal(false)} />
+                </div>
+
+                {/* Guardar (bloqueado si no hay cambios o si guarda) */}
+                <div className={saveDisabled ? "opacity-50 pointer-events-none" : ""}>
+                  <Button title="Guardar" action={handleSaveStatus} bgColor="#AD946C" />
+                </div>
               </div>
             </div>
           </div>
