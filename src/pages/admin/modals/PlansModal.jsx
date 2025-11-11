@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Button from "../../../components/Button";
-import Swal from 'sweetalert2';
+import { showCustomAlert } from "../../../components/CustomAlert";
 
 const PlansModal = ({ plan, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     boxType: "",
-    boxSize: "", // Mantener como string en el estado del formulario
+    boxSize: "", 
     price: "",
     active: true,
   });
@@ -16,8 +16,8 @@ const PlansModal = ({ plan, onClose, onSave }) => {
     if (plan) {
       setFormData({
         boxType: plan.boxType || "",
-        boxSize: String(plan.boxSize || ""), // Convertir número a string para el input
-        price: String(plan.price || ""), // También convertir precio a string para el input
+        boxSize: String(plan.boxSize || ""), 
+        price: String(plan.price || ""), 
         active: plan.active ?? true,
       });
     } else {
@@ -78,12 +78,11 @@ const PlansModal = ({ plan, onClose, onSave }) => {
       await onSave(dataToSave);
     } catch (err) {
       console.error("Error guardando plan:", err);
-      Swal.fire({
+      showCustomAlert({
         title: "Error",
         text: "No se pudo guardar el plan. Por favor, intenta nuevamente.",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-        confirmButtonColor: "#d33",
+        type: "error",
+       
       });
     }
   };
