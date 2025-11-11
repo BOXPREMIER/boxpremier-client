@@ -1,7 +1,7 @@
 // src/pages/GiftPage.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/Button"; 
+import Button from "../components/Button";
 
 const GiftPage = () => {
   const [offsetY, setOffsetY] = useState(0);
@@ -46,8 +46,9 @@ const GiftPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  
   const handleButtonClick = () => {
-    navigate("/subscription");
+    navigate("/app/subscription/checkout");
   };
 
   return (
@@ -119,7 +120,11 @@ const GiftPage = () => {
 
         {/* Botón debajo del texto */}
         <div className="w-full md:w-auto">
-          <Button title="Regala" action={handleButtonClick} />
+          <Button
+            title="Regala"
+            tooltip="Ir al formulario de regalo"
+            action={handleButtonClick}
+          />
         </div>
       </div>
 
@@ -141,10 +146,9 @@ const GiftPage = () => {
         </p>
       </div>
 
-      {/* Sección de imágenes con efecto "sonrisa" muy pronunciado y fade-in notable */}
+      {/* Sección de imágenes con fade-in */}
       <div className="bg-black w-full flex flex-col items-center py-24">
         <div className="relative flex flex-col md:flex-row items-center justify-center md:space-x-8">
-          {/* bottlehand.jpg - ligeramente arriba */}
           <img
             ref={el => (imagesRef.current[0] = el)}
             src="/public/bottlehand.jpg"
@@ -155,7 +159,6 @@ const GiftPage = () => {
             style={{ maxWidth: "300px", marginTop: "-40px" }}
           />
 
-          {/* toast.jpg - mucho más abajo */}
           <img
             ref={el => (imagesRef.current[1] = el)}
             src="/public/toast.jpg"
@@ -166,7 +169,6 @@ const GiftPage = () => {
             style={{ maxWidth: "300px", marginTop: "300px" }}
           />
 
-          {/* bottletable.jpg - muchísimo más arriba */}
           <img
             ref={el => (imagesRef.current[2] = el)}
             src="/public/bottletable.jpg"
@@ -179,7 +181,7 @@ const GiftPage = () => {
         </div>
       </div>
 
-      {/* Nueva sección de texto debajo de las imágenes (todo en itálica) */}
+      {/* Nueva sección de texto */}
       <div className="bg-black w-full flex flex-col items-center px-6 pb-24 space-y-6">
         <div className="max-w-4xl text-center space-y-4">
           <p style={{ fontFamily: "Gotham", fontWeight: 600, fontStyle: "italic", fontSize: "1.5rem" }}>
@@ -199,9 +201,13 @@ const GiftPage = () => {
           </p>
         </div>
 
-        {/* Botón "Regala" al final */}
+        {/* Botón "Regala" */}
         <div className="mt-8">
-          <Button title="Regala" action={handleButtonClick} />
+          <Button
+            title="Regala"
+            tooltip="Ir al formulario de regalo"
+            action={handleButtonClick}
+          />
         </div>
       </div>
     </div>
