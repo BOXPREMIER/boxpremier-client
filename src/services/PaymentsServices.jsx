@@ -76,7 +76,7 @@ export const updatePaymentStatus = async (id, updates) => {
 // Función alternativa específica para actualizar solo el estado
 export const updateStatus = async (id, status) => {
   try {
-    const response = await API.patch(`/payments/${id}/status`);
+    const response = await API.patch(`/payments/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al actualizar el estado del pago ${id}:`, error);
