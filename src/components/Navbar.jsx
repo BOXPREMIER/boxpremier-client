@@ -15,7 +15,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     user?.name ||
     user?.username ||
     user?.firstName ||
-    user?.email?.split("@")[0] || // fallback — часть email до "@"
+    user?.email?.split("@")[0] ||
     "usuario";
 
   const linkClass = ({ isActive }) =>
@@ -33,7 +33,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     >
       {/* 🔸 Enlaces principales */}
       <NavLink
-        to="subscription"
+        to="/subscription"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
       >
@@ -41,7 +41,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
       </NavLink>
 
       <NavLink
-        to="gift"
+        to="/gift"
         className={linkClass}
         onClick={isMobile ? closeMenu : undefined}
       >
@@ -67,7 +67,8 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg z-50">
+              {/* Функции обычного пользователя */}
               <NavLink
                 to="/app/profile"
                 className="block px-4 py-2 hover:bg-gray-100"
@@ -78,6 +79,34 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
               >
                 Ver perfil
               </NavLink>
+
+              {/* Дополнительно: кнопки админа */}
+              {user?.role === "admin" && (
+                <>
+                  <NavLink
+                    to="/admin/dashboard"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      if (closeMenu) closeMenu();
+                    }}
+                  >
+                    Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/admin/users"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      if (closeMenu) closeMenu();
+                    }}
+                  >
+                    Gestionar usuarios
+                  </NavLink>
+                </>
+              )}
+
+              {/* Кнопка выхода */}
               <button
                 onClick={() => {
                   logout();
@@ -133,7 +162,7 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* 🔹 Botón menú hamburguesa (solo móvil) */}
+        {/* 🔹 Botón menú hamburguesа (solo móvil) */}
         <button
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
