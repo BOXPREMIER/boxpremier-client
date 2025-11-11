@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 
-const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
+const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment, isAdmin = true }) => {
+  if (!payment) return null;
+
+  // --- state que faltaba ---
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(payment?.status || "pending");
   const [saving, setSaving] = useState(false);
-
-  if (!payment) return null;
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(amount || 0);
@@ -26,33 +27,16 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
   const subscription = payment?.subscriptionId || {};
   const address = user?.address || {};
 
-  const wineTypeMap = {
-    mixed: "Mixto",
-    rose: "Rosé",
-    red: "Tinto",
-    white: "Blanco",
-    sparkling: "Espumoso"
-  };
-
-  const boxTypeMap = {
-    basic: "Basic",
-    premium: "Premium",
-    deluxe: "Deluxe"
-  };
-
-  const statusMap = {
-    pending: "Pendiente",
-    completed: "Completado",
-    failed: "Fallido"
-  };
-
+  const wineTypeMap = { mixed: "Mixto", rose: "Rosé", red: "Tinto", white: "Blanco", sparkling: "Espumoso" };
+  const boxTypeMap = { basic: "Basic", premium: "Premium", deluxe: "Deluxe" };
+  const statusMap = { pending: "Pendiente", completed: "Completado", failed: "Fallido" };
   const getStatusColor = (status) => {
     const colors = {
       pending: "bg-yellow-100 text-yellow-800",
       completed: "bg-green-100 text-green-800",
-      failed: "bg-red-100 text-red-800"
+      failed: "bg-red-100 text-red-800",
     };
-    return colors[status?.toLowerCase()] || "bg-gray-100 text-gray-800";
+    return colors[(status || "").toLowerCase()] || "bg-gray-100 text-gray-800";
   };
 
   const handleEditClick = () => {
@@ -65,16 +49,13 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
       console.error("onUpdatePayment no está definido");
       return;
     }
-
     try {
       setSaving(true);
       const paymentId = payment._id || payment.id;
       await onUpdatePayment(paymentId, { status: selectedStatus });
       setShowEditModal(false);
-      // Cerrar también el modal de detalles para volver a la tabla
-      setTimeout(() => {
-        onClose();
-      }, 200);
+      // opcional: cerrar detalles después de guardar
+      // onClose();
     } catch (error) {
       console.error("Error al actualizar el estado:", error);
       alert("Error al actualizar el estado del pedido");
@@ -105,16 +86,10 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">ID del Pago</p>
-                <p className="text-lg font-mono font-semibold text-gray-900">
-                  #{payment._id || payment.id}
-                </p>
+                <p className="text-lg font-mono font-semibold text-gray-900">#{payment._id || payment.id}</p>
               </div>
-              <span
-                className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(
-                  payment.status
-                )}`}
-              >
-                {statusMap[payment.status?.toLowerCase()] || payment.status}
+              <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(payment.status)}`}>
+                {statusMap[(payment.status || "").toLowerCase()] || payment.status}
               </span>
             </div>
 
@@ -146,11 +121,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Dirección de Entrega</h3>
                 <div className="space-y-1 text-base text-gray-900">
                   {address.street && <p>{address.street}</p>}
-                  {address.postalCode && address.city && (
-                    <p>
-                      {address.postalCode} {address.city}
-                    </p>
-                  )}
+                  {address.postalCode && address.city && <p>{address.postalCode} {address.city}</p>}
                   {address.province && <p>{address.province}, {address.country || "ES"}</p>}
                   {!address.street && !address.postalCode && <p className="text-gray-500">-</p>}
                 </div>
@@ -166,13 +137,13 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                 <div>
                   <p className="text-sm text-gray-600">Tipo de Box</p>
                   <p className="text-base font-medium text-gray-900 capitalize">
-                    {boxTypeMap[subscription.boxType?.toLowerCase()] || subscription.boxType || "-"}
+                    {boxTypeMap[(subscription.boxType || "").toLowerCase()] || subscription.boxType || "-"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Tipo de Vino</p>
                   <p className="text-base font-medium text-gray-900 capitalize">
-                    {wineTypeMap[subscription.wineType?.toLowerCase()] || subscription.wineType || "-"}
+                    {wineTypeMap[(subscription.wineType || "").toLowerCase()] || subscription.wineType || "-"}
                   </p>
                 </div>
                 <div>
@@ -183,9 +154,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">ID de Suscripción</p>
-                  <p className="text-base font-mono text-gray-900 truncate">
-                    {subscription._id || "-"}
-                  </p>
+                  <p className="text-base font-mono text-gray-900 truncate">{subscription._id || "-"}</p>
                 </div>
               </div>
             </div>
@@ -198,15 +167,11 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Monto</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {formatCurrency(payment.amount)}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(payment.amount)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Gateway</p>
-                  <p className="text-base font-medium text-gray-900 capitalize">
-                    {payment.gateway || "-"}
-                  </p>
+                  <p className="text-base font-medium text-gray-900 capitalize">{payment.gateway || "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Fecha de Creación</p>
@@ -219,9 +184,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                 {payment.transactionId && (
                   <div className="md:col-span-2">
                     <p className="text-sm text-gray-600">ID de Transacción</p>
-                    <p className="text-base font-mono text-gray-900 break-all">
-                      {payment.transactionId}
-                    </p>
+                    <p className="text-base font-mono text-gray-900 break-all">{payment.transactionId}</p>
                   </div>
                 )}
               </div>
@@ -237,9 +200,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                     {payment.trackingNumber && (
                       <div>
                         <p className="text-sm text-gray-600">Número de Seguimiento</p>
-                        <p className="text-base font-mono text-gray-900">
-                          {payment.trackingNumber}
-                        </p>
+                        <p className="text-base font-mono text-gray-900">{payment.trackingNumber}</p>
                       </div>
                     )}
                     {payment.carrier && (
@@ -251,9 +212,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                     {payment.shippingStatus && (
                       <div>
                         <p className="text-sm text-gray-600">Estado de Envío</p>
-                        <p className="text-base text-gray-900 capitalize">
-                          {payment.shippingStatus}
-                        </p>
+                        <p className="text-base text-gray-900 capitalize">{payment.shippingStatus}</p>
                       </div>
                     )}
                     {payment.shippedAt && (
@@ -287,17 +246,20 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
             >
               Cerrar
             </button>
-            <button
-              onClick={handleEditClick}
-              className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
-            >
-              Editar Pedido
-            </button>
+
+            {isAdmin && (
+              <button
+                onClick={handleEditClick}
+                className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+              >
+                Editar Pedido
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modal de Edición */}
+      {/* Modal de Edición (estado) */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
@@ -321,9 +283,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Estado del Pedido
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado del Pedido</label>
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
@@ -334,9 +294,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                   <option value="completed">Completado</option>
                   <option value="failed">Fallido</option>
                 </select>
-                <p className="mt-2 text-xs text-gray-500">
-                  Estados disponibles según el modelo de base de datos
-                </p>
+                <p className="mt-2 text-xs text-gray-500">Estados disponibles según el modelo de base de datos</p>
               </div>
 
               <div className="flex justify-end gap-3">
@@ -350,7 +308,7 @@ const PaymentDetailsModal = ({ payment, onClose, onUpdatePayment }) => {
                 <button
                   onClick={handleSaveStatus}
                   className="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={saving}
+                  disabled={saving || selectedStatus === payment.status}
                 >
                   {saving ? "Guardando..." : "Guardar"}
                 </button>
