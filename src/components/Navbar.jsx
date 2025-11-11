@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-import Logo from "../assets/full-logo-white.png"; // большое лого (слева)
-import logo2 from "../assets/logo2.png"; // круглое лого (по центру)
+import Logo from "../assets/full-logo-white.png";
+import logo2 from "../assets/logo2.png";
 
 const NavLinks = ({ isMobile = false, closeMenu }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const nombreUsuario =
     user?.nombre ||
@@ -19,19 +19,24 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
     user?.email?.split("@")[0] ||
     "usuario";
 
-  const linkClass = ({ isActive }) =>
-    `hover:text-[#C9A35C] transition-colors ${
-      isActive ? "text-[#C9A35C]" : ""
-    }`;
-
   const isAdmin = user?.userType === "admin";
+
+  const linkClass = ({ isActive }) =>
+    `hover:text-[#C9A35C] transition-colors ${isActive ? "text-[#C9A35C]" : ""}`;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    setIsDropdownOpen(false);
+    if (closeMenu) closeMenu();
+  };
+
+  const handleDropdownToggle = () => setIsDropdownOpen((prev) => !prev);
 
   return (
     <div
       className={`${
-        isMobile
-          ? "flex flex-col items-start gap-3 mt-4"
-          : "flex items-center gap-6"
+        isMobile ? "flex flex-col items-start gap-3 mt-4" : "flex items-center gap-6"
       } text-sm font-semibold tracking-wide`}
     >
       {isAuthenticated && isAdmin ? (
@@ -46,15 +51,14 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
 
           <div className="relative">
             <button
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
+              onClick={handleDropdownToggle}
               className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
             >
               Hola, {nombreUsuario}
             </button>
-
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg z-50">
-<NavLink
+                <NavLink
                   to="/app/profile"
                   className="block px-4 py-2 hover:bg-gray-100"
                   onClick={() => {
@@ -65,12 +69,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
                   Ver mi perfil
                 </NavLink>
                 <button
-                  onClick={() => {
-                    logout();
-                    navigate("/");
-                    setIsDropdownOpen(false);
-                    if (closeMenu) closeMenu();
-                  }}
+                  onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
                   Cerrar sesión
@@ -82,54 +81,49 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
       ) : (
         <>
           <NavLink
-            to="/subscription"
+            to="/app/subscription"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
           >
             PLANES
           </NavLink>
           <NavLink
-            to="/gift"
+            to="/app/gift"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
           >
             REGALA
           </NavLink>
           <NavLink
-            to="/cajas-anteriores"
+            to="/app/monthly-wines"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
           >
             CAJAS ANTERIORES
           </NavLink>
 
-          {isAuthenticated && user ? (
+          {isAuthenticated ? (
             <div className="relative">
               <button
-                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                onClick={handleDropdownToggle}
                 className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
               >
                 Hola, {nombreUsuario}
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg z-50">
-<NavLink
-                  to="/app/profile"
-                  className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    if (closeMenu) closeMenu();
-                  }}
-                >
-                  Ver mi perfil
-                </NavLink>
-                  <button
+                  <NavLink
+                    to="/app/profile"
+                    className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => {
-                      logout();
-                      navigate("/");
                       setIsDropdownOpen(false);
                       if (closeMenu) closeMenu();
                     }}
+                  >
+                    Ver mi perfil
+                  </NavLink>
+                  <button
+                    onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
                     Cerrar sesión
@@ -152,17 +146,22 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
   );
 };
 
-// 🔸 Navbar principal
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.userType === "admin";
 
+  const closeMobileMenu = () => setIsMenuOpen(false);
+
   return (
     <nav className="w-full bg-black text-white px-6 py-3 relative">
       <div className="flex items-center justify-between relative">
-        {/* 🔹 Logotipo grande (izquierda) → Home */}
-        <Link to="/" aria-label="Ir al inicio">
+        {/* Grande Logo */}
+        <Link
+          to={isAdmin ? "/app/admin/users" : "/"}
+          aria-label="Ir al inicio"
+          onClick={closeMobileMenu}
+        >
           <img
             src={Logo}
             alt="Vino Premier Logo"
@@ -170,11 +169,12 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* 🔹 Logotipo circular (centro) */}
+        {/* Circular Logo */}
         <Link
-          to={isAdmin ? "/app/admin/users" : "/main"} // ← единственное изменение
+          to={isAdmin ? "/app/admin/users" : "/main"}
           aria-label="Ir a la página principal"
           className="absolute left-1/2 transform -translate-x-1/2"
+          onClick={closeMobileMenu}
         >
           <img
             src={logo2}
@@ -183,7 +183,7 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* 🔹 Botón menú hamburguesа (solo móvil) */}
+        {/* Hamburger Mobile */}
         <button
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
@@ -192,16 +192,16 @@ const NavBar = () => {
           {isMenuOpen ? "✕" : "☰"}
         </button>
 
-        {/* 🔹 Enlaces de escritorio */}
+        {/* Desktop Links */}
         <div className="hidden md:flex">
           <NavLinks />
         </div>
       </div>
 
-      {/* 🔹 Menú móvil desplegable */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden">
-          <NavLinks isMobile closeMenu={() => setIsMenuOpen(false)} />
+          <NavLinks isMobile closeMenu={closeMobileMenu} />
         </div>
       )}
     </nav>
