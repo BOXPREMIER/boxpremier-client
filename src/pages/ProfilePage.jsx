@@ -464,154 +464,155 @@ export default function ProfilePage() {
         </section>
       )}
 
-      {
-        tab === "suscripciones" && (
-          <section className={card}>
-            <h2 className="text-2xl font-semibold mb-2">Suscripciones Actuales</h2>
-            <p className="text-sm" style={{ color: "#ADADAD" }}>
-              Administra tus suscripciones como quieras.
-            </p>
-            {loadingSub ? (
-              <p>Cargando...</p>
-            ) : sub.length === 0 ? (
-              <p>No tienes suscripciones activas.</p>
-            ) : (
-              sub.map((s) => (
+      {tab === "suscripciones" && (
+        <section className={card}>
+          <h2 className="text-2xl font-semibold mb-2">Suscripciones Actuales</h2>
+          <p className="text-sm" style={{ color: "#ADADAD" }}>
+            Administra tus suscripciones como quieras.
+          </p>
+          {loadingSub ? (
+            <p>Cargando...</p>
+          ) : sub.length === 0 ? (
+            <p>No tienes suscripciones activas.</p>
+          ) : (
+            sub.map((s) => (
+              <div
+                key={s._id}
+                onClick={() => handleOpenSubDetails(s)}
+                className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
+                style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-1">
+                      {s.subscriptionPlan?.boxType === "basic"
+                        ? "Box Premier Basic"
+                        : "Box Premier Prestige"}
+                    </h3>
+                    <p className="text-sm" style={{ color: "#6B6B6B" }}>
+                      {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
+                    </p>
+                  </div>
+                </div>
+
                 <div
-                  key={s._id}
-                  onClick={() => handleOpenSubDetails(s)}
-                  className="rounded-xl p-6 mt-4 cursor-pointer hover:shadow-lg transition-shadow"
-                  style={{ backgroundColor: "#EFE8DD", border: "1px solid #D9C7AE" }}
+                  className="border-t mt-4 pt-4 text-sm space-y-2"
+                  style={{ borderColor: "#D9C7AE" }}
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-1">
-                        {s.subscriptionPlan?.boxType === "basic" ? "Box Premier Basic" : "Box Premier Prestige"}
-                      </h3>
-                      <p className="text-sm" style={{ color: "#6B6B6B" }}>
-                        {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
-                      </p>
-                    </div>
+                  <div className="flex justify-between">
+                    <span>Fecha de suscripción:</span>
+                    <span>
+                      {new Date(s.startDate).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
                   </div>
-                  <div
-                    className="border-t mt-4 pt-4 text-sm space-y-2"
-                    style={{ borderColor: "#D9C7AE" }}
-                  >
-                    <div className="flex justify-between">
-                      <span>Fecha de suscripción:</span>
-                      <span>
-                        {new Date(s.startDate).toLocaleDateString("es-ES", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Próximo cobro:</span>
-                      <span>
-                        {new Date(s.nextPayDate).toLocaleDateString("es-ES", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-6 flex justify-end">
-                    {s.hasOrders ? (
-                      <p className="text-sm text-gray-600 italic">
-                        Contacta con el administrador para cancelar esa suscripción.
-                      </p>
-                    ) : (
-                      <button
-                        onClick={() => { console.log("Clicou no botão, subId:", s._id); onCancelPlan(s._id) }}
-                        disabled={canceling || s.status == "canceled"}
-                        className="px-5 py-2 rounded-full text-white cursor-pointer"
-                        style={{
-                          backgroundColor: "#7B1D1D",
-                          opacity: canceling || s.status == "canceled" ? 0.6 : 1,
-                        }}
-                      >
-                        {canceling ? "Cancelando..." : "Cancelar plan"}
-                      </button>
-                    )}
+                  <div className="flex justify-between">
+                    <span>Próximo cobro:</span>
+                    <span>
+                      {new Date(s.nextPayDate).toLocaleDateString("es-ES", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
                   </div>
                 </div>
-              ))
-            )}
-          </section>
-        )
-      }
 
-      {
-        tab === "ajustes" && (
-          <section className={card}>
-            <h2 className="text-xl font-semibold mb-6">Modificar Contraseña</h2>
-
-            <form onSubmit={onChangePassword} className="space-y-5 max-w-xl">
-              <div>
-                <label className="text-sm">Nueva Contraseña</label>
-                <div className="relative">
-                  <input
-                    className={field}
-                    type={show.n ? "text" : "password"}
-                    value={pwd.newPassword}
-                    onChange={(e) => setPwd({ ...pwd, newPassword: e.target.value })}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                    onClick={() => setShow((s) => ({ ...s, n: !s.n }))}
-                    title={show.n ? "Ocultar" : "Mostrar"}
-                  >
-                    {show.n ? "🙈" : "👁️"}
-                  </button>
+                <div className="mt-6 flex justify-end">
+                  {s.hasOrders ? (
+                    <p className="text-sm text-gray-600 italic">
+                      Contacta con el administrador para cancelar esa suscripción.
+                    </p>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCancelPlan(s._id);
+                      }}
+                      disabled={canceling || s.status === "canceled"}
+                      className="px-5 py-2 rounded-full text-white cursor-pointer"
+                      style={{
+                        backgroundColor: "#7B1D1D",
+                        opacity: canceling || s.status === "canceled" ? 0.6 : 1,
+                      }}
+                    >
+                      {canceling ? "Cancelando..." : "Cancelar plan"}
+                    </button>
+                  )}
                 </div>
               </div>
+            ))
+          )}
+        </section>
+      )}
+      {tab === "ajustes" && (
+        <section className={card}>
+          <h2 className="text-xl font-semibold mb-6">Modificar Contraseña</h2>
 
-              <div>
-                <label className="text-sm">Confirmar Nueva Contraseña</label>
-                <div className="relative">
-                  <input
-                    className={field}
-                    type={show.r ? "text" : "password"}
-                    value={pwd.confirmPassword}
-                    onChange={(e) => setPwd({ ...pwd, confirmPassword: e.target.value })}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                    onClick={() => setShow((s) => ({ ...s, r: !s.r }))}
-                    title={show.r ? "Ocultar" : "Mostrar"}
-                  >
-                    {show.r ? "🙈" : "👁️"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="pt-2">
+          <form onSubmit={onChangePassword} className="space-y-5 max-w-xl">
+            <div>
+              <label className="text-sm">Nueva Contraseña</label>
+              <div className="relative">
+                <input
+                  className={field}
+                  type={show.n ? "text" : "password"}
+                  value={pwd.newPassword}
+                  onChange={(e) => setPwd({ ...pwd, newPassword: e.target.value })}
+                />
                 <button
-                  type="submit"
-                  disabled={changing}
-                  className="px-6 py-2 rounded-full text-white"
-                  style={{ backgroundColor: "#AD946C" }}
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={() => setShow((s) => ({ ...s, n: !s.n }))}
+                  title={show.n ? "Ocultar" : "Mostrar"}
                 >
-                  {changing ? "Actualizando..." : "Actualizar"}
+                  {show.n ? "🙈" : "👁️"}
                 </button>
               </div>
-            </form>
-          </section>
-        )
-      }
+            </div>
 
-      {
-        isSubModalOpen && selectedSub && (
-          <SubscriptionDetailsModal
-            subscription={selectedSub}
-            onClose={() => setIsSubModalOpen(false)}
-          />
-        )
+            <div>
+              <label className="text-sm">Confirmar Nueva Contraseña</label>
+              <div className="relative">
+                <input
+                  className={field}
+                  type={show.r ? "text" : "password"}
+                  value={pwd.confirmPassword}
+                  onChange={(e) => setPwd({ ...pwd, confirmPassword: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={() => setShow((s) => ({ ...s, r: !s.r }))}
+                  title={show.r ? "Ocultar" : "Mostrar"}
+                >
+                  {show.r ? "🙈" : "👁️"}
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={changing}
+                className="px-6 py-2 rounded-full text-white"
+                style={{ backgroundColor: "#AD946C" }}
+              >
+                {changing ? "Actualizando..." : "Actualizar"}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {isSubModalOpen && selectedSub && (
+        <SubscriptionDetailsModal
+          subscription={selectedSub}
+          onClose={() => setIsSubModalOpen(false)}
+        />
+      )
       }
     </div >
   );

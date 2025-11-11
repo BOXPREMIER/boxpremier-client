@@ -139,20 +139,21 @@ const PlansModal = ({ plan, onClose, onSave }) => {
               >
                 Tipo de caja
               </label>
-              <select
+              
+ <input
+                type="text"
                 name="boxType"
                 value={formData.boxType}
                 onChange={handleChange}
+               
                 className="w-full border rounded-lg p-2 sm:p-3 text-sm sm:text-base"
                 style={{ 
                   fontFamily: "Gotham, sans-serif",
                   borderColor: "#AB9470"
                 }}
-              >
-                <option value="">Seleccionar tipo</option>
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
-              </select>
+                placeholder="Basic"
+              />
+              
               {errors.boxType && <p className="text-red-500 text-sm mt-1">{errors.boxType}</p>}
             </div>
 
