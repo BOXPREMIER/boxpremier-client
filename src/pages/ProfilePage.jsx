@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import useAuthStore from "../store/authStore";
 import { getSubscriptions, cancelSubscription } from "../services/SubscriptionServices";
 import { getMe, updateMe, changeMyPassword } from "../services/ProfileServices";
-import { getAllOrders, cancelOrder } from "../services/OrderServices";
+import { getAllOrders } from "../services/OrderServices";
 import SubscriptionDetailsModal from "../components/SubscriptionDetailsModal";
+import { useLocation } from "react-router-dom";
+import { showCustomAlert } from "../components/CustomAlert";
 
 const tabButton = (active) =>
   `px-4 py-1 rounded-full text-sm border transition font-gotham ${active ? "bg-[#F5F5F5] border-[#ADADAD]" : "border-[#ADADAD] hover:bg-[#F5F5F5]"}`;
@@ -19,6 +21,14 @@ export default function ProfilePage() {
   const { user: userStore, setUser } = useAuthStore();
   const [tab, setTab] = useState("perfil");
   const [orders, setOrders] = useState([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.openTab) {
+      setTab(location.state.openTab);
+    }
+  }, [location.state]);
+
 
   const [profile, setProfile] = useState({
     firstName: "",
@@ -78,7 +88,12 @@ export default function ProfilePage() {
         }
       } catch (e) {
         console.error(e);
-        alert("No se pudo cargar tu perfil");
+        showCustomAlert({
+          title: "Error",
+          text: "No se pudo cargar tu perfil.",
+          confirmText: "Cerrar",
+          type: "error"
+        });
       }
     })();
   }, []);
@@ -123,6 +138,12 @@ export default function ProfilePage() {
       } catch (e) {
         console.error(e);
         setSub([]);
+        showCustomAlert({
+          title: "Error",
+          text: "No se pudieron cargar las suscripciones.",
+          confirmText: "Cerrar",
+          type: "error"
+        });
       } finally {
         setLoadingSub(false);
       }
@@ -138,16 +159,32 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       setSaving(true);
-      const updated = await updateMe(profile);
 
-      const newUser = { ...userStore, ...profile, ...updated };
+      const dataToUpdate = userStore?.userType === 'admin'
+        ? { firstName: profile.firstName, lastName: profile.lastName, email: profile.email }
+        : profile;
+
+      const updated = await updateMe(dataToUpdate);
+
+      const newUser = { ...userStore, ...dataToUpdate, ...updated };
       setUser(newUser);
 
       setIsEditing(false);
-      alert("Perfil actualizado");
+      showCustomAlert({
+        title: "Éxito",
+        text: "Perfil actualizado.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
     } catch (e) {
       console.error(e);
-      alert("No se pudo actualizar el perfil");
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo actualizar el perfil.",
+        confirmText: "Cerrar",
+        type: "error"
+      });
+
     } finally {
       setSaving(false);
     }
@@ -155,53 +192,79 @@ export default function ProfilePage() {
 
   const onCancelPlan = async (subId) => {
     if (!subId) return;
-    if (!confirm("¿Seguro que quieres cancelar tu plan?")) return;
 
-    try {
-      setCanceling(true);
+    showCustomAlert({
+      title: "¿Seguro que quieres cancelar tu plan?",
+      text: "Esta acción no se puede revertir.",
+      confirmText: "Sí, cancelar",
+      cancelText: "No, mantener",
+      onConfirm: async () => {
+        try {
+          setCanceling(true);
 
-      await cancelSubscription(subId);
+          await cancelSubscription(subId);
 
-      const activeOrder = orders.find(
-        (o) =>
-          (String(o.subscriptionId?._id) === String(subId) ||
-            String(o.subscriptionId) === String(subId)) &&
-          !["shipped", "delivered", "cancelled"].includes(o.status)
-      );
-
-      // if (activeOrder) {
-      //   await cancelOrder(activeOrder._id);
-      //   console.log("Pedido cancelado:", activeOrder._id);
-      // }
-
-      setSub((prev) =>
-        prev.map((s) =>
-          s._id === subId ? { ...s, status: "canceled" } : s
-        )
-      );
-    } catch (e) {
-      console.error(e);
-      alert("No se pudo cancelar la suscripción ni el pedido");
-    } finally {
-      setCanceling(false);
-    }
+          setSub((prev) =>
+            prev.map((s) =>
+              s._id === subId ? { ...s, status: "canceled" } : s
+            )
+          );
+          window.location.reload();
+        } catch (e) {
+          console.error(e);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo cancelar la suscripción ni el pedido.",
+            confirmText: "Cerrar",
+            type: "error"
+          });
+        } finally {
+          setCanceling(false);
+        }
+      },
+      onCancel: () => {
+      },
+    });
   };
 
 
   const onChangePassword = async (e) => {
     e.preventDefault();
-    if (!pwd.newPassword) return alert("Introduce la nueva contraseña");
+    if (!pwd.newPassword) return showCustomAlert({
+      title: "Atención",
+      text: "Introduce la nueva contraseña.",
+      confirmText: "Cerrar",
+      showCancelButton: false,
+    });
+
     if (pwd.newPassword !== pwd.confirmPassword) {
-      return alert("La nueva contraseña y su confirmación no coinciden");
+      return showCustomAlert({
+        title: "Error",
+        text: "La nueva contraseña y su confirmación no coinciden.",
+        confirmText: "Cerrar",
+        type: "error"
+      });
+
     }
     try {
       setChanging(true);
       await changeMyPassword({ newPassword: pwd.newPassword });
       setPwd({ currentPassword: "", newPassword: "", confirmPassword: "" });
-      alert("Contraseña actualizada");
+      showCustomAlert({
+        title: "Éxito",
+        text: "Contraseña actualizada.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
+
     } catch (e) {
       console.error(e);
-      alert("No se pudo cambiar la contraseña");
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo cambiar la contraseña.",
+        confirmText: "Cerrar",
+        type: "error"
+      });
     } finally {
       setChanging(false);
     }
@@ -228,7 +291,7 @@ export default function ProfilePage() {
     setIsSubModalOpen(true);
   };
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-0 py-10 font-gotham text-primary" >
       <header className="mb-6">
         <h1 className="text-3xl font-semibold tracking-tight">Mi cuenta</h1>
         <p className="text-sm" style={{ color: "#ADADAD" }}>
@@ -275,6 +338,7 @@ export default function ProfilePage() {
                   value={profile.firstName}
                   onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
                   disabled={!isEditing}
+                  required
                 />
               </div>
               <div>
@@ -294,6 +358,7 @@ export default function ProfilePage() {
                   value={profile.email}
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   disabled={true}
+                  required
                 />
               </div>
 
@@ -305,6 +370,7 @@ export default function ProfilePage() {
                     value={profile.phone}
                     onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                     disabled={!isEditing}
+                    required
                   />
                 </div>
               )}
@@ -321,6 +387,7 @@ export default function ProfilePage() {
                       value={profile.street}
                       onChange={(e) => setProfile({ ...profile, street: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -330,6 +397,7 @@ export default function ProfilePage() {
                       value={profile.number}
                       onChange={(e) => setProfile({ ...profile, number: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -348,6 +416,7 @@ export default function ProfilePage() {
                       value={profile.postalCode}
                       onChange={(e) => setProfile({ ...profile, postalCode: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -357,6 +426,7 @@ export default function ProfilePage() {
                       value={profile.city}
                       onChange={(e) => setProfile({ ...profile, city: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                   <div>
@@ -366,6 +436,7 @@ export default function ProfilePage() {
                       value={profile.province}
                       onChange={(e) => setProfile({ ...profile, province: e.target.value })}
                       disabled={!isEditing}
+                      required
                     />
                   </div>
                 </div>
@@ -428,13 +499,16 @@ export default function ProfilePage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-1">
-                      {s.subscriptionPlan?.boxType}
+                      {s.subscriptionPlan?.boxType === "basic"
+                        ? "Box Premier Basic"
+                        : "Box Premier Prestige"}
                     </h3>
                     <p className="text-sm" style={{ color: "#6B6B6B" }}>
                       {s.subscriptionPlan?.boxSize || 3} botellas de vino al mes.
                     </p>
                   </div>
                 </div>
+
                 <div
                   className="border-t mt-4 pt-4 text-sm space-y-2"
                   style={{ borderColor: "#D9C7AE" }}
@@ -460,19 +534,23 @@ export default function ProfilePage() {
                     </span>
                   </div>
                 </div>
+
                 <div className="mt-6 flex justify-end">
                   {s.hasOrders ? (
                     <p className="text-sm text-gray-600 italic">
-                      Esta suscripción tiene pedido enviado o entregue. Contacta con el administrador para cancelarla.
+                      Contacta con el administrador para cancelar esa suscripción.
                     </p>
                   ) : (
                     <button
-                      onClick={() => { console.log("Clicou no botão, subId:", s._id); onCancelPlan(s._id) }}
-                      disabled={canceling || s.status == "canceled"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCancelPlan(s._id);
+                      }}
+                      disabled={canceling || s.status === "canceled"}
                       className="px-5 py-2 rounded-full text-white cursor-pointer"
                       style={{
                         backgroundColor: "#7B1D1D",
-                        opacity: canceling || s.status == "canceled" ? 0.6 : 1,
+                        opacity: canceling || s.status === "canceled" ? 0.6 : 1,
                       }}
                     >
                       {canceling ? "Cancelando..." : "Cancelar plan"}
@@ -484,7 +562,6 @@ export default function ProfilePage() {
           )}
         </section>
       )}
-
       {tab === "ajustes" && (
         <section className={card}>
           <h2 className="text-xl font-semibold mb-6">Modificar Contraseña</h2>
@@ -549,7 +626,8 @@ export default function ProfilePage() {
           subscription={selectedSub}
           onClose={() => setIsSubModalOpen(false)}
         />
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

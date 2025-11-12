@@ -240,7 +240,7 @@ export default function SubscriptionCheckout() {
 
       await createSubscription(subscriptionData);
 
-      navigate("/account/subscription", { state: { createdId: planId } });
+      navigate("/app/profile", { state: { openTab: "suscripciones", createdId: planId } });
     } catch (err) {
       const apiError = err?.response?.data?.message;
       setError(apiError || err.message || "No se pudo crear la suscripción");
