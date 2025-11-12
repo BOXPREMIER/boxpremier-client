@@ -15,16 +15,16 @@ const PaymentCreateModal = ({
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
-  // Paso 1
+  // Step 1
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Paso 2
+  // Step 2
   const [subscriptions, setSubscriptions] = useState([]);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
-  // Paso 3
+  // Step 3
   const [amount, setAmount] = useState("");
   const [gateway, setGateway] = useState("paypal");
 
@@ -196,7 +196,7 @@ const PaymentCreateModal = ({
   return (
     <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
+      
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold">Crear Pago Manual</h2>
@@ -221,7 +221,7 @@ const PaymentCreateModal = ({
             </div>
           )}
 
-          {/* Paso 1: Usuarios */}
+          {/* Step 1: */}
           {step === 1 && isAdmin && (
             <div className="space-y-4">
               <div className="relative">
@@ -262,7 +262,7 @@ const PaymentCreateModal = ({
             </div>
           )}
 
-          {/* Paso 2: Suscripciones */}
+          {/* Step 2: */}
           {step === 2 && (
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-lg p-4 mb-4">
@@ -327,7 +327,7 @@ const PaymentCreateModal = ({
             </div>
           )}
 
-          {/* Paso 3: Datos del pago */}
+          {/* Step 3: */}
           {step === 3 && (
             <div className="space-y-4">
               <div className="bg-white border border-primary rounded-lg p-4">
