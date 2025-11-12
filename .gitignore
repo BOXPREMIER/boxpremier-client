@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 
 .env
-.env.test
+.env.test 
+__snapshots__
