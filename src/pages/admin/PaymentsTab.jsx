@@ -126,8 +126,7 @@ const PaymentsTab = () => {
   };
 
   const handlePaymentCreated = (createdPayment) => {
-    try {
-      console.log("Pago recibido en PaymentsTab:", createdPayment);
+    try {   
 
       if (!createdPayment) {
         console.error("No se recibió pago");
@@ -152,7 +151,7 @@ const PaymentsTab = () => {
         ...prev.filter((p) => (p._id || p.id) !== paymentId),
       ]);
 
-      console.log("Pago insertado correctamente en la tabla");
+     
     } catch (e) {
       console.error("Error al insertar el pago:", e);
       fetchData();

@@ -58,7 +58,7 @@ export const updateShipping = async (id, shippingData) => {
     const response = await API.patch(`/payments/${id}/shipping`, shippingData);
     return response;
   } catch (error) {
-    console.error(`Error al actualizar el envÃ­o del pago ${id}:`, error);
+    console.error(`Error al actualizar el envi­o del pago ${id}:`, error);
     throw error;
   }
 };
