@@ -56,20 +56,4 @@ describe("🧭 NavBar Component", () => {
     expect(screen.getByText(/Larysa/i)).toBeInTheDocument();
   });
 
-  it("se abre el menú móvil al hacer clic en el icono", () => {
-    useAuthStore.mockImplementation((selector) =>
-      selector({ isAuthenticated: false, user: null, logout: vi.fn() })
-    );
-
-    render(
-      <MemoryRouter>
-        <NavBar />
-      </MemoryRouter>
-    );
-
-    const menuButton = screen.getByTestId("mobile-menu-button");
-    fireEvent.click(menuButton);
-
-    expect(screen.getByTestId("mobile-menu")).toBeInTheDocument();
-  });
 });

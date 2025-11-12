@@ -119,14 +119,6 @@ export default function ProfilePage() {
             const match3 = String(order.subscriptionId?._id) === String(sub._id);
             const match4 = String(order.subscriptionId) === String(sub._id);
 
-            // console.log("Comparando:", {
-            //   subId: sub._id,
-            //   orderSubId: order.subscriptionId,
-            //   orderSubIdObj: order.subscriptionId?._id,
-            //   match1, match2, match3, match4,
-            //   orderStatus: order.status
-            // });
-
             return (match3 || match4) && ['pending', 'preparing', 'shipped', 'delivered'].includes(order.status);
           });
 
@@ -157,37 +149,41 @@ export default function ProfilePage() {
 
   const onSaveProfile = async (e) => {
     e.preventDefault();
-    try {
-      setSaving(true);
 
-      const dataToUpdate = userStore?.userType === 'admin'
-        ? { firstName: profile.firstName, lastName: profile.lastName, email: profile.email }
-        : profile;
+    showCustomAlert({
+      title: "¿Guardar cambios?",
+      text: "¿Estás seguro de que quieres actualizar tu perfil?",
+      confirmText: "Sí, guardar",
+      cancelText: "No, cancelar",
+      onConfirm: async () => {
+        try {
+          setSaving(true);
 
-      const updated = await updateMe(dataToUpdate);
+          const dataToUpdate = userStore?.userType === 'admin'
+            ? { firstName: profile.firstName, lastName: profile.lastName, email: profile.email }
+            : profile;
 
-      const newUser = { ...userStore, ...dataToUpdate, ...updated };
-      setUser(newUser);
+          const updated = await updateMe(dataToUpdate);
 
-      setIsEditing(false);
-      showCustomAlert({
-        title: "Éxito",
-        text: "Perfil actualizado.",
-        confirmText: "Cerrar",
-        showCancelButton: false,
-      });
-    } catch (e) {
-      console.error(e);
-      showCustomAlert({
-        title: "Error",
-        text: "No se pudo actualizar el perfil.",
-        confirmText: "Cerrar",
-        type: "error"
-      });
+          const newUser = { ...userStore, ...dataToUpdate, ...updated };
+          setUser(newUser);
 
-    } finally {
-      setSaving(false);
-    }
+          setIsEditing(false);
+
+        } catch (e) {
+          console.error(e);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo actualizar el perfil.",
+            confirmText: "Cerrar",
+            type: "error"
+          });
+        } finally {
+          setSaving(false);
+        }
+      },
+      onCancel: () => { }
+    });
   };
 
   const onCancelPlan = async (subId) => {
@@ -230,12 +226,15 @@ export default function ProfilePage() {
 
   const onChangePassword = async (e) => {
     e.preventDefault();
-    if (!pwd.newPassword) return showCustomAlert({
-      title: "Atención",
-      text: "Introduce la nueva contraseña.",
-      confirmText: "Cerrar",
-      showCancelButton: false,
-    });
+
+    if (!pwd.newPassword) {
+      return showCustomAlert({
+        title: "Atención",
+        text: "Introduce la nueva contraseña.",
+        confirmText: "Cerrar",
+        showCancelButton: false,
+      });
+    }
 
     if (pwd.newPassword !== pwd.confirmPassword) {
       return showCustomAlert({
@@ -244,32 +243,33 @@ export default function ProfilePage() {
         confirmText: "Cerrar",
         type: "error"
       });
-
     }
-    try {
-      setChanging(true);
-      await changeMyPassword({ newPassword: pwd.newPassword });
-      setPwd({ currentPassword: "", newPassword: "", confirmPassword: "" });
-      showCustomAlert({
-        title: "Éxito",
-        text: "Contraseña actualizada.",
-        confirmText: "Cerrar",
-        showCancelButton: false,
-      });
 
-    } catch (e) {
-      console.error(e);
-      showCustomAlert({
-        title: "Error",
-        text: "No se pudo cambiar la contraseña.",
-        confirmText: "Cerrar",
-        type: "error"
-      });
-    } finally {
-      setChanging(false);
-    }
+    showCustomAlert({
+      title: "¿Cambiar contraseña?",
+      text: "¿Estás seguro de que quieres actualizar tu contraseña?",
+      confirmText: "Sí, cambiar",
+      cancelText: "No, cancelar",
+      onConfirm: async () => {
+        try {
+          setChanging(true);
+          await changeMyPassword({ newPassword: pwd.newPassword });
+          setPwd({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        } catch (e) {
+          console.error(e);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo cambiar la contraseña.",
+            confirmText: "Cerrar",
+            type: "error"
+          });
+        } finally {
+          setChanging(false);
+        }
+      },
+      onCancel: () => { }
+    });
   };
-
   const handleCancelEdit = () => {
     setIsEditing(false);
     setProfile({
@@ -582,7 +582,7 @@ export default function ProfilePage() {
                   onClick={() => setShow((s) => ({ ...s, n: !s.n }))}
                   title={show.n ? "Ocultar" : "Mostrar"}
                 >
-                  {show.n ? "🙈" : "👁️"}
+                  {show.n ? "👁️" : "🙈"}
                 </button>
               </div>
             </div>
@@ -602,7 +602,7 @@ export default function ProfilePage() {
                   onClick={() => setShow((s) => ({ ...s, r: !s.r }))}
                   title={show.r ? "Ocultar" : "Mostrar"}
                 >
-                  {show.r ? "🙈" : "👁️"}
+                  {show.r ? "👁️" : "🙈"}
                 </button>
               </div>
             </div>

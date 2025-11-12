@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, Navigate, useLocation } from "react-router-dom";
-import StatsCards from "./StatsCards";
+
 
 
 const AdminDashboard = () => {
@@ -20,7 +20,7 @@ const AdminDashboard = () => {
          : "bg-secondary text-primary hover:opacity-80"
      }`;
 
-  // Redirección por defecto si estás en /app/admin
+  
   if (location.pathname === "/app/admin") {
     return <Navigate to="users" replace />;
   }

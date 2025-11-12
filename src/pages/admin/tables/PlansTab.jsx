@@ -7,7 +7,7 @@ import {
   updatePlan,
   deletePlan,
 } from "../../../services/SubscriptionPlanServices"; 
-import Swal from 'sweetalert2';
+import { showCustomAlert } from "../../../components/CustomAlert";
 
 const PlansTab = () => {
   const [plans, setPlans] = useState([]);
@@ -15,7 +15,7 @@ const PlansTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 📦 Cargar planes al montar el componente
+  
   useEffect(() => {
     fetchPlans();
   }, []);
@@ -27,12 +27,10 @@ const PlansTab = () => {
       setPlans(data);
     } catch (error) {
       console.error("Error al cargar los planes:", error);
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudieron cargar los planes',
-        icon: 'error',
-        confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#d33',
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudieron cargar los planes",
+        type: "error"
       });
     } finally {
       setLoading(false);
@@ -52,75 +50,47 @@ const PlansTab = () => {
   const handleSave = async (formData) => {
     try {
       if (selectedPlan) {
-        // ✏️ Editar plan existente
+      
         await updatePlan(selectedPlan._id, formData);
-        Swal.fire({
-          title: '¡Plan actualizado!',
-          text: 'El plan se actualizó correctamente.',
-          icon: 'success',
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#3085d6',
-        });
+        await fetchPlans();
+        handleCloseModal();
       } else {
-        // ➕ Crear nuevo plan
+        
         await createPlan(formData);
-        Swal.fire({
-          title: '¡Plan creado!',
-          text: 'El nuevo plan se creó correctamente.',
-          icon: 'success',
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#3085d6',
-        });
+        await fetchPlans();
+        handleCloseModal();
       }
-      await fetchPlans(); // recarga la lista
-      handleCloseModal(); // Cerrar modal después de guardar
     } catch (error) {
       console.error("Error al guardar el plan:", error);
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudo guardar el plan. Por favor, intenta nuevamente.',
-        icon: 'error',
-        confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#d33',
+      showCustomAlert({
+        title: "Error",
+        text: "No se pudo guardar el plan. Por favor, intenta nuevamente.",
+        type: "error"
       });
-      throw error; // Re-lanzar para que el modal lo maneje
+      throw error;
     }
   };
 
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
+    showCustomAlert({
       title: "¿Estás seguro?",
       text: "No podrás revertir esta acción.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar"
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deletePlan(id);
-        setPlans(plans.filter((plan) => plan._id !== id));
-        Swal.fire({
-          title: "¡Eliminado!",
-          text: "El plan ha sido eliminado.",
-          icon: "success",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#3085d6",
-        });
-      } catch (error) {
-        console.error("Error al eliminar el plan:", error);
-        Swal.fire({
-          title: "Error",
-          text: "No se pudo eliminar el plan.",
-          icon: "error",
-          confirmButtonText: "Aceptar",
-          confirmButtonColor: "#d33",
-        });
+      confirmText: "Sí, eliminar",
+      cancelText: "Cancelar",
+      onConfirm: async () => {
+        try {
+          await deletePlan(id);
+          setPlans(plans.filter((plan) => plan._id !== id));
+        } catch (error) {
+          console.error("Error al eliminar el plan:", error);
+          showCustomAlert({
+            title: "Error",
+            text: "No se pudo eliminar el plan.",
+            type: "error"
+          });
+        }
       }
-    }
+    });
   };
 
   return (
@@ -169,7 +139,7 @@ const PlansTab = () => {
                 <tr key={plan._id} className="border-t hover:bg-gray-50">
                   <td className="p-3">{plan.boxType}</td>
                   <td className="p-3">{plan.boxSize}</td>
-                  <td className="p-3">${plan.price.toFixed(2)}</td>
+                  <td className="p-3">€{plan.price.toFixed(2)}</td>
                   <td className="p-3">
                     {plan.active ? (
                       <span className="text-green-600 font-semibold">Activo</span>
@@ -226,7 +196,7 @@ const PlansTab = () => {
                 <div>
                   <span className="block text-sm font-medium text-gray-500">Precio</span>
                   <span className="text-base font-semibold text-green-600">
-                    ${plan.price.toFixed(2)}
+                    €{plan.price.toFixed(2)}
                   </span>
                 </div>
                 <div>

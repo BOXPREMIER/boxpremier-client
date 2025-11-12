@@ -21,7 +21,7 @@ const PlansModal = ({ plan, onClose, onSave }) => {
         active: plan.active ?? true,
       });
     } else {
-      // Resetear el formulario cuando no hay plan (crear nuevo)
+      
       setFormData({
         boxType: "",
         boxSize: "",
@@ -67,11 +67,11 @@ const PlansModal = ({ plan, onClose, onSave }) => {
     if (!validate()) return;
     
     try {
-      // Preparar datos para enviar - convertir a los tipos correctos para MongoDB
+    
       const dataToSave = {
         boxType: formData.boxType,
-        boxSize: parseInt(formData.boxSize), // Convertir a número para MongoDB
-        price: parseFloat(formData.price),   // Convertir a número para MongoDB
+        boxSize: parseInt(formData.boxSize), 
+        price: parseFloat(formData.price),   
         active: formData.active
       };
       
@@ -128,7 +128,7 @@ const PlansModal = ({ plan, onClose, onSave }) => {
         {/* Form content */}
         <div className="p-4 sm:p-6">
           <div className="space-y-4 sm:space-y-3">
-            {/* Box Type - Cambiar a select para coincidir con el enum del schema */}
+            
             <div>
               <label 
                 className="block text-sm font-medium mb-1"
@@ -157,7 +157,7 @@ const PlansModal = ({ plan, onClose, onSave }) => {
               {errors.boxType && <p className="text-red-500 text-sm mt-1">{errors.boxType}</p>}
             </div>
 
-            {/* Box Size - Input numérico pero manejado como string en el estado */}
+          
             <div>
               <label 
                 className="block text-sm font-medium mb-1"
