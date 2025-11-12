@@ -66,7 +66,7 @@ const UsersTab = () => {
 
   const handleSubmitUser = async (userData) => {
     try {
-      // Para creación: enviar todos los datos necesarios
+      
       if (!userData._id) {
         const cleanedData = Object.fromEntries(
           Object.entries(userData).filter(([key, value]) => {
@@ -83,11 +83,7 @@ const UsersTab = () => {
           preferences: {
             emailNotifications: true
           }
-        };
-
-        console.log("📤 Creando nuevo usuario:", finalData);
-        await createUser(finalData); // ✅ IMPORTANTE: Esta línea estaba faltando
-        
+        };        
         showCustomAlert({
           title: "¡Usuario creado!",
           text: "El nuevo usuario se creó correctamente.",
@@ -99,7 +95,7 @@ const UsersTab = () => {
         setSelectedUser(null);
 
       } else {
-        // Para edición: enviar solo campos modificados
+        
         const originalUser = users.find(u => u._id === userData._id);
         if (!originalUser) {
           throw new Error("Usuario original no encontrado");
@@ -115,21 +111,19 @@ const UsersTab = () => {
           const newValue = userData[field];
           const originalValue = originalUser[field];
           
-          // Manejar casos especiales
           if (field === 'password') {
-            // Solo enviar password si no está vacío
+            
             if (newValue && newValue.trim() !== '') {
               updateData[field] = newValue;
             }
           } else if (field === 'floor') {
-            // Para floor, considerar null/undefined/string vacío como equivalentes
             const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
             const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
             if (normalizedNew !== normalizedOriginal) {
               updateData[field] = normalizedNew || '';
             }
           } else {
-            // Para otros campos, comparar normalmente
+           
             const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
             const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
             if (normalizedNew !== normalizedOriginal) {
@@ -138,15 +132,11 @@ const UsersTab = () => {
           }
         });
 
-        // Siempre incluir campos de sistema
+        
         updateData.userType = isAdminModal ? "admin" : "customer";
         updateData.status = true;
         updateData.preferences = { emailNotifications: true };
-
-        console.log("📤 Actualizando usuario - Campos modificados:", updateData);
-
-        // Si no hay campos para actualizar
-        if (Object.keys(updateData).length <= 3) { // Solo userType, status, preferences
+        if (Object.keys(updateData).length <= 3) { 
           showCustomAlert({
             title: "Sin cambios",
             text: "No se detectaron cambios para guardar.",
@@ -155,7 +145,7 @@ const UsersTab = () => {
           return;
         }
 
-        await updateUser(userData._id, updateData); // ✅ IMPORTANTE: Esta línea estaba faltando
+        await updateUser(userData._id, updateData); 
         
         showCustomAlert({
           title: "¡Usuario actualizado!",
@@ -188,8 +178,6 @@ const UsersTab = () => {
       });
     }
   };
-
-  // ✅ AGREGAR: Función handleDeleteUser que faltaba
   const handleDeleteUser = async (id) => {
     showCustomAlert({
       title: "¿Estás seguro?",
@@ -215,7 +203,6 @@ const UsersTab = () => {
         }
       },
       onCancel: () => {
-        // No hacer nada si cancela
       }
     });
   };
@@ -388,7 +375,7 @@ const UsersTab = () => {
                 <p className="text-gray-500 text-xs">{user.phone || "Sin teléfono"}</p>
               </div>
 
-              {/* Información específica para clientes */}
+              
               {filterType === "customer" && (
                 <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
                   <div>
