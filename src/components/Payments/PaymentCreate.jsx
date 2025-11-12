@@ -123,7 +123,7 @@ const PaymentCreateModal = ({
       setLoading(true);
       setErr(null);
 
-      // 1) Crear pago
+      
       const res = await createPayment({
         subscriptionId: selectedSubscription._id,
         amount: parseFloat(amount),
@@ -133,14 +133,14 @@ const PaymentCreateModal = ({
       let created = unwrap(res);
       const paymentId = extractId(created) || extractId(res);
 
-      // 2) Siempre obtener el pago completo con populate
+     
       if (paymentId) {
         try {
           const fullPayment = await getPaymentById(paymentId);
           created = unwrap(fullPayment);
         } catch (fetchError) {
           console.error("Error obteniendo pago completo:", fetchError);
-          // Si falla, construimos un objeto mínimo con los datos que tenemos
+          
           created = {
             _id: paymentId,
             id: paymentId,
@@ -156,7 +156,7 @@ const PaymentCreateModal = ({
         }
       }
 
-      // 3) Si aún no tenemos el usuario poblado, lo añadimos manualmente
+      
       if (
         created &&
         selectedUser &&
@@ -172,12 +172,12 @@ const PaymentCreateModal = ({
         };
       }
 
-      console.log("Pago creado completo:", created);
+     
 
-      // 4) Enviar al componente padre
+    
       onSuccess?.(created);
 
-      // 5) Cerrar modal
+    
       onClose?.();
     } catch (e) {
       console.error("Error al crear pago:", e);
