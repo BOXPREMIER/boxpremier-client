@@ -139,7 +139,7 @@ const PlansTab = () => {
                 <tr key={plan._id} className="border-t hover:bg-gray-50">
                   <td className="p-3">{plan.boxType}</td>
                   <td className="p-3">{plan.boxSize}</td>
-                  <td className="p-3">${plan.price.toFixed(2)}</td>
+                  <td className="p-3">€{plan.price.toFixed(2)}</td>
                   <td className="p-3">
                     {plan.active ? (
                       <span className="text-green-600 font-semibold">Activo</span>
@@ -196,7 +196,7 @@ const PlansTab = () => {
                 <div>
                   <span className="block text-sm font-medium text-gray-500">Precio</span>
                   <span className="text-base font-semibold text-green-600">
-                    ${plan.price.toFixed(2)}
+                    €{plan.price.toFixed(2)}
                   </span>
                 </div>
                 <div>
