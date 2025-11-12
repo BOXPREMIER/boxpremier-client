@@ -49,6 +49,7 @@ const GiftPage = () => {
   
   const handleButtonClick = () => {
     navigate("/app/subscription/checkout");
+    window.scrollTo(0, 0); 
   };
 
   return (
