@@ -45,6 +45,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             to="/app/admin/users"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-admin-dashboard"
           >
             TABLERO
           </NavLink>
@@ -53,6 +54,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             <button
               onClick={handleDropdownToggle}
               className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
+              data-testid="dropdown-button"
             >
               Hola, {nombreUsuario}
             </button>
@@ -65,12 +67,14 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
                     setIsDropdownOpen(false);
                     if (closeMenu) closeMenu();
                   }}
+                  data-testid="link-profile"
                 >
                   Ver mi perfil
                 </NavLink>
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  data-testid="button-logout"
                 >
                   Cerrar sesión
                 </button>
@@ -84,6 +88,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             to="/app/subscription"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-subscription"
           >
             PLANES
           </NavLink>
@@ -91,6 +96,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             to="/app/gift"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-gift"
           >
             REGALA
           </NavLink>
@@ -98,6 +104,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
             to="/app/monthly-wines"
             className={linkClass}
             onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-previous-boxes"
           >
             CAJAS ANTERIORES
           </NavLink>
@@ -107,6 +114,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
               <button
                 onClick={handleDropdownToggle}
                 className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
+                data-testid="dropdown-button"
               >
                 Hola, {nombreUsuario}
               </button>
@@ -119,12 +127,14 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
                       setIsDropdownOpen(false);
                       if (closeMenu) closeMenu();
                     }}
+                    data-testid="link-profile"
                   >
                     Ver mi perfil
                   </NavLink>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    data-testid="button-logout"
                   >
                     Cerrar sesión
                   </button>
@@ -136,6 +146,7 @@ const NavLinks = ({ isMobile = false, closeMenu }) => {
               to="/login"
               className={linkClass}
               onClick={isMobile ? closeMenu : undefined}
+              data-testid="link-login"
             >
               LOGIN
             </NavLink>
@@ -161,6 +172,7 @@ const NavBar = () => {
           to={isAdmin ? "/app/admin/users" : "/"}
           aria-label="Ir al inicio"
           onClick={closeMobileMenu}
+          data-testid="link-home"
         >
           <img
             src={Logo}
@@ -175,6 +187,7 @@ const NavBar = () => {
           aria-label="Ir a la página principal"
           className="absolute left-1/2 transform -translate-x-1/2"
           onClick={closeMobileMenu}
+          data-testid="link-main"
         >
           <img
             src={logo2}
@@ -188,6 +201,7 @@ const NavBar = () => {
           onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
           aria-label="Abrir o cerrar menú"
+          data-testid="mobile-menu-button"
         >
           {isMenuOpen ? "✕" : "☰"}
         </button>
