@@ -3,7 +3,7 @@ import Button from "../../../components/Button";
 
 const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = false }) => {
   const [formData, setFormData] = useState({
-    _id: null, // ← AGREGAR _id al estado inicial
+    _id: null, 
     userType: "admin",
     firstName: "",
     lastName: "",
@@ -15,16 +15,16 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
   useEffect(() => {
     if (initialData && initialData._id) {
       setFormData({
-        _id: initialData._id, // ← INCLUIR el _id del initialData
+        _id: initialData._id, 
         userType: "admin", 
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         email: initialData.email || "",
-        password: "" // Siempre vacío en edición
+        password: "" 
       });
     } else {
       setFormData({
-        _id: null, // ← Para creación
+        _id: null, 
         userType: "admin",
         firstName: "",
         lastName: "",
@@ -32,14 +32,14 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         password: ""
       });
     }
-    // Limpiar errores al abrir/cerrar modal
+    
     setErrors({});
   }, [initialData, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Limpiar error del campo cuando el usuario escriba
+    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -52,16 +52,16 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
     if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
     if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
     
-    // Validación de contraseña
+    
     if (!formData._id) {
-      // Para creación: contraseña obligatoria
+      
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
       } else if (formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     } else {
-      // Para edición: contraseña opcional pero si se ingresa, debe tener al menos 6 caracteres
+      
       if (formData.password && formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
@@ -78,18 +78,14 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
       return;
     }
     
-    // Preparar datos para enviar
+    
     const dataToSubmit = {
       ...formData,
       status: true,
       preferences: {
         emailNotifications: true
       }
-    };
-
-    console.log("📤 Enviando datos de admin:", dataToSubmit);
-    onSubmit(dataToSubmit);
-  };
+    }; };
 
   if (!open) return null;
 

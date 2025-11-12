@@ -20,9 +20,7 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
     country: ""
   });
 
-  const [errors, setErrors] = useState({});
-
-  // Cargar datos iniciales 
+  const [errors, setErrors] = useState({}); 
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -41,7 +39,7 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
         country: initialData.country || ""
       });
     } else {
-      // Reset completo cuando no hay initialData (nuevo usuario)
+      
       setFormData({
         _id: null,
         firstName: "",
@@ -58,11 +56,11 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
         country: ""
       });
     }
-    // Limpiar errores al abrir/cerrar modal
+    
     setErrors({});
   }, [initialData, open]); 
 
-  // Cerrar modal al hacer clic fuera o presionar ESC
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -110,14 +108,12 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
     
     // Validación de contraseña
     if (!formData._id) {
-      // Para creación: contraseña obligatoria
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
       } else if (formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     } else {
-      // Para edición: contraseña opcional pero si se ingresa, debe tener al menos 6 caracteres
       if (formData.password && formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
@@ -144,7 +140,6 @@ const UserModal = ({ open, onClose, onSubmit, initialData, readOnly }) => {
       }
     };
 
-    console.log("📤 Enviando datos de usuario:", dataToSubmit);
     onSubmit(dataToSubmit);
   };
 
