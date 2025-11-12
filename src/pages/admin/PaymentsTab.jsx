@@ -7,9 +7,7 @@ import PaymentDetailsModal from "../../components/Payments/PaymentDetailModal";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
 import Button from "../../components/Button";
 
-// Color común (marrón) para íconos
 const ICON_CLASS = "w-10 h-10 text-[#AD946C]";
-// Badge marrón para estados
 const STATUS_BADGE_CLASS =
   "inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary text-white";
 
@@ -53,11 +51,13 @@ const PaymentsTab = () => {
       const list = asArrayOrEmpty(payload);
       setPayments(list);
       setFilteredPayments(list);
+      return list;
     } catch (err) {
       console.error("Error cargando pagos:", err);
       setError("Error al cargar los pagos. Por favor, intenta de nuevo.");
       setPayments([]);
       setFilteredPayments([]);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -106,21 +106,19 @@ const PaymentsTab = () => {
     setShowDetailsModal(false);
   };
 
-  const unwrap = (x) => x?.data ?? x?.payment ?? x;
-
   const handleUpdatePayment = async (id, updates) => {
     try {
-      const updatedRes = await paymentServices.updatePaymentStatus(id, updates);
-      const updated = unwrap(updatedRes);
-      const apply = (p) => ((p._id || p.id) === id ? { ...p, ...updated } : p);
+      await paymentServices.updatePaymentStatus(id, updates);
 
-      setPayments((prev) => prev.map(apply));
-      setFilteredPayments((prev) => prev.map(apply));
-      setSelectedPayment((prev) =>
-        prev && (prev._id || prev.id) === id ? { ...prev, ...updated } : prev
-      );
+      const updatedList = await fetchData();
 
-      return updated;
+      const updatedPayment = updatedList.find(p => (p._id || p.id) === id);
+
+      if (updatedPayment) {
+        setSelectedPayment(updatedPayment);
+      }
+
+      return updatedPayment;
     } catch (err) {
       console.error("Error actualizando pago:", err);
       throw err;
@@ -226,7 +224,6 @@ const PaymentsTab = () => {
         )}
       </div>
 
-      {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-lg border shadow-sm">
           <div className="flex items-center justify-between">
@@ -275,49 +272,43 @@ const PaymentsTab = () => {
         </div>
       </div>
 
-      {/* Componente de filtros */}
       <PaymentFilters onApplyFilters={handleApplyFilters} />
 
-      {/* Botones de filtro por estado */}
       <div className="bg-white p-4 rounded-lg border shadow-sm">
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setFilter("pending")}
-            className={`px-4 py-2 rounded transition-colors ${
-              filter === "pending"
-                ? "bg-primary text-white"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded transition-colors ${filter === "pending"
+              ? "bg-primary text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
           >
             Pendientes ({stats.pending})
           </button>
           <button
             onClick={() => setFilter("completed")}
-            className={`px-4 py-2 rounded transition-colors ${
-              filter === "completed"
-                ? "bg-primary text-white"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded transition-colors ${filter === "completed"
+              ? "bg-primary text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
           >
             Completados ({stats.completed})
           </button>
           <button
             onClick={() => setFilter("failed")}
-            className={`px-4 py-2 rounded transition-colors ${
-              filter === "failed"
-                ? "bg-primary text-white"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded transition-colors ${filter === "failed"
+              ? "bg-primary text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
           >
             Fallidos ({stats.failed})
           </button>
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded transition-colors ${
-              filter === "all"
-                ? "bg-primary text-white"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded transition-colors ${filter === "all"
+              ? "bg-primary text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+              }`}
           >
             Todos ({stats.total})
           </button>
@@ -330,7 +321,6 @@ const PaymentsTab = () => {
         </div>
       )}
 
-      {/* Tabla de pagos */}
       <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
