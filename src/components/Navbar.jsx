@@ -1,105 +1,221 @@
-import Logo from "../assets/Logo.png"; 
-import logo2 from "../assets/logo2.png";
-import { useState, useEffect } from "react"; 
-import { NavLink, useLocation, useNavigate, Link } from "react-router-dom"; 
+import { useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
+import Logo from "../assets/full-logo-white.png";
+import logo2 from "../assets/logo2.png";
 
-const NavBar = ({ logo = Logo }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation(); //borrar si no lo vamos a usar
-  const navigate = useNavigate();//borrar si no lo  vamos a usar
-
+const NavLinks = ({ isMobile = false, closeMenu }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
- 
+  const nombreUsuario =
+    user?.nombre ||
+    user?.name ||
+    user?.username ||
+    user?.firstName ||
+    user?.email?.split("@")[0] ||
+    "usuario";
+
+  const isAdmin = user?.userType === "admin";
+
+  const linkClass = ({ isActive }) =>
+    `hover:text-[#C9A35C] transition-colors ${isActive ? "text-[#C9A35C]" : ""}`;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    setIsDropdownOpen(false);
+    if (closeMenu) closeMenu();
+  };
+
+  const handleDropdownToggle = () => setIsDropdownOpen((prev) => !prev);
+
   return (
-    <nav className="w-full bg-black text-white px-6 py-3">
-     <div className="flex items-center justify-between">
-        <Link to="/" aria-label="Ir al inicio">
+    <div
+      className={`${
+        isMobile ? "flex flex-col items-start gap-3 mt-4" : "flex items-center gap-6"
+      } text-sm font-semibold tracking-wide`}
+    >
+      {isAuthenticated && isAdmin ? (
+        <>
+          <NavLink
+            to="/app/admin/users"
+            className={linkClass}
+            onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-admin-dashboard"
+          >
+            TABLERO
+          </NavLink>
+
+          <div className="relative">
+            <button
+              onClick={handleDropdownToggle}
+              className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
+              data-testid="dropdown-button"
+            >
+              Hola, {nombreUsuario}
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg z-50">
+                <NavLink
+                  to="/app/profile"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    if (closeMenu) closeMenu();
+                  }}
+                  data-testid="link-profile"
+                >
+                  Ver mi perfil
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  data-testid="button-logout"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <NavLink
+            to="/app/subscription"
+            className={linkClass}
+            onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-subscription"
+          >
+            PLANES
+          </NavLink>
+          <NavLink
+            to="/app/gift"
+            className={linkClass}
+            onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-gift"
+          >
+            REGALA
+          </NavLink>
+          <NavLink
+            to="/app/monthly-wines"
+            className={linkClass}
+            onClick={isMobile ? closeMenu : undefined}
+            data-testid="link-previous-boxes"
+          >
+            CAJAS ANTERIORES
+          </NavLink>
+
+          {isAuthenticated ? (
+            <div className="relative">
+              <button
+                onClick={handleDropdownToggle}
+                className="hover:text-[#C9A35C] transition-colors flex items-center gap-1"
+                data-testid="dropdown-button"
+              >
+                Hola, {nombreUsuario}
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg z-50">
+                  <NavLink
+                    to="/app/profile"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      if (closeMenu) closeMenu();
+                    }}
+                    data-testid="link-profile"
+                  >
+                    Ver mi perfil
+                  </NavLink>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    data-testid="button-logout"
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <NavLink
+              to="/login"
+              className={linkClass}
+              onClick={isMobile ? closeMenu : undefined}
+              data-testid="link-login"
+            >
+              LOGIN
+            </NavLink>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const NavBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.userType === "admin";
+
+  const closeMobileMenu = () => setIsMenuOpen(false);
+
+  return (
+    <nav className="w-full bg-black text-white px-6 py-3 relative">
+      <div className="flex items-center justify-between relative">
+        {/* Grande Logo */}
+        <Link
+          to={isAdmin ? "/app/admin/users" : "/"}
+          aria-label="Ir al inicio"
+          onClick={closeMobileMenu}
+          data-testid="link-home"
+        >
           <img
-            src={logo}
-            alt="Vino Premier"
+            src={Logo}
+            alt="Vino Premier Logo"
             className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
           />
         </Link>
 
-        {/* Logo central (solo visible en pantallas medianas y grandes) */}
-        <div className="hidden md:flex justify-center items-center">
-          <Link to="/subscriptionPage" aria-label="Página de suscripción">
-            <img
-              src={logo2}
-              alt="Círculo dorado - Suscripción"
-              className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-            />
-          </Link>
-        </div>
+        {/* Circular Logo */}
+        <Link
+          to={isAdmin ? "/app/admin/users" : "/main"}
+          aria-label="Ir a la página principal"
+          className="absolute left-1/2 transform -translate-x-1/2"
+          onClick={closeMobileMenu}
+          data-testid="link-main"
+        >
+          <img
+            src={logo2}
+            alt="Círculo dorado - Main"
+            className="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+          />
+        </Link>
 
-        {/* Menú hamburguesa (solo visible en móviles) */}
+        {/* Hamburger Mobile */}
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen((prev) => !prev)}
           className="block md:hidden p-2 text-2xl"
           aria-label="Abrir o cerrar menú"
+          data-testid="mobile-menu-button"
         >
-          {isMenuOpen ? "Χ" : "☰"}
+          {isMenuOpen ? "✕" : "☰"}
         </button>
 
-        {/* Enlaces de escritorio */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-semibold tracking-wide">
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `hover:text-[#C9A35C] transition-colors ${
-                isActive ? "text-[#C9A35C]" : ""
-              }`
-            }
-          >
-            LOGIN
-          </NavLink>
-
-          <button
-            type="button"
-            aria-label="Cambiar idioma"
-            className="flex items-center gap-1 hover:text-[#C9A35C] transition-colors"
-          >
-            <span>IDIOMA</span>
-          </button>
+        {/* Desktop Links */}
+        <div className="hidden md:flex">
+          <NavLinks />
         </div>
       </div>
 
-      {/* Menú móvil desplegable */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden flex flex-col items-start gap-3 mt-4 text-sm font-semibold tracking-wide">
-          {/* Logo dorado en versión móvil */}
-          <Link
-            to="/subscriptionPage"
-            className="hover:text-[#C9A35C] transition-colors"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            SUSCRIPCIÓN
-          </Link>
-
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              `hover:text-[#C9A35C] transition-colors ${
-                isActive ? "text-[#C9A35C]" : ""
-              }`
-            }
-            onClick={() => setIsMenuOpen(false)}
-          >
-            LOGIN
-          </NavLink>
-
-          <button
-            type="button"
-            aria-label="Cambiar idioma"
-            className="hover:text-[#C9A35C] transition-colors"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            IDIOMA
-          </button>
+        <div className="md:hidden">
+          <NavLinks isMobile closeMenu={closeMobileMenu} />
         </div>
       )}
     </nav>

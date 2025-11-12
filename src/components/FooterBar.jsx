@@ -3,6 +3,7 @@ import { Facebook, Instagram, Twitter, Youtube, ChevronUp } from "lucide-react";
 import footerImg1 from "../assets/img/footer/footer_beta_2025_png-03.png";
 import footerImg2 from "../assets/img/footer/footer-payments2_1.png";
 import footerImg3 from "../assets/img/footer/logo-footer.png";
+import logoWhite from "../assets/img/footer/logo-white.png";
 
 // -------------------- Newsletter Popup --------------------
 function NewsletterPopup() {
@@ -24,7 +25,14 @@ function NewsletterPopup() {
         <div className="inline-block bg-yellow-500 text-black px-3 py-1 font-bold mb-2 text-sm">
           5% DE DESCUENTO
         </div>
-        <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-2"></div>
+
+        {/* ЛОГО В ЦЕНТРЕ */}
+        <img
+          src={logoWhite}
+          alt="logo"
+          className="w-20 h-20 mx-auto mb-3 object-contain drop-shadow-md"
+        />
+
         <h2 className="text-lg font-bold mb-1">¡RECIBE NUESTRAS</h2>
         <h2 className="text-lg font-bold mb-1">MEJORES OFERTAS</h2>
         <h2 className="text-lg font-bold mb-2">DIRECTO EN TU E-MAIL!</h2>
@@ -81,10 +89,8 @@ export default function VinoPremierNewsletter() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <div className="flex-1">{/* Основной контент */}</div>
-
-      {/* Футер */}
+    <div className="flex flex-col bg-white">
+      {/* Footer */}
       <footer className="w-full bg-gray-200 py-6 flex flex-col lg:flex-row items-start justify-center gap-6 px-4">
         {/* Left Column */}
         <div className="lg:w-1/4">

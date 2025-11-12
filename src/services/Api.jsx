@@ -3,7 +3,7 @@ import axios from 'axios'
 import useAuthStore from '../store/authStore'
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' }
 })
@@ -27,7 +27,7 @@ API.interceptors.response.use(
   async (error) => {
     const { response } = error
     if (response?.status === 401) {
-      
+
       useAuthStore.getState().logout()
     }
     return Promise.reject(error)

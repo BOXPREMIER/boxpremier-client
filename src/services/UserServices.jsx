@@ -2,32 +2,37 @@ import API from "./Api";
 
 // Obtener todos los usuarios
 export const getUsers = async () => {
-  const res = await API.get("/users"); // json-server usa plural
-  console.log("Datos recibidos en getUsers:", res.data);
-  // En el backend real probablemente vendrá como res.data.data
-  return res.data.data || res.data || [];
+  const { data } = await API.get("/users");
+  return data.data || [];
 };
 
 // Obtener un usuario específico
 export const getUser = async (id) => {
-  const res = await API.get(`/users/${id}`);
-  return res.data;
+  const { data } = await API.get(`/users/${id}`);
+  return data.data;
 };
-
+ 
 // Crear usuario
-export const createUser = async (data) => {
-  const res = await API.post("/users", data);
-  return res.data;
+export const createUser = async (userData) => {
+  const { data } = await API.post("/users", userData);
+  return data.data;
 };
 
 // Actualizar usuario
-export const updateUser = async (id, data) => {
-  const res = await API.patch(`/users/${id}`, data);
-  return res.data;
+export const updateUser = async (id, userData) => {
+  const { data } = await API.put(`/users/${id}`, userData);
+  return data.data;
 };
 
 // Eliminar usuario
 export const deleteUser = async (id) => {
-  const res = await API.delete(`/users/${id}`);
-  return res.data;
+  const { data } = await API.delete(`/users/${id}`);
+  return data.data;
+};
+
+
+
+export const updatePaymentMethod = async (paymentData) => {
+  const { data } = await API.patch('/users/me/payment-method', paymentData);
+  return data.data;
 };
