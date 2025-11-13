@@ -3,7 +3,7 @@ import Button from "../../../components/Button";
 
 const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = false }) => {
   const [formData, setFormData] = useState({
-    _id: null, 
+    _id: null,
     userType: "admin",
     firstName: "",
     lastName: "",
@@ -15,16 +15,16 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
   useEffect(() => {
     if (initialData && initialData._id) {
       setFormData({
-        _id: initialData._id, 
-        userType: "admin", 
+        _id: initialData._id,
+        userType: "admin",
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         email: initialData.email || "",
-        password: "" 
+        password: ""
       });
     } else {
       setFormData({
-        _id: null, 
+        _id: null,
         userType: "admin",
         firstName: "",
         lastName: "",
@@ -32,14 +32,14 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         password: ""
       });
     }
-    
+
     setErrors({});
   }, [initialData, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -47,7 +47,7 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.firstName.trim()) newErrors.firstName = "El nombre es obligatorio";
     if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
     if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
@@ -63,7 +63,7 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,7 +81,6 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         emailNotifications: true
       }
     };
-    
     onSubmit(dataToSubmit);
   };
 
