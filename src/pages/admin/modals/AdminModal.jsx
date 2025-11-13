@@ -3,7 +3,7 @@ import Button from "../../../components/Button";
 
 const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = false }) => {
   const [formData, setFormData] = useState({
-    _id: null, 
+    _id: null,
     userType: "admin",
     firstName: "",
     lastName: "",
@@ -15,16 +15,16 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
   useEffect(() => {
     if (initialData && initialData._id) {
       setFormData({
-        _id: initialData._id, 
-        userType: "admin", 
+        _id: initialData._id,
+        userType: "admin",
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         email: initialData.email || "",
-        password: "" 
+        password: ""
       });
     } else {
       setFormData({
-        _id: null, 
+        _id: null,
         userType: "admin",
         firstName: "",
         lastName: "",
@@ -32,14 +32,14 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         password: ""
       });
     }
-    
+
     setErrors({});
   }, [initialData, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -47,45 +47,47 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.firstName.trim()) newErrors.firstName = "El nombre es obligatorio";
     if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
     if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
-    
-    
+
+
     if (!formData._id) {
-      
+
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
       } else if (formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     } else {
-      
+
       if (formData.password && formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
-    
+
+
     const dataToSubmit = {
       ...formData,
       status: true,
       preferences: {
         emailNotifications: true
       }
-    }; };
+    };
+    onSubmit(dataToSubmit);
+  };
 
   if (!open) return null;
 
@@ -106,9 +108,8 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="off"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.firstName ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.firstName ? 'border-red-500' : 'border-secondary'
+                }`}
               required
             />
             {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
@@ -123,9 +124,8 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="off"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.lastName ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.lastName ? 'border-red-500' : 'border-secondary'
+                }`}
               required
             />
             {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
@@ -140,9 +140,8 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="new email"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.email ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.email ? 'border-red-500' : 'border-secondary'
+                }`}
               required
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -159,9 +158,8 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="new password"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.password ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.password ? 'border-red-500' : 'border-secondary'
+                }`}
               required={!formData._id}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
