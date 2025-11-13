@@ -46,14 +46,14 @@ const UsersTab = () => {
   }, []);
 
   const handleAddUser = () => {
-    setSelectedUser(null); // ✅ Resetear usuario seleccionado
+    setSelectedUser(null); 
     setReadOnly(false);
     setIsAdminModal(false); 
     setModalOpen(true);
   };
 
   const handleAddAdmin = () => {
-    setSelectedUser(null); // ✅ Resetear usuario seleccionado
+    setSelectedUser(null); 
     setReadOnly(false);
     setIsAdminModal(true); 
     setModalOpen(true);
@@ -70,7 +70,7 @@ const UsersTab = () => {
     try {
       
       if (!userData._id) {
-        // CREAR NUEVO USUARIO
+   
         const cleanedData = Object.fromEntries(
           Object.entries(userData).filter(([key, value]) => {
             if (value === "" || value === null || value === undefined) return false;
@@ -88,10 +88,10 @@ const UsersTab = () => {
           }
         };
 
-        // ✅ Llamada al backend para crear usuario
+     
         await createUser(finalData);
         
-        // ✅ Mostrar alert DESPUÉS de crear
+        
         showCustomAlert({
           title: "¡Usuario creado!",
           text: "El nuevo usuario se creó correctamente.",
@@ -103,7 +103,7 @@ const UsersTab = () => {
         setSelectedUser(null);
 
       } else {
-        // ACTUALIZAR USUARIO EXISTENTE
+       
         const originalUser = users.find(u => u._id === userData._id);
         if (!originalUser) {
           throw new Error("Usuario original no encontrado");
@@ -443,7 +443,7 @@ const UsersTab = () => {
           open={modalOpen}
           onClose={() => {
             setModalOpen(false);
-            setSelectedUser(null); // ✅ Resetear al cerrar
+            setSelectedUser(null); 
           }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}
@@ -455,7 +455,7 @@ const UsersTab = () => {
           open={modalOpen}
           onClose={() => {
             setModalOpen(false);
-            setSelectedUser(null); // ✅ Resetear al cerrar
+            setSelectedUser(null); 
           }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}

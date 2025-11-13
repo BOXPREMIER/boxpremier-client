@@ -83,10 +83,8 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
     };
     onSubmit(dataToSubmit);
   };
-
-  // Handler para el botón - NO previene el submit del form
-  const handleSaveClick = (e) => {
-    // Si el Button component previene el submit, lo forzamos manualmente
+   const handleSaveClick = (e) => {
+   
     if (e) {
       e.preventDefault();
     }
