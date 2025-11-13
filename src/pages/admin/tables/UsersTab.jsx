@@ -46,12 +46,14 @@ const UsersTab = () => {
   }, []);
 
   const handleAddUser = () => {
+    setSelectedUser(null); // ✅ Resetear usuario seleccionado
     setReadOnly(false);
     setIsAdminModal(false); 
     setModalOpen(true);
   };
 
   const handleAddAdmin = () => {
+    setSelectedUser(null); // ✅ Resetear usuario seleccionado
     setReadOnly(false);
     setIsAdminModal(true); 
     setModalOpen(true);
@@ -64,126 +66,125 @@ const UsersTab = () => {
     setModalOpen(true);
   };
 
- // Reemplaza tu función handleSubmitUser con esta versión corregida:
-
-const handleSubmitUser = async (userData) => {
-  try {
-    
-    if (!userData._id) {
-      // CREAR NUEVO USUARIO
-      const cleanedData = Object.fromEntries(
-        Object.entries(userData).filter(([key, value]) => {
-          if (value === "" || value === null || value === undefined) return false;
-          if (key === 'subscription' || key === 'plan' || key === 'status' || key === 'fullName') return false;
-          return true;
-        })
-      );
-
-      const finalData = {
-        ...cleanedData,
-        userType: isAdminModal ? "admin" : "customer",
-        status: true,
-        preferences: {
-          emailNotifications: true
-        }
-      };
-
-      // ✅ AQUÍ ESTABA EL PROBLEMA - Faltaba esta línea
-      await createUser(finalData);
+  const handleSubmitUser = async (userData) => {
+    try {
       
-      // ✅ AHORA SÍ mostramos el alert DESPUÉS de crear
-      showCustomAlert({
-        title: "¡Usuario creado!",
-        text: "El nuevo usuario se creó correctamente.",
-        confirmText: "Aceptar"
-      });
+      if (!userData._id) {
+        // CREAR NUEVO USUARIO
+        const cleanedData = Object.fromEntries(
+          Object.entries(userData).filter(([key, value]) => {
+            if (value === "" || value === null || value === undefined) return false;
+            if (key === 'subscription' || key === 'plan' || key === 'status' || key === 'fullName') return false;
+            return true;
+          })
+        );
 
-      await fetchUsers();
-      setModalOpen(false);
-      setSelectedUser(null);
+        const finalData = {
+          ...cleanedData,
+          userType: isAdminModal ? "admin" : "customer",
+          status: true,
+          preferences: {
+            emailNotifications: true
+          }
+        };
 
-    } else {
-      // ACTUALIZAR USUARIO EXISTENTE
-      const originalUser = users.find(u => u._id === userData._id);
-      if (!originalUser) {
-        throw new Error("Usuario original no encontrado");
-      }
-
-      const updateData = {};
-      const fieldsToCheck = [
-        'firstName', 'lastName', 'email', 'password', 'phone', 
-        'street', 'number', 'floor', 'postalCode', 'city', 'province', 'country'
-      ];
-
-      fieldsToCheck.forEach(field => {
-        const newValue = userData[field];
-        const originalValue = originalUser[field];
+        // ✅ Llamada al backend para crear usuario
+        await createUser(finalData);
         
-        if (field === 'password') {
-          if (newValue && newValue.trim() !== '') {
-            updateData[field] = newValue;
-          }
-        } else if (field === 'floor') {
-          const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
-          const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
-          if (normalizedNew !== normalizedOriginal) {
-            updateData[field] = normalizedNew || '';
-          }
-        } else {
-          const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
-          const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
-          if (normalizedNew !== normalizedOriginal) {
-            updateData[field] = normalizedNew;
-          }
-        }
-      });
-
-      updateData.userType = isAdminModal ? "admin" : "customer";
-      updateData.status = true;
-      updateData.preferences = { emailNotifications: true };
-      
-      if (Object.keys(updateData).length <= 3) { 
+        // ✅ Mostrar alert DESPUÉS de crear
         showCustomAlert({
-          title: "Sin cambios",
-          text: "No se detectaron cambios para guardar.",
+          title: "¡Usuario creado!",
+          text: "El nuevo usuario se creó correctamente.",
           confirmText: "Aceptar"
         });
-        return;
+
+        await fetchUsers();
+        setModalOpen(false);
+        setSelectedUser(null);
+
+      } else {
+        // ACTUALIZAR USUARIO EXISTENTE
+        const originalUser = users.find(u => u._id === userData._id);
+        if (!originalUser) {
+          throw new Error("Usuario original no encontrado");
+        }
+
+        const updateData = {};
+        const fieldsToCheck = [
+          'firstName', 'lastName', 'email', 'password', 'phone', 
+          'street', 'number', 'floor', 'postalCode', 'city', 'province', 'country'
+        ];
+
+        fieldsToCheck.forEach(field => {
+          const newValue = userData[field];
+          const originalValue = originalUser[field];
+          
+          if (field === 'password') {
+            if (newValue && newValue.trim() !== '') {
+              updateData[field] = newValue;
+            }
+          } else if (field === 'floor') {
+            const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
+            const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
+            if (normalizedNew !== normalizedOriginal) {
+              updateData[field] = normalizedNew || '';
+            }
+          } else {
+            const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
+            const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
+            if (normalizedNew !== normalizedOriginal) {
+              updateData[field] = normalizedNew;
+            }
+          }
+        });
+
+        updateData.userType = isAdminModal ? "admin" : "customer";
+        updateData.status = true;
+        updateData.preferences = { emailNotifications: true };
+        
+        if (Object.keys(updateData).length <= 3) { 
+          showCustomAlert({
+            title: "Sin cambios",
+            text: "No se detectaron cambios para guardar.",
+            confirmText: "Aceptar"
+          });
+          return;
+        }
+
+        await updateUser(userData._id, updateData); 
+        
+        showCustomAlert({
+          title: "¡Usuario actualizado!",
+          text: "Los cambios se guardaron correctamente.",
+          confirmText: "Aceptar"
+        });
+
+        await fetchUsers();
+        setModalOpen(false);
+        setSelectedUser(null);
       }
 
-      await updateUser(userData._id, updateData); 
+    } catch (error) {
+      console.error("Error al guardar usuario:", error);
+      
+      let errorMessage = "No se pudo guardar el usuario. Por favor, verifica los datos.";
+      
+      if (error.response?.status === 400) {
+        if (error.response.data.message === "Email already exists") {
+          errorMessage = "El email ya está registrado. Por favor, utiliza otro email.";
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
       
       showCustomAlert({
-        title: "¡Usuario actualizado!",
-        text: "Los cambios se guardaron correctamente.",
-        confirmText: "Aceptar"
+        title: "Error",
+        text: errorMessage,
+        type: "error"
       });
-
-      await fetchUsers();
-      setModalOpen(false);
-      setSelectedUser(null);
     }
+  };
 
-  } catch (error) {
-    console.error("Error al guardar usuario:", error);
-    
-    let errorMessage = "No se pudo guardar el usuario. Por favor, verifica los datos.";
-    
-    if (error.response?.status === 400) {
-      if (error.response.data.message === "Email already exists") {
-        errorMessage = "El email ya está registrado. Por favor, utiliza otro email.";
-      } else if (error.response.data.message) {
-        errorMessage = error.response.data.message;
-      }
-    }
-    
-    showCustomAlert({
-      title: "Error",
-      text: errorMessage,
-      type: "error"
-    });
-  }
-};
   const handleDeleteUser = async (id) => {
     showCustomAlert({
       title: "¿Estás seguro?",
@@ -440,7 +441,10 @@ const handleSubmitUser = async (userData) => {
         <AdminModal
           key={selectedUser?._id || 'new-admin'}
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedUser(null); // ✅ Resetear al cerrar
+          }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}
           readOnly={readOnly}
@@ -449,7 +453,10 @@ const handleSubmitUser = async (userData) => {
         <UserModal
           key={selectedUser?._id || 'new-user'}
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedUser(null); // ✅ Resetear al cerrar
+          }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}
           readOnly={readOnly}
