@@ -52,16 +52,13 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
     if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
     if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
     
-    
     if (!formData._id) {
-      
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
       } else if (formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     } else {
-      
       if (formData.password && formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
@@ -73,11 +70,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
-    
     
     const dataToSubmit = {
       ...formData,
@@ -85,9 +80,36 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
       preferences: {
         emailNotifications: true
       }
-    }; };
+    };
+    
+    onSubmit(dataToSubmit);
+  };
 
-  if (!open) return null;
+  // Handler para el botón - NO previene el submit del form
+  const handleSaveClick = (e) => {
+    // Si el Button component previene el submit, lo forzamos manualmente
+    if (e) {
+      e.preventDefault();
+    }
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    const dataToSubmit = {
+      ...formData,
+      status: true,
+      preferences: {
+        emailNotifications: true
+      }
+    };
+    
+    onSubmit(dataToSubmit);
+  };
+
+  if (!open) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -109,7 +131,6 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               className={`w-full border p-2 rounded-lg ${
                 errors.firstName ? 'border-red-500' : 'border-secondary'
               }`}
-              required
             />
             {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
           </div>
@@ -126,7 +147,6 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               className={`w-full border p-2 rounded-lg ${
                 errors.lastName ? 'border-red-500' : 'border-secondary'
               }`}
-              required
             />
             {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
           </div>
@@ -138,12 +158,11 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               name="email"
               value={formData.email}
               onChange={handleChange}
-              autoComplete="new email"
+              autoComplete="new-email"
               readOnly={readOnly}
               className={`w-full border p-2 rounded-lg ${
                 errors.email ? 'border-red-500' : 'border-secondary'
               }`}
-              required
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
@@ -157,12 +176,11 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               name="password"
               value={formData.password}
               onChange={handleChange}
-              autoComplete="new password"
+              autoComplete="new-password"
               readOnly={readOnly}
               className={`w-full border p-2 rounded-lg ${
                 errors.password ? 'border-red-500' : 'border-secondary'
               }`}
-              required={!formData._id}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             {formData._id && (
@@ -174,8 +192,18 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
           {/* Botones */}
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-            <Button title="Cerrar" action={onClose} tooltip="Cerrar modal" />
-            {!readOnly && <Button title="Guardar" type="submit" tooltip="Guardar administrador" />}
+            <Button 
+              title="Cerrar" 
+              action={onClose} 
+              tooltip="Cerrar modal" 
+            />
+            {!readOnly && (
+              <Button 
+                title="Guardar" 
+                action={handleSaveClick}
+                tooltip="Guardar administrador"
+              />
+            )}
           </div>
         </form>
       </div>
