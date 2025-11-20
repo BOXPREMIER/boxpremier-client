@@ -46,12 +46,14 @@ const UsersTab = () => {
   }, []);
 
   const handleAddUser = () => {
+    setSelectedUser(null); 
     setReadOnly(false);
     setIsAdminModal(false); 
     setModalOpen(true);
   };
 
   const handleAddAdmin = () => {
+    setSelectedUser(null); 
     setReadOnly(false);
     setIsAdminModal(true); 
     setModalOpen(true);
@@ -68,6 +70,7 @@ const UsersTab = () => {
     try {
       
       if (!userData._id) {
+   
         const cleanedData = Object.fromEntries(
           Object.entries(userData).filter(([key, value]) => {
             if (value === "" || value === null || value === undefined) return false;
@@ -83,7 +86,12 @@ const UsersTab = () => {
           preferences: {
             emailNotifications: true
           }
-        };        
+        };
+
+     
+        await createUser(finalData);
+        
+        
         showCustomAlert({
           title: "¡Usuario creado!",
           text: "El nuevo usuario se creó correctamente.",
@@ -95,7 +103,7 @@ const UsersTab = () => {
         setSelectedUser(null);
 
       } else {
-        
+       
         const originalUser = users.find(u => u._id === userData._id);
         if (!originalUser) {
           throw new Error("Usuario original no encontrado");
@@ -112,7 +120,6 @@ const UsersTab = () => {
           const originalValue = originalUser[field];
           
           if (field === 'password') {
-            
             if (newValue && newValue.trim() !== '') {
               updateData[field] = newValue;
             }
@@ -123,7 +130,6 @@ const UsersTab = () => {
               updateData[field] = normalizedNew || '';
             }
           } else {
-           
             const normalizedNew = newValue === null || newValue === undefined ? '' : String(newValue);
             const normalizedOriginal = originalValue === null || originalValue === undefined ? '' : String(originalValue);
             if (normalizedNew !== normalizedOriginal) {
@@ -132,10 +138,10 @@ const UsersTab = () => {
           }
         });
 
-        
         updateData.userType = isAdminModal ? "admin" : "customer";
         updateData.status = true;
         updateData.preferences = { emailNotifications: true };
+        
         if (Object.keys(updateData).length <= 3) { 
           showCustomAlert({
             title: "Sin cambios",
@@ -178,6 +184,7 @@ const UsersTab = () => {
       });
     }
   };
+
   const handleDeleteUser = async (id) => {
     showCustomAlert({
       title: "¿Estás seguro?",
@@ -434,7 +441,10 @@ const UsersTab = () => {
         <AdminModal
           key={selectedUser?._id || 'new-admin'}
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedUser(null); 
+          }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}
           readOnly={readOnly}
@@ -443,7 +453,10 @@ const UsersTab = () => {
         <UserModal
           key={selectedUser?._id || 'new-user'}
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedUser(null); 
+          }}
           onSubmit={handleSubmitUser}
           initialData={selectedUser}
           readOnly={readOnly}

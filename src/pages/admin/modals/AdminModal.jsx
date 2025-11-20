@@ -89,7 +89,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
     onSubmit(dataToSubmit);
   };
 
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -138,7 +140,7 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               name="email"
               value={formData.email}
               onChange={handleChange}
-              autoComplete="new email"
+              autoComplete="new-email"
               readOnly={readOnly}
               className={`w-full border p-2 rounded-lg ${errors.email ? 'border-red-500' : 'border-secondary'
                 }`}
@@ -156,7 +158,7 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               name="password"
               value={formData.password}
               onChange={handleChange}
-              autoComplete="new password"
+              autoComplete="new-password"
               readOnly={readOnly}
               className={`w-full border p-2 rounded-lg ${errors.password ? 'border-red-500' : 'border-secondary'
                 }`}
@@ -172,8 +174,18 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
           {/* Botones */}
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-            <Button title="Cerrar" action={onClose} tooltip="Cerrar modal" />
-            {!readOnly && <Button title="Guardar" type="submit" tooltip="Guardar administrador" />}
+            <Button 
+              title="Cerrar" 
+              action={onClose} 
+              tooltip="Cerrar modal" 
+            />
+            {!readOnly && (
+              <Button 
+                title="Guardar" 
+                action={handleSaveClick}
+                tooltip="Guardar administrador"
+              />
+            )}
           </div>
         </form>
       </div>
