@@ -51,14 +51,17 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
     if (!formData.firstName.trim()) newErrors.firstName = "El nombre es obligatorio";
     if (!formData.lastName.trim()) newErrors.lastName = "El apellido es obligatorio";
     if (!formData.email.trim()) newErrors.email = "El email es obligatorio";
-    
+
+
     if (!formData._id) {
+
       if (!formData.password) {
         newErrors.password = "La contraseña es obligatoria";
       } else if (formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
     } else {
+
       if (formData.password && formData.password.length < 6) {
         newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       }
@@ -70,10 +73,12 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!validateForm()) {
       return;
     }
-    
+
+
     const dataToSubmit = {
       ...formData,
       status: true,
@@ -81,26 +86,6 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
         emailNotifications: true
       }
     };
-    onSubmit(dataToSubmit);
-  };
-   const handleSaveClick = (e) => {
-   
-    if (e) {
-      e.preventDefault();
-    }
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    const dataToSubmit = {
-      ...formData,
-      status: true,
-      preferences: {
-        emailNotifications: true
-      }
-    };
-    
     onSubmit(dataToSubmit);
   };
 
@@ -125,9 +110,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="off"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.firstName ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.firstName ? 'border-red-500' : 'border-secondary'
+                }`}
+              required
             />
             {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
           </div>
@@ -141,9 +126,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="off"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.lastName ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.lastName ? 'border-red-500' : 'border-secondary'
+                }`}
+              required
             />
             {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
           </div>
@@ -157,9 +142,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="new-email"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.email ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.email ? 'border-red-500' : 'border-secondary'
+                }`}
+              required
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
@@ -175,9 +160,9 @@ const AdminModal = ({ open, onClose, onSubmit, initialData = {}, readOnly = fals
               onChange={handleChange}
               autoComplete="new-password"
               readOnly={readOnly}
-              className={`w-full border p-2 rounded-lg ${
-                errors.password ? 'border-red-500' : 'border-secondary'
-              }`}
+              className={`w-full border p-2 rounded-lg ${errors.password ? 'border-red-500' : 'border-secondary'
+                }`}
+              required={!formData._id}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             {formData._id && (
